@@ -6,7 +6,7 @@
 
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { ContactShadows, Environment, Lightformer, OrbitControls, useGLTF } from "@react-three/drei";
+import { Bounds, Center, ContactShadows, Environment, Lightformer, OrbitControls, useBounds, useGLTF } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import { Maximize2, Minimize2, RotateCcw } from "lucide-react";
@@ -77,6 +77,21 @@ function SnapshotBridge({ captureRef }: { captureRef?: React.RefObject<CaptureFn
   return null;
 }
 
+/** Lets the Reset view button re-frame the piece. */
+function FitBridge({ fitRef }: { fitRef: React.RefObject<(() => void) | null> }) {
+  const bounds = useBounds();
+  useEffect(() => {
+    fitRef.current = () => bounds.refresh().fit();
+    // Fit again on the next frame, once the orbit controls exist and every mesh has its final size.
+    const id = requestAnimationFrame(() => bounds.refresh().fit());
+    return () => {
+      cancelAnimationFrame(id);
+      fitRef.current = null;
+    };
+  }, [bounds, fitRef]);
+  return null;
+}
+
 /** Optional .glb model (Phase 2/3): meshes named "metal" and "stone*" receive the selected materials. */
 function GlbModel({ url, ...p }: ModelProps & { url: string }) {
   const { scene } = useGLTF(url);
@@ -114,6 +129,9 @@ export function JewelryViewer({ config, options, captureRef, autoRotate = true, 
   const reduced = usePrefersReducedMotion();
   const resolved = useResolved(config, options);
   const controls = useRef<OrbitControlsImpl>(null);
+  const fitRef = useRef<(() => void) | null>(null);
+  const [shadowY, setShadowY] = useState(-1.2);
+  const fitKey = `${config.productType}|${config.sizeId}|${config.gemstoneId === "gem-none" ? 0 : config.stoneQuantity}`;
   const wrap = useRef<HTMLDivElement>(null);
   const [interacted, setInteracted] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -140,25 +158,31 @@ export function JewelryViewer({ config, options, captureRef, autoRotate = true, 
           shadows={false}
         >
           <color attach="background" args={["#F6F1E9"]} />
-          <ambientLight intensity={0.35} />
-          <directionalLight position={[3, 5, 4]} intensity={1.4} />
+          <ambientLight intensity={0.25} />
+          <directionalLight position={[3, 5, 4]} intensity={1.2} />
           <Suspense fallback={null}>
-            {resolved.modelUrl ? <GlbModel url={resolved.modelUrl} {...resolved} /> : <Model {...resolved} />}
+            {/* Bounds frames every piece automatically; it re-fits when the shape changes. */}
+            <Bounds key={fitKey} fit clip margin={1.3}>
+              <Center onCentered={({ height }) => setShadowY(-height / 2 - 0.02)}>{resolved.modelUrl ? <GlbModel url={resolved.modelUrl} {...resolved} /> : <Model {...resolved} />}</Center>
+              <FitBridge fitRef={fitRef} />
+            </Bounds>
           </Suspense>
-          <ContactShadows position={[0, -1.35, 0]} opacity={0.28} scale={7} blur={2.6} far={3} resolution={256} frames={1} />
+          <ContactShadows key={shadowY} position={[0, shadowY, 0]} opacity={0.32} scale={8} blur={2.4} far={4} resolution={256} frames={1} />
+          {/* Studio reflections: a darker room with bright light strips gives metal and stones contrast. */}
           <Environment resolution={256} frames={1}>
-            <color attach="background" args={["#d9cfc0"]} />
-            <Lightformer form="rect" intensity={6} position={[0, 4, 2]} scale={[6, 2, 1]} rotation={[Math.PI / 2.5, 0, 0]} color="#fff8ee" />
-            <Lightformer form="rect" intensity={4} position={[-4, 1, 1]} scale={[2, 5, 1]} rotation={[0, Math.PI / 2, 0]} />
-            <Lightformer form="rect" intensity={4} position={[4, 1, 1]} scale={[2, 5, 1]} rotation={[0, -Math.PI / 2, 0]} />
-            <Lightformer form="ring" intensity={1.5} position={[0, 0, -5]} scale={3} color="#ffe9c4" />
-            <Lightformer form="rect" intensity={0.8} position={[0, -3, 2]} scale={[6, 1, 1]} rotation={[-Math.PI / 2, 0, 0]} />
+            <color attach="background" args={["#2b2622"]} />
+            <Lightformer form="rect" intensity={7} position={[0, 5, 1]} scale={[8, 1.5, 1]} rotation={[Math.PI / 2, 0, 0]} color="#fff7ea" />
+            <Lightformer form="rect" intensity={5} position={[-5, 1.5, 1]} scale={[1.2, 6, 1]} rotation={[0, Math.PI / 2, 0]} />
+            <Lightformer form="rect" intensity={5} position={[5, 1.5, 1]} scale={[1.2, 6, 1]} rotation={[0, -Math.PI / 2, 0]} />
+            <Lightformer form="rect" intensity={3} position={[0, 1, 6]} scale={[6, 1, 1]} color="#ffffff" />
+            <Lightformer form="ring" intensity={2.5} position={[0, 2, -6]} scale={4} color="#ffe6bd" />
+            <Lightformer form="rect" intensity={1.2} position={[0, -4, 0]} scale={[10, 10, 1]} rotation={[-Math.PI / 2, 0, 0]} color="#f3e8d8" />
           </Environment>
           <OrbitControls
             ref={controls}
             enablePan={false}
-            minDistance={2}
-            maxDistance={8}
+            minDistance={1.5}
+            maxDistance={12}
             minPolarAngle={Math.PI * 0.15}
             maxPolarAngle={Math.PI * 0.75}
             autoRotate={autoRotate && !reduced && !interacted}
@@ -177,7 +201,7 @@ export function JewelryViewer({ config, options, captureRef, autoRotate = true, 
             size="sm"
             className="bg-paper/90"
             onClick={() => {
-              controls.current?.reset();
+              fitRef.current?.();
               setInteracted(false);
             }}
           >

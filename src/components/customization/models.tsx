@@ -22,18 +22,24 @@ export function MetalMaterial({ finish }: { finish: FinishOption }) {
 }
 
 export function GemMaterial({ gem }: { gem: GemstoneOption }) {
+  // Partly transparent with strong reflections and flat facets, so stones read as cut gems
+  // (fully transparent glass looks empty against a light background).
+  const clear = gem.colorHex.toLowerCase() === "#ffffff" || gem.colorHex.toLowerCase() === "#f4f6fa";
   return (
     <meshPhysicalMaterial
       color={gem.colorHex}
-      metalness={0}
+      metalness={clear ? 0.25 : 0.1}
       roughness={0}
-      transmission={1}
-      thickness={0.5}
+      transmission={clear ? 0.55 : 0.4}
+      thickness={0.6}
       ior={gem.ior}
       attenuationColor={gem.colorHex}
-      attenuationDistance={0.6}
+      attenuationDistance={0.4}
       specularIntensity={1}
-      envMapIntensity={2.5}
+      clearcoat={1}
+      clearcoatRoughness={0}
+      envMapIntensity={clear ? 3.5 : 2.5}
+      iridescence={clear ? 0.35 : 0}
       flatShading
     />
   );
@@ -65,11 +71,11 @@ export function Stone({ gem, cut, r }: { gem: GemstoneOption; cut: CutOption | n
   const brilliant = (
     <>
       <mesh position={[0, r * 0.12, 0]}>
-        <cylinderGeometry args={[r * 0.58, r, r * 0.25, 16, 1]} />
+        <cylinderGeometry args={[r * 0.58, r, r * 0.28, 8, 1]} />
         {mat}
       </mesh>
       <mesh position={[0, -r * 0.4, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[r, r * 0.8, 16, 1]} />
+        <coneGeometry args={[r, r * 0.85, 8, 1]} />
         {mat}
       </mesh>
     </>
@@ -88,8 +94,8 @@ export function Stone({ gem, cut, r }: { gem: GemstoneOption; cut: CutOption | n
     return (
       <group name="stone">
         {brilliant}
-        <mesh position={[r * 0.75, -r * 0.05, 0]} rotation={[0, 0, -Math.PI / 2]} scale={[1, 1, 0.55]}>
-          <coneGeometry args={[r * 0.8, r * 1.3, 12, 1]} />
+        <mesh position={[r * 0.8, r * 0.05, 0]} rotation={[0, 0, -Math.PI / 2]} scale={[0.4, 1, 1]}>
+          <coneGeometry args={[r * 0.88, r * 0.85, 8, 1]} />
           {mat}
         </mesh>
       </group>
@@ -119,12 +125,14 @@ function Prongs({ r, finish, count = 4, height }: { r: number; finish: FinishOpt
 
 export function RingModel({ finish, gem, cut, stones, sizeFactor }: ModelProps) {
   const R = 0.9 + 0.1 * sizeFactor;
-  const tube = 0.1 * sizeFactor;
-  const r = 0.17;
-  const angles = stones > 0 ? Array.from({ length: stones }, (_, i) => (i - (stones - 1) / 2) * 0.33) : [];
+  const tube = 0.09 * sizeFactor;
+  // One stone is a solitaire; more stones get smaller and sit side by side along the top of the band.
+  const r = stones <= 1 ? 0.26 : stones <= 3 ? 0.19 : 0.15;
+  const step = (2.25 * r) / R;
+  const angles = stones > 0 ? Array.from({ length: stones }, (_, i) => (i - (stones - 1) / 2) * step) : [];
   return (
-    <group name="ring" position={[0, -0.3, 0]} rotation={[-0.2, 0.6, 0]}>
-      <mesh name="metal" castShadow>
+    <group name="ring" rotation={[-0.45, 0.55, 0]}>
+      <mesh name="metal" castShadow scale={[1, 1, 1.7]}>
         <torusGeometry args={[R, tube, 48, 160]} />
         <MetalMaterial finish={finish} />
       </mesh>
@@ -136,7 +144,7 @@ export function RingModel({ finish, gem, cut, stones, sizeFactor }: ModelProps) 
               <cylinderGeometry args={[r * 0.75, r * 0.45, r * 0.5, 16, 1, true]} />
               <MetalMaterial finish={finish} />
             </mesh>
-            <Prongs r={r} finish={finish} height={r * 1.1} />
+            <Prongs r={r} finish={finish} height={r * 0.8} />
             <group position={[0, r * 0.3, 0]}>
               <Stone gem={gem} cut={cut} r={r} />
             </group>
@@ -170,8 +178,8 @@ export function PendantModel({ finish, gem, cut, stones, sizeFactor }: ModelProp
           const rr = n === 1 ? r : r * 0.62;
           return (
             <group key={i} position={[0, y, 0.06]} rotation={[Math.PI / 2, 0, 0]}>
-              <mesh position={[0, -rr * 0.15, 0]}>
-                <torusGeometry args={[rr * 1.02, rr * 0.12, 12, 48]} />
+              <mesh position={[0, -rr * 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
+                <torusGeometry args={[rr * 1.04, rr * 0.13, 12, 48]} />
                 <MetalMaterial finish={finish} />
               </mesh>
               <group rotation={[0, 0, 0]}>
@@ -220,6 +228,8 @@ export function NecklaceModel({ finish, sizeFactor }: ModelProps) {
       mesh.setMatrixAt(i, m);
     }
     mesh.instanceMatrix.needsUpdate = true;
+    mesh.computeBoundingBox();
+    mesh.computeBoundingSphere();
   }, [curve, count]);
 
   const end = curve.getPointAt(1);
