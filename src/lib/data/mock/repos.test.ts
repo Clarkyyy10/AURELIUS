@@ -219,3 +219,37 @@ describe("simulated errors", () => {
     await expect(repos.catalog.listProducts()).rejects.toThrow(/Simulated error/);
   });
 });
+
+describe("notifications for every event (frontend-spec §7, FR-49, FR-50)", () => {
+  it("sends each event to the right person, and emails customer events", async () => {
+    useDemoStore.setState({ notifications: [], emails: [] });
+    await loginAs("maria@demo.ph");
+    const order = await repos.orders.place({ productId: "prod-1", quantity: 1, clientRequestId: rid() });
+    const co = await repos.customOrders.submit({ config: ring, source: "customizer", clientRequestId: rid() });
+    const sr = await repos.services.submit({ itemType: "watch", itemDescription: "Seiko automatic watch", serviceIds: ["svc-battery"], details: "Stopped running.", photos: [], source: "form", clientRequestId: rid() });
+    await loginAs("owner@afables.ph");
+    await repos.customOrders.openForReview(co.id);
+    await repos.customOrders.requestRevision(co.id, "Please pick a smaller stone.");
+    await repos.transactions.issueQuotation("order", order.id, { finalPrice: 24500, downPaymentRequired: 5000, expectedDate: "2099-01-01" });
+    await loginAs("maria@demo.ph");
+    await repos.transactions.respondToQuotation("order", order.id, "accepted");
+    const p1 = await repos.payments.submit("order", order.id, { kind: "down_payment", amount: 5000, paidOn: "2026-01-01", method: "gcash", referenceNumber: "1111", clientRequestId: rid() });
+    await loginAs("owner@afables.ph");
+    await repos.payments.reject("order", order.id, p1.id, "Reference not found");
+    await loginAs("maria@demo.ph");
+    const p2 = await repos.payments.submit("order", order.id, { kind: "down_payment", amount: 5000, paidOn: "2026-01-01", method: "gcash", referenceNumber: "2222", clientRequestId: rid() });
+    await loginAs("owner@afables.ph");
+    await repos.payments.verify("order", order.id, p2.id);
+    await repos.transactions.changeStatus("order", order.id, "ready_for_claiming", "owner");
+    await loginAs("maria@demo.ph");
+    await repos.transactions.cancel("service", sr.id, "customer", "Changed my mind");
+
+    const n = useDemoStore.getState().notifications;
+    const forOwner = new Set(n.filter((x) => x.userId === "user-owner").map((x) => x.type));
+    const forMaria = new Set(n.filter((x) => x.userId === "user-maria").map((x) => x.type));
+    for (const t of ["new_order", "new_custom_request", "new_service_request", "payment_submitted", "cancelled_by_customer"]) expect(forOwner).toContain(t);
+    for (const t of ["revision_requested", "quotation_issued", "status_changed", "payment_verified", "payment_rejected", "ready_for_claiming"]) expect(forMaria).toContain(t);
+    const mariaCount = n.filter((x) => x.userId === "user-maria").length;
+    expect(useDemoStore.getState().emails.filter((e) => e.to === "maria@demo.ph")).toHaveLength(mariaCount);
+  });
+});
