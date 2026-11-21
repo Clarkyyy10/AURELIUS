@@ -6,6 +6,8 @@ import { InvalidTransitionError } from "@/lib/status/machines";
 import { UserFacingError } from "./repositories";
 import { useDemoStore } from "./mock/store";
 import type { UserProfile } from "@/types";
+import { repos } from "./index";
+import { seedSettings } from "./seed/catalog";
 
 /** Turn any error into a message that is safe and useful to show. */
 export function errorMessage(e: unknown): string {
@@ -82,4 +84,10 @@ export function useAction() {
 
 export function newRequestId(): string {
   return crypto.randomUUID();
+}
+
+/** Store settings (address, hours, payment instructions). Falls back to the seed values while loading. */
+export function useSettings() {
+  const q = useQuery("settings", () => repos.settings.get());
+  return q.data ?? seedSettings;
 }
