@@ -29,12 +29,14 @@ export default function AdminDashboard() {
   const thisMonth = all.filter((t) => t.createdAt >= monthStart);
   const openBalances = all.filter((t) => t.quotation?.response?.decision === "accepted" && !["cancelled", "completed", "claimed"].includes(t.status)).reduce((s, t) => s + balance(t), 0);
 
+  const readyKind = (["custom", "order", "service"] as const).find((k) => all.some((t) => t.kind === k && t.status === "ready_for_claiming")) ?? "custom";
+  const readyHref = `${{ custom: "/admin/custom-requests", order: "/admin/orders", service: "/admin/service-requests" }[readyKind]}?status=ready_for_claiming`;
   const cards = [
     { label: "Custom requests to review", n: c.customToReview, href: "/admin/custom-requests?status=__open", icon: Gem },
     { label: "Orders to quote", n: c.ordersToQuote, href: "/admin/orders?status=pending", icon: ShoppingBag },
     { label: "Service requests to assess", n: c.servicesToAssess, href: "/admin/service-requests?status=__open", icon: Wrench },
     { label: "Payments to verify", n: c.paymentsToVerify, href: "/admin/payments", icon: CreditCard },
-    { label: "Ready for claiming", n: c.readyForClaiming, href: "/admin/custom-requests?status=ready_for_claiming", icon: PackageCheck },
+    { label: "Ready for claiming", n: c.readyForClaiming, href: readyHref, icon: PackageCheck },
   ];
 
   return (
