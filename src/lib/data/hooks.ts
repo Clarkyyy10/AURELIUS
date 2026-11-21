@@ -91,3 +91,11 @@ export function useSettings() {
   const q = useQuery("settings", () => repos.settings.get());
   return q.data ?? seedSettings;
 }
+
+/** Service id → name, for showing service requests. */
+export function useServiceNames(): Record<string, string> {
+  const q = useQuery("service-names", () => repos.catalog.listServices({ includeHidden: true }));
+  const names: Record<string, string> = {};
+  for (const s of q.data ?? []) names[s.id] = s.name;
+  return names;
+}

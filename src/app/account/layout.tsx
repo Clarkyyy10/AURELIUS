@@ -1,3 +1,5 @@
+"use client";
+
 import { Suspense } from "react";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { RequireAuth } from "@/components/layout/Guards";

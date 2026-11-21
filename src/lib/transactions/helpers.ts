@@ -67,3 +67,23 @@ export function customerActionNeeded(tx: Transaction): string | null {
   if (tx.status === "ready_for_claiming") return "Ready for claiming";
   return null;
 }
+
+/** Short description of what a record is about (lists and headers). */
+export function txTitle(tx: Transaction, serviceNames: Record<string, string> = {}): string {
+  if (tx.kind === "order") return `${tx.quantity} × ${tx.productSnapshot.name}`;
+  if (tx.kind === "custom") {
+    const l = tx.versions[tx.versions.length - 1].labels;
+    return `${l.finish} ${l.material} ${l.productType.toLowerCase()}${l.gemstone !== "None" ? `, ${l.gemstone}` : ""}`;
+  }
+  const names = tx.serviceIds.map((id) => serviceNames[id]).filter(Boolean);
+  return names.length ? `${names.join(", ")} — ${tx.itemDescription}` : tx.itemDescription;
+}
+
+/** Amount shown in lists: balance when quoted, otherwise the estimate/price. */
+export function txAmount(tx: Transaction): { label: string; value: number } | null {
+  if (tx.quotation && tx.quotation.response?.decision === "accepted") return { label: "Balance", value: balance(tx) };
+  if (tx.quotation) return { label: "Quoted", value: tx.quotation.finalPrice };
+  if (tx.kind === "custom") return { label: "Estimate", value: tx.versions[tx.versions.length - 1].estimate.price };
+  if (tx.kind === "order") return { label: "Price", value: tx.productSnapshot.price * tx.quantity };
+  return null;
+}
