@@ -1,0 +1,137 @@
+"use client";
+
+// Phase 1 mock database: one zustand store persisted to localStorage (key "aurelius-demo-v1").
+// Only the mock repositories in ./repos.ts write to it. Phase 2 replaces it with Supabase.
+
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
+import type {
+  AppNotification,
+  CustomizationOptions,
+  CustomOrderRequest,
+  DesignConfig,
+  Draft,
+  FaqEntry,
+  ID,
+  Product,
+  ProductOrder,
+  ServiceCatalogItem,
+  ServiceRequest,
+  SimulatedEmail,
+  StoreSettings,
+  UserProfile,
+} from "@/types";
+import { seedFaqs, seedPolicies, seedProducts, seedServices, seedSettings, seedUsers } from "../seed/catalog";
+import { seedOptions } from "../seed/options";
+import { seedCustomOrders, seedNotifications, seedOrders, seedServiceRequests } from "../seed/transactions";
+
+export const STORAGE_KEY = "aurelius-demo-v1";
+
+export interface DbState {
+  users: UserProfile[];
+  sessionUserId: ID | null;
+  failedLogins: Record<string, { count: number; lockedUntil?: string }>;
+  verifyTokens: Record<string, ID>;
+  resetTokens: Record<string, { userId: ID; expiresAt: string }>;
+  options: CustomizationOptions;
+  products: Product[];
+  services: ServiceCatalogItem[];
+  faqs: FaqEntry[];
+  policies: string;
+  settings: StoreSettings;
+  customOrders: CustomOrderRequest[];
+  orders: ProductOrder[];
+  serviceRequests: ServiceRequest[];
+  notifications: AppNotification[];
+  emails: SimulatedEmail[];
+  drafts: Draft[];
+  /** clientRequestId → created record id (idempotent submits) */
+  processed: Record<string, ID>;
+  counters: Record<"CO" | "OR" | "SR", number>;
+  /** A design a guest started before logging in, so it isn't lost (frontend-spec §5.4). */
+  pendingDesign: (DesignConfig & { fromProductId?: ID }) | null;
+}
+
+export interface DemoState extends DbState {
+  /** Demo bar: make every repository call fail, to show error states. */
+  simulateErrors: boolean;
+  /** Bumped on every write so queries refetch. */
+  version: number;
+  hydrated: boolean;
+  write: (recipe: (draft: DbState) => void) => void;
+  setSimulateErrors: (on: boolean) => void;
+  reset: () => void;
+}
+
+export function createSeedState(now = new Date()): DbState {
+  const options = seedOptions();
+  const products = seedProducts(now);
+  const customOrders = seedCustomOrders(now, options);
+  const orders = seedOrders(now, products);
+  const serviceRequests = seedServiceRequests(now);
+  return {
+    users: seedUsers(now),
+    sessionUserId: null,
+    failedLogins: {},
+    verifyTokens: {},
+    resetTokens: {},
+    options,
+    products,
+    services: seedServices(),
+    faqs: seedFaqs(),
+    policies: seedPolicies,
+    settings: { ...seedSettings },
+    customOrders,
+    orders,
+    serviceRequests,
+    notifications: seedNotifications(now),
+    emails: [],
+    drafts: [],
+    processed: {},
+    counters: { CO: customOrders.length, OR: orders.length, SR: serviceRequests.length },
+    pendingDesign: null,
+  };
+}
+
+const DB_KEYS: (keyof DbState)[] = [
+  "users", "sessionUserId", "failedLogins", "verifyTokens", "resetTokens", "options", "products", "services", "faqs",
+  "policies", "settings", "customOrders", "orders", "serviceRequests", "notifications", "emails", "drafts", "processed",
+  "counters", "pendingDesign",
+];
+
+function pickDb(s: DemoState | DbState): DbState {
+  const out = {} as Record<string, unknown>;
+  for (const k of DB_KEYS) out[k] = (s as unknown as Record<string, unknown>)[k];
+  return out as unknown as DbState;
+}
+
+export const useDemoStore = create<DemoState>()(
+  persist(
+    (set, get) => ({
+      ...createSeedState(),
+      simulateErrors: false,
+      version: 0,
+      hydrated: false,
+      write: (recipe) => {
+        const draft = structuredClone(pickDb(get()));
+        recipe(draft);
+        set({ ...draft, version: get().version + 1 });
+      },
+      setSimulateErrors: (on) => set({ simulateErrors: on, version: get().version + 1 }),
+      reset: () => set({ ...createSeedState(), simulateErrors: false, version: get().version + 1 }),
+    }),
+    {
+      name: STORAGE_KEY,
+      version: 1,
+      storage: createJSONStorage(() => localStorage),
+      skipHydration: true,
+      partialize: (s) => ({ ...pickDb(s), simulateErrors: s.simulateErrors }),
+      onRehydrateStorage: () => () => {
+        useDemoStore.setState({ hydrated: true });
+      },
+    },
+  ),
+);
+
+/** Read the current database snapshot (for repositories). */
+export const db = () => useDemoStore.getState();
