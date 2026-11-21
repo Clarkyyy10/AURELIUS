@@ -8,6 +8,8 @@ import type {
   AppNotification,
   CustomizationOptions,
   CustomOrderRequest,
+  CustomOrderDraft,
+  ServiceRequestDraft,
   DesignConfig,
   Draft,
   FaqEntry,
@@ -161,7 +163,7 @@ export interface CustomerRepo {
 }
 
 export interface DraftRepo {
-  save(draft: Omit<Draft, "id" | "createdAt">): Promise<Draft>;
+  save(draft: Omit<CustomOrderDraft, "id" | "createdAt"> | Omit<ServiceRequestDraft, "id" | "createdAt">): Promise<Draft>;
   get(id: ID): Promise<Draft | null>;
 }
 
