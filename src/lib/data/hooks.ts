@@ -99,3 +99,11 @@ export function useServiceNames(): Record<string, string> {
   for (const s of q.data ?? []) names[s.id] = s.name;
   return names;
 }
+
+/** Owner only: customer id → profile, for showing names in lists. */
+export function useCustomerMap() {
+  const q = useQuery("customers", () => repos.customers.list());
+  const map: Record<string, UserProfile> = {};
+  for (const c of q.data ?? []) map[c.id] = c;
+  return { map, list: q.data, query: q };
+}

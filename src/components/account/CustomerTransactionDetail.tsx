@@ -198,7 +198,7 @@ function Detail({ tx, serviceNames }: { tx: Transaction; serviceNames: Record<st
   );
 }
 
-function OrderItem({ tx }: { tx: ProductOrder }) {
+export function OrderItem({ tx }: { tx: ProductOrder }) {
   return (
     <div className="flex gap-4">
       <StoredImage src={tx.productSnapshot.photo} alt={tx.productSnapshot.name} className="size-24 shrink-0 rounded-xl border border-line" />
@@ -213,7 +213,7 @@ function OrderItem({ tx }: { tx: ProductOrder }) {
   );
 }
 
-function CustomItem({ tx }: { tx: CustomOrderRequest }) {
+export function CustomItem({ tx }: { tx: CustomOrderRequest }) {
   const [compareOpen, setCompareOpen] = useState(false);
   const v = tx.versions[tx.versions.length - 1];
   const prev = tx.versions.length > 1 ? tx.versions[tx.versions.length - 2] : null;
@@ -300,7 +300,7 @@ export function VersionCompare({ a, b }: { a: CustomOrderRequest["versions"][num
   );
 }
 
-function ServiceItem({ tx, serviceNames }: { tx: ServiceRequest; serviceNames: Record<string, string> }) {
+export function ServiceItem({ tx, serviceNames }: { tx: ServiceRequest; serviceNames: Record<string, string> }) {
   return (
     <div className="space-y-3 text-sm">
       <dl className="grid grid-cols-[minmax(8rem,auto)_1fr] gap-x-4 gap-y-2">
