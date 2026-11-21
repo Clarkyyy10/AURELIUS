@@ -218,7 +218,8 @@ function serviceStep(state: Extract<State, { flow: "service" }>, text: string, k
       return {
         state: { flow: "idle" },
         result: {
-          reply: `Your service request draft is ready. Open it to review and send it — I won't submit it for you. The owner will inspect your item and send a quotation; ${PRICE_GUARDRAIL.charAt(0).toLowerCase()}${PRICE_GUARDRAIL.slice(1)}`,
+          reply:
+            "Your service request draft is ready. Open it to review and send it — I won't submit it for you. I can't give prices or completion dates: the owner inspects your item and confirms the cost and date in a quotation.",
           draft: { kind: "service_request", fields: f },
           quickReplies: ["Start over"],
         },
