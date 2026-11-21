@@ -2,6 +2,7 @@
 // Messages say what went wrong and how to fix it, in plain English.
 
 import { z } from "zod";
+import { todayISODate } from "@/lib/utils/format";
 
 // ---------- Shared pieces ----------
 export const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
@@ -59,7 +60,8 @@ export function checkFile(file: { type: string; size: number }, allowed: readonl
   return null;
 }
 
-const todayISO = () => new Date().toISOString().slice(0, 10);
+// Local calendar date (not UTC) — the store is in the Philippines (UTC+8), so UTC would be a day behind each morning.
+const todayISO = () => todayISODate();
 
 const peso = (label: string) =>
   z

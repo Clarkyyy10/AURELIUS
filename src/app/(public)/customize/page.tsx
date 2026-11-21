@@ -18,7 +18,7 @@ import { repos } from "@/lib/data";
 import { errorMessage, newRequestId, useCurrentUser, useQuery } from "@/lib/data/hooks";
 import { useDemoStore } from "@/lib/data/mock/store";
 import { EstimateError, estimate as computeEstimate } from "@/lib/pricing/estimate";
-import { designLabels } from "@/lib/pricing/labels";
+import { designLabels, placeholderFor } from "@/lib/pricing/labels";
 import { normalizeConfig } from "@/lib/pricing/normalize";
 import { PRODUCT_TYPES, type CustomizationOptions, type CustomOrderRequest, type DesignConfig, type Draft, type Product, type ProductType } from "@/types";
 
@@ -139,13 +139,13 @@ function Customizer({
   const submit = async (): Promise<string | null> => {
     try {
       if (request) {
-        await repos.customOrders.resubmit(request.id, { config, snapshotDataUrl: snapshot ?? undefined, clientRequestId: requestKey });
+        await repos.customOrders.resubmit(request.id, { config, snapshotDataUrl: snapshot ?? placeholderFor(config), clientRequestId: requestKey });
         toast.success(`Version ${request.versions.length + 1} sent to the owner for review.`);
         router.push(`/account/custom/${request.id}`);
       } else {
         const tx = await repos.customOrders.submit({
           config,
-          snapshotDataUrl: snapshot ?? undefined,
+          snapshotDataUrl: snapshot ?? placeholderFor(config),
           source: draft ? "chatbot" : fromProductId ? "catalog" : "customizer",
           basedOnProductId: fromProductId,
           clientRequestId: requestKey,

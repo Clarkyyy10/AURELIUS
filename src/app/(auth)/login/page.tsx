@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingState } from "@/components/shared/States";
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -99,7 +100,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<LoadingState className="mx-auto max-w-3xl p-6" />}>
       <LoginForm />
     </Suspense>
   );

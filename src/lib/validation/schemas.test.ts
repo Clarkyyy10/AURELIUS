@@ -103,3 +103,11 @@ describe("quotationSchema (FR-15)", () => {
     expect(firstError(r)).toMatch(/can't be more than the final price/);
   });
 });
+
+describe("dates use the local calendar day", () => {
+  it("accepts today's local date as a payment date, even when UTC is still yesterday", async () => {
+    const { todayISODate } = await import("@/lib/utils/format");
+    const r = customerPaymentSchema.safeParse({ kind: "down_payment", amount: 100, paidOn: todayISODate(), method: "gcash", referenceNumber: "1234", proofFile: { name: "a.png", type: "image/png", sizeBytes: 10 } });
+    expect(r.success).toBe(true);
+  });
+});

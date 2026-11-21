@@ -36,3 +36,9 @@ export function defaultConfig(productType: DesignConfig["productType"], options:
 export function diffLabels(a: DesignLabels, b: DesignLabels): (keyof DesignLabels)[] {
   return (Object.keys(a) as (keyof DesignLabels)[]).filter((k) => a[k] !== b[k]);
 }
+
+/** Placeholder image for a design when no 3D snapshot could be taken (e.g. no WebGL). */
+export function placeholderFor(config: DesignConfig): string {
+  const tone = config.materialId === "mat-silver" || config.materialId === "mat-steel" ? "silver" : config.finishId === "fin-rose" ? "rose" : "gold";
+  return `/placeholders/${config.productType}-${tone}.svg`;
+}

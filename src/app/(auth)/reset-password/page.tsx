@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingState } from "@/components/shared/States";
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -79,7 +80,7 @@ function ResetPassword() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<LoadingState className="mx-auto max-w-3xl p-6" />}>
       <ResetPassword />
     </Suspense>
   );

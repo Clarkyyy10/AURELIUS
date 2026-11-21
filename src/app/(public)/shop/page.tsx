@@ -1,5 +1,6 @@
 "use client";
 
+import { LoadingState } from "@/components/shared/States";
 import { Suspense, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -169,7 +170,7 @@ function FilterSelect({ label, value, onChange, options }: { label: string; valu
 
 export default function ShopPage() {
   return (
-    <Suspense>
+    <Suspense fallback={<LoadingState className="mx-auto max-w-3xl p-6" />}>
       <Shop />
     </Suspense>
   );
