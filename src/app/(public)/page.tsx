@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Clock, MapPin, MessageCircle, Phone, ShoppingBag, Sparkles, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { openChat } from "@/components/chatbot/ChatWidget";
-import { ProductCard } from "@/components/ecommerce/ProductCard";
+import { ProductCard, SharedViewCanvas } from "@/components/ecommerce/ProductCard";
 import { HomeHero } from "@/components/layout/HomeHero";
 import { ServiceCard } from "@/components/services/ServiceCard";
 import { LoadingState } from "@/components/shared/States";
@@ -21,10 +21,12 @@ const steps = [
 export default function HomePage() {
   const settings = useSettings();
   const products = useQuery("home:products", () => repos.catalog.listProducts({ availability: "available" }));
+  const optionsQ = useQuery("options:active", () => repos.customization.getOptions());
   const services = useQuery("services:visible", () => repos.catalog.listServices());
 
   return (
     <>
+      <SharedViewCanvas />
       <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 lg:grid-cols-2 lg:py-20">
         <div>
           <p className="text-sm font-medium tracking-[0.2em] text-gold-dark uppercase">Afable&apos;s Jewelry Store · Montalban</p>
@@ -95,7 +97,7 @@ export default function HomePage() {
             <ul className="grid grid-cols-1 gap-5 min-[420px]:grid-cols-2 lg:grid-cols-4">
               {products.data.slice(0, 4).map((p) => (
                 <li key={p.id}>
-                  <ProductCard product={p} />
+                  <ProductCard product={p} options={optionsQ.data} />
                 </li>
               ))}
             </ul>

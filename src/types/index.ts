@@ -110,6 +110,8 @@ export interface Product {
   material: string;
   price: number;
   photos: string[];
+  /** How the piece is drawn in 3D (piece type comes from category). Missing fields are derived from the material. */
+  design?: Partial<Omit<DesignConfig, "productType">>;
   availability: Availability;
   hidden: boolean;
   createdAt: ISODate;

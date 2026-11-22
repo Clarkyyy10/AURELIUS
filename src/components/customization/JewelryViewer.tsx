@@ -4,48 +4,17 @@
 // React Three Fiber canvas, limited OrbitControls, gentle auto-rotate that stops on interaction,
 // Reset view, fullscreen, studio lighting built from Lightformers (no network download).
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { Bounds, Center, ContactShadows, Environment, Lightformer, OrbitControls, useBounds, useGLTF } from "@react-three/drei";
-import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import { Maximize2, Minimize2, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { CustomizationOptions, DesignConfig, ProductType } from "@/types";
-import { BraceletModel, EarringsModel, NecklaceModel, PendantModel, RingModel, type ModelProps } from "./models";
+import type { CustomizationOptions, DesignConfig } from "@/types";
+import { JewelryScene } from "./JewelryScene";
 import { usePrefersReducedMotion, useWebGL } from "./webgl";
 
 export type CaptureFn = () => string | null;
-
-const MODELS: Record<ProductType, React.ComponentType<ModelProps>> = {
-  ring: RingModel,
-  pendant: PendantModel,
-  necklace: NecklaceModel,
-  bracelet: BraceletModel,
-  earrings: EarringsModel,
-};
-
-const CAMERA: Record<ProductType, [number, number, number]> = {
-  ring: [0, 0.7, 6.6],
-  pendant: [0, 0.2, 4.4],
-  necklace: [0, 0, 6.2],
-  bracelet: [0, 0.6, 5.6],
-  earrings: [0, 0.3, 3.8],
-};
-
-/** Resolve the config into the options needed for drawing. Unknown IDs fall back safely. */
-function useResolved(config: DesignConfig, options: CustomizationOptions) {
-  return useMemo(() => {
-    const finish = options.finishes.find((f) => f.id === config.finishId) ?? options.finishes[0];
-    const g = options.gemstones.find((x) => x.id === config.gemstoneId);
-    const gem = g && !g.isNone ? g : null;
-    const cut = gem ? (options.cuts.find((c) => c.id === config.cutId) ?? null) : null;
-    const size = options.sizes.find((s) => s.id === config.sizeId);
-    const type = options.productTypes.find((p) => p.type === config.productType);
-    return { finish, gem, cut, stones: gem ? config.stoneQuantity : 0, sizeFactor: size?.factor ?? 1, modelUrl: type?.modelUrl };
-  }, [config, options]);
-}
 
 /** Exposes captureSnapshot() through a ref: PNG/JPEG data URL of the current view. */
 function SnapshotBridge({ captureRef }: { captureRef?: React.RefObject<CaptureFn | null> }) {
@@ -77,43 +46,6 @@ function SnapshotBridge({ captureRef }: { captureRef?: React.RefObject<CaptureFn
   return null;
 }
 
-/** Lets the Reset view button re-frame the piece. */
-function FitBridge({ fitRef }: { fitRef: React.RefObject<(() => void) | null> }) {
-  const bounds = useBounds();
-  useEffect(() => {
-    fitRef.current = () => bounds.refresh().fit();
-    // Fit again on the next frame, once the orbit controls exist and every mesh has its final size.
-    const id = requestAnimationFrame(() => bounds.refresh().fit());
-    return () => {
-      cancelAnimationFrame(id);
-      fitRef.current = null;
-    };
-  }, [bounds, fitRef]);
-  return null;
-}
-
-/** Optional .glb model (Phase 2/3): meshes named "metal" and "stone*" receive the selected materials. */
-function GlbModel({ url, ...p }: ModelProps & { url: string }) {
-  const { scene } = useGLTF(url);
-  const clone = useMemo(() => scene.clone(true), [scene]);
-  const metal = useMemo(() => new THREE.MeshPhysicalMaterial({ color: p.finish.colorHex, metalness: 1, roughness: p.finish.roughness }), [p.finish]);
-  const stone = useMemo(
-    () => (p.gem ? new THREE.MeshPhysicalMaterial({ color: p.gem.colorHex, transmission: 1, ior: p.gem.ior, thickness: 0.5, roughness: 0 }) : null),
-    [p.gem],
-  );
-  useEffect(() => {
-    clone.traverse((o) => {
-      if (!(o instanceof THREE.Mesh)) return;
-      if (o.name.startsWith("metal")) o.material = metal;
-      if (o.name.startsWith("stone")) {
-        o.visible = Boolean(stone);
-        if (stone) o.material = stone;
-      }
-    });
-  }, [clone, metal, stone]);
-  return <primitive object={clone} />;
-}
-
 export interface JewelryViewerProps {
   config: DesignConfig;
   options: CustomizationOptions;
@@ -127,11 +59,7 @@ export interface JewelryViewerProps {
 export function JewelryViewer({ config, options, captureRef, autoRotate = true, showControls = true, className, label = "3D preview of your design" }: JewelryViewerProps) {
   const webgl = useWebGL();
   const reduced = usePrefersReducedMotion();
-  const resolved = useResolved(config, options);
-  const controls = useRef<OrbitControlsImpl>(null);
   const fitRef = useRef<(() => void) | null>(null);
-  const [shadowY, setShadowY] = useState(-1.2);
-  const fitKey = `${config.productType}|${config.sizeId}|${config.gemstoneId === "gem-none" ? 0 : config.stoneQuantity}`;
   const wrap = useRef<HTMLDivElement>(null);
   const [interacted, setInteracted] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -144,52 +72,15 @@ export function JewelryViewer({ config, options, captureRef, autoRotate = true, 
 
   if (webgl === false) return <NoWebGL className={className} />;
 
-  const Model = MODELS[config.productType];
-  const cam = CAMERA[config.productType];
-
   return (
     <div ref={wrap} className={cn("relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#FFFDF9] to-[#EFE7DA]", className)} role="img" aria-label={label}>
       {webgl && (
         <Canvas
-          key={config.productType}
           dpr={[1, 2]}
-          camera={{ position: cam, fov: 35 }}
           gl={{ preserveDrawingBuffer: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
           shadows={false}
         >
-          <color attach="background" args={["#F6F1E9"]} />
-          <ambientLight intensity={0.25} />
-          <directionalLight position={[3, 5, 4]} intensity={1.2} />
-          <Suspense fallback={null}>
-            {/* Bounds frames every piece automatically; it re-fits when the shape changes. */}
-            <Bounds key={fitKey} fit clip margin={1.3}>
-              <Center onCentered={({ height }) => setShadowY(-height / 2 - 0.02)}>{resolved.modelUrl ? <GlbModel url={resolved.modelUrl} {...resolved} /> : <Model {...resolved} />}</Center>
-              <FitBridge fitRef={fitRef} />
-            </Bounds>
-          </Suspense>
-          <ContactShadows key={shadowY} position={[0, shadowY, 0]} opacity={0.32} scale={8} blur={2.4} far={4} resolution={256} frames={1} />
-          {/* Studio reflections: a darker room with bright light strips gives metal and stones contrast. */}
-          <Environment resolution={256} frames={1}>
-            <color attach="background" args={["#2b2622"]} />
-            <Lightformer form="rect" intensity={7} position={[0, 5, 1]} scale={[8, 1.5, 1]} rotation={[Math.PI / 2, 0, 0]} color="#fff7ea" />
-            <Lightformer form="rect" intensity={5} position={[-5, 1.5, 1]} scale={[1.2, 6, 1]} rotation={[0, Math.PI / 2, 0]} />
-            <Lightformer form="rect" intensity={5} position={[5, 1.5, 1]} scale={[1.2, 6, 1]} rotation={[0, -Math.PI / 2, 0]} />
-            <Lightformer form="rect" intensity={3} position={[0, 1, 6]} scale={[6, 1, 1]} color="#ffffff" />
-            <Lightformer form="ring" intensity={2.5} position={[0, 2, -6]} scale={4} color="#ffe6bd" />
-            <Lightformer form="rect" intensity={1.2} position={[0, -4, 0]} scale={[10, 10, 1]} rotation={[-Math.PI / 2, 0, 0]} color="#f3e8d8" />
-          </Environment>
-          <OrbitControls
-            ref={controls}
-            enablePan={false}
-            minDistance={1.5}
-            maxDistance={12}
-            minPolarAngle={Math.PI * 0.15}
-            maxPolarAngle={Math.PI * 0.75}
-            autoRotate={autoRotate && !reduced && !interacted}
-            autoRotateSpeed={1.2}
-            onStart={() => setInteracted(true)}
-            makeDefault
-          />
+          <JewelryScene config={config} options={options} autoRotate={autoRotate && !reduced && !interacted} onInteract={() => setInteracted(true)} fitRef={fitRef} />
           <SnapshotBridge captureRef={captureRef} />
         </Canvas>
       )}

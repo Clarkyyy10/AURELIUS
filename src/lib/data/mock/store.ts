@@ -122,7 +122,16 @@ export const useDemoStore = create<DemoState>()(
     }),
     {
       name: STORAGE_KEY,
-      version: 1,
+      version: 2,
+      // v2: products gained a 3D "design". Copy it from the seed for products saved before that.
+      migrate: (persisted, from) => {
+        const state = persisted as DemoState;
+        if (from < 2 && state?.products) {
+          const seed = seedProducts(new Date());
+          state.products = state.products.map((p) => (p.design ? p : { ...p, design: seed.find((x) => x.id === p.id)?.design }));
+        }
+        return state;
+      },
       storage: createJSONStorage(() => localStorage),
       skipHydration: true,
       partialize: (s) => ({ ...pickDb(s), simulateErrors: s.simulateErrors }),

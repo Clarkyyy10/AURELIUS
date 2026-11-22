@@ -1,4 +1,5 @@
-import type { CustomizationOptions, DesignConfig, DesignLabels } from "@/types";
+import type { CustomizationOptions, DesignConfig, DesignLabels, Product } from "@/types";
+import { normalizeConfig } from "./normalize";
 
 /** Human-readable labels for a design, captured when it is submitted. */
 export function designLabels(config: DesignConfig, options: CustomizationOptions): DesignLabels {
@@ -41,4 +42,13 @@ export function diffLabels(a: DesignLabels, b: DesignLabels): (keyof DesignLabel
 export function placeholderFor(config: DesignConfig): string {
   const tone = config.materialId === "mat-silver" || config.materialId === "mat-steel" ? "silver" : config.finishId === "fin-rose" ? "rose" : "gold";
   return `/placeholders/${config.productType}-${tone}.svg`;
+}
+
+/**
+ * The 3D design for a catalog product: its saved design, else one derived from the category and the
+ * material name (e.g. "18K Gold" → 18K gold, first allowed finish). Always valid for the options.
+ */
+export function productDesign(product: Product, options: CustomizationOptions): DesignConfig {
+  const material = options.materials.find((m) => m.label.toLowerCase() === product.material.toLowerCase());
+  return normalizeConfig({ productType: product.category, materialId: material?.id, ...product.design }, options).config;
 }

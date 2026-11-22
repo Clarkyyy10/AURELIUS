@@ -3,7 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { ChevronLeft, Minus, Plus, Sparkles, Store } from "lucide-react";
+import { ChevronLeft, Minus, Plus, Rotate3d, Sparkles, Store } from "lucide-react";
+import { LazyJewelryViewer } from "@/components/customization/LazyViewer";
+import { productDesign } from "@/lib/pricing/labels";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -16,7 +18,6 @@ import { StoredImage } from "@/components/shared/StoredImage";
 import { MoneyText } from "@/components/shared/Text";
 import { repos } from "@/lib/data";
 import { errorMessage, newRequestId, useCurrentUser, useQuery } from "@/lib/data/hooks";
-import { normalizeConfig } from "@/lib/pricing/normalize";
 import type { Product, UserProfile } from "@/types";
 
 /** FR-12 to FR-14 and FR-07 (made-to-order creates a custom order request). */
@@ -41,7 +42,8 @@ export default function ProductPage() {
 function ProductDetail({ product }: { product: Product }) {
   const router = useRouter();
   const { user } = useCurrentUser();
-  const [photo, setPhoto] = useState(0);
+  const [photo, setPhoto] = useState(-1); // -1 = the 3D model
+  const optionsQ = useQuery("options:active", () => repos.customization.getOptions());
   const [quantity, setQuantity] = useState(1);
   const [notes, setNotes] = useState("");
   const [requestId, setRequestId] = useState(newRequestId);
@@ -77,8 +79,7 @@ function ProductDetail({ product }: { product: Product }) {
   const requestPiece = async () => {
     try {
       const options = await repos.customization.getOptions();
-      const material = options.materials.find((m) => m.label === product.material);
-      const { config } = normalizeConfig({ productType: product.category, materialId: material?.id, notes: `Requesting “${product.name}” as shown in the shop.${notes.trim() ? ` ${notes.trim()}` : ""}` }, options);
+      const config = { ...productDesign(product, options), notes: `Requesting “${product.name}” as shown in the shop.${notes.trim() ? ` ${notes.trim()}` : ""}` };
       const tx = await repos.customOrders.submit({ config, source: "catalog", basedOnProductId: product.id, snapshotDataUrl: product.photos[0], clientRequestId: requestId });
       setRequestId(newRequestId());
       router.push(`/customize/submitted?id=${tx.id}`);
@@ -104,9 +105,29 @@ function ProductDetail({ product }: { product: Product }) {
       </Link>
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
-          <StoredImage src={product.photos[photo]} alt={product.name} className="aspect-square w-full rounded-2xl border border-line" />
-          {product.photos.length > 1 && (
+          {photo === -1 && optionsQ.data ? (
+            <LazyJewelryViewer
+              config={productDesign(product, optionsQ.data)}
+              options={optionsQ.data}
+              className="aspect-square w-full border border-line"
+              label={`3D model of ${product.name}. Drag to rotate, scroll or pinch to zoom.`}
+            />
+          ) : (
+            <StoredImage src={product.photos[Math.max(0, photo)]} alt={product.name} className="aspect-square w-full rounded-2xl border border-line" />
+          )}
+          {(product.photos.length > 0 || optionsQ.data) && (
             <div className="mt-3 flex gap-2">
+              {optionsQ.data && (
+                <button
+                  type="button"
+                  onClick={() => setPhoto(-1)}
+                  aria-label="Show the 3D model"
+                  aria-pressed={photo === -1}
+                  className={`flex size-[68px] flex-col items-center justify-center rounded-lg border-2 bg-paper text-xs font-semibold text-gold-dark ${photo === -1 ? "border-gold-dark" : "border-line"}`}
+                >
+                  <Rotate3d className="size-5" aria-hidden /> 3D
+                </button>
+              )}
               {product.photos.map((p, i) => (
                 <button key={p} type="button" onClick={() => setPhoto(i)} aria-label={`Show photo ${i + 1}`} aria-pressed={i === photo} className={`overflow-hidden rounded-lg border-2 ${i === photo ? "border-gold-dark" : "border-transparent"}`}>
                   <StoredImage src={p} alt="" className="size-16" />

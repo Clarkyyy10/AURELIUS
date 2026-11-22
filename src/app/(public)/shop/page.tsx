@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ProductCard } from "@/components/ecommerce/ProductCard";
+import { ProductCard, SharedViewCanvas } from "@/components/ecommerce/ProductCard";
 import { PageHeader } from "@/components/shared/PageHeader";
 import { EmptyState, QueryView } from "@/components/shared/States";
 import { repos } from "@/lib/data";
@@ -45,11 +45,13 @@ function Shop() {
 
   const q = useQuery(`products:${params.toString()}`, () => repos.catalog.listProducts(filter));
   const allQ = useQuery("products:all", () => repos.catalog.listProducts());
+  const optionsQ = useQuery("options:active", () => repos.customization.getOptions());
   const materials = useMemo(() => [...new Set((allQ.data ?? []).map((p) => p.material))].sort(), [allQ.data]);
   const active = ["category", "material", "availability", "min", "max", "q"].some((k) => params.get(k));
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
+      <SharedViewCanvas />
       <PageHeader title="Shop the collection" description="Ready-made pieces and made-to-order designs from Afable's Jewelry Store." />
 
       <div className="mb-6 grid gap-3 rounded-2xl border border-line bg-paper p-4 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1.2fr]">
@@ -115,7 +117,7 @@ function Shop() {
           <ul className="grid grid-cols-1 gap-5 min-[420px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {list.slice(0, 5).map((p) => (
               <li key={p.id}>
-                <ProductCard product={p} />
+                <ProductCard product={p} options={optionsQ.data} />
               </li>
             ))}
             <li>
@@ -123,7 +125,7 @@ function Shop() {
             </li>
             {list.slice(5).map((p) => (
               <li key={p.id}>
-                <ProductCard product={p} />
+                <ProductCard product={p} options={optionsQ.data} />
               </li>
             ))}
           </ul>

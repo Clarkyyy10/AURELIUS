@@ -34,6 +34,22 @@ export function placeholder(category: ProductType, tone: "gold" | "silver" | "ro
 
 type P = [name: string, category: ProductType, material: string, price: number, availability: Product["availability"], tone: "gold" | "silver" | "rose", description: string, hidden?: boolean];
 
+/** 3D appearance of each seed product (materials, finishes, stones from data-model.md §3). */
+const designs: Record<string, Product["design"]> = {
+  "Classic Solitaire Ring": { materialId: "mat-18k", finishId: "fin-yellow", gemstoneId: "gem-diamond", cutId: "cut-round", stoneQuantity: 1 },
+  "Sampaguita Pendant": { materialId: "mat-14k", finishId: "fin-yellow", gemstoneId: "gem-cz", cutId: "cut-round", stoneQuantity: 1 },
+  "Rope Chain Necklace": { materialId: "mat-18k", finishId: "fin-yellow" },
+  "Eternity Band Ring": { materialId: "mat-14k", finishId: "fin-white", gemstoneId: "gem-cz", cutId: "cut-round", stoneQuantity: 5 },
+  "Pearl Drop Earrings": { materialId: "mat-silver", finishId: "fin-polished" },
+  "Tennis Bracelet": { materialId: "mat-silver", finishId: "fin-polished" },
+  "Heirloom Signet Ring": { materialId: "mat-silver", finishId: "fin-oxidized" },
+  "Rose Gold Heart Pendant": { materialId: "mat-18k", finishId: "fin-rose" },
+  "Box Chain Necklace": { materialId: "mat-silver", finishId: "fin-polished" },
+  "Classic Cuff Bracelet": { materialId: "mat-steel", finishId: "fin-silver-tone" },
+  "Sapphire Stud Earrings": { materialId: "mat-14k", finishId: "fin-yellow", gemstoneId: "gem-sapphire", cutId: "cut-round", stoneQuantity: 2 },
+  "Filigree Bangle": { materialId: "mat-silver", finishId: "fin-oxidized" },
+};
+
 const products: P[] = [
   ["Classic Solitaire Ring", "ring", "18K Gold", 24500, "available", "gold", "A single lab-grown diamond held in a four-prong setting on a slim 18K gold band. Simple, timeless, and made to be worn every day."],
   ["Sampaguita Pendant", "pendant", "14K Gold", 12800, "available", "gold", "A small pendant shaped like the sampaguita flower, with five soft petals and a cubic zirconia center. Comes with an 18-inch chain."],
@@ -61,6 +77,7 @@ export function seedProducts(now: Date): Product[] {
       material,
       price,
       photos: [placeholder(category, tone)],
+      design: designs[name],
       availability,
       hidden: Boolean(hidden),
       createdAt: created,

@@ -42,3 +42,23 @@ describe("normalizeConfig", () => {
     expect(config.sizeId).toBe("size-bracelet-7in");
   });
 });
+
+describe("productDesign (3D models in the shop)", () => {
+  it("uses the product's saved design", async () => {
+    const { productDesign } = await import("./labels");
+    const { seedProducts } = await import("@/lib/data/seed/catalog");
+    const solitaire = seedProducts(new Date()).find((p) => p.name === "Classic Solitaire Ring")!;
+    expect(productDesign(solitaire, options)).toMatchObject({ productType: "ring", materialId: "mat-18k", gemstoneId: "gem-diamond", stoneQuantity: 1 });
+  });
+  it("derives a valid design from category and material when none is saved", async () => {
+    const { productDesign } = await import("./labels");
+    const p = { ...seedProductsStub(), category: "bracelet" as const, material: "Stainless Steel", design: undefined };
+    const cfg = productDesign(p, options);
+    expect(cfg).toMatchObject({ productType: "bracelet", materialId: "mat-steel", finishId: "fin-silver-tone", gemstoneId: "gem-none" });
+    expect(() => estimate(cfg, options)).not.toThrow();
+  });
+});
+
+function seedProductsStub() {
+  return { id: "x", slug: "x", name: "X", description: "", category: "ring" as const, material: "", price: 1, photos: [], availability: "available" as const, hidden: false, createdAt: "", updatedAt: "" };
+}

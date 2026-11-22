@@ -18,7 +18,7 @@ import { repos } from "@/lib/data";
 import { errorMessage, newRequestId, useCurrentUser, useQuery } from "@/lib/data/hooks";
 import { useDemoStore } from "@/lib/data/mock/store";
 import { EstimateError, estimate as computeEstimate } from "@/lib/pricing/estimate";
-import { designLabels, placeholderFor } from "@/lib/pricing/labels";
+import { designLabels, placeholderFor, productDesign } from "@/lib/pricing/labels";
 import { normalizeConfig } from "@/lib/pricing/normalize";
 import { PRODUCT_TYPES, type CustomizationOptions, type CustomOrderRequest, type DesignConfig, type Draft, type Product, type ProductType } from "@/types";
 
@@ -54,7 +54,7 @@ function CustomizerLoader() {
     const { fromProductId: _from, ...saved } = pending;
     void _from;
     start = saved;
-  }
+  } else if (product) start = productDesign(product, options);
 
   const key = `${requestId}|${draftId}|${fromId}|${typeParam}`;
   return (

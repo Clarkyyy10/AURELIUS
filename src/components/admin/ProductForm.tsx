@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { toast } from "sonner";
@@ -16,10 +16,14 @@ import { FileDropzone, type StoredFile } from "@/components/shared/FileDropzone"
 import { Spinner } from "@/components/shared/States";
 import { StoredImage } from "@/components/shared/StoredImage";
 import { repos } from "@/lib/data";
-import { errorMessage } from "@/lib/data/hooks";
+import { errorMessage, useQuery } from "@/lib/data/hooks";
+import { productDesign } from "@/lib/pricing/labels";
+import { normalizeConfig } from "@/lib/pricing/normalize";
+import { LazyJewelryViewer } from "@/components/customization/LazyViewer";
+import { Label } from "@/components/ui/label";
 import { slugify } from "@/lib/utils/format";
 import { PHOTO_TYPES, productSchema, type ProductInput } from "@/lib/validation/schemas";
-import { PRODUCT_TYPES, type Product } from "@/types";
+import { PRODUCT_TYPES, type CustomizationOptions, type DesignConfig, type Product } from "@/types";
 
 const CATEGORY: Record<string, string> = { ring: "Ring", pendant: "Pendant", necklace: "Necklace", bracelet: "Bracelet", earrings: "Earrings" };
 
@@ -35,12 +39,25 @@ export function ProductForm({ product }: { product?: Product }) {
       : { name: "", slug: "", category: "ring", material: "", price: 0, description: "", availability: "available", hidden: false, photos: [] },
   });
   const { errors } = form.formState;
+  const optionsQ = useQuery("options:active", () => repos.customization.getOptions());
+  const category = useWatch({ control: form.control, name: "category" });
+  const material = useWatch({ control: form.control, name: "material" });
+  const [appearanceEdit, setAppearance] = useState<Partial<DesignConfig> | null>(null);
+  // The 3D look follows the category; it starts from the saved design (or the material name).
+  const appearance = optionsQ.data
+    ? normalizeConfig(
+        { ...productDesign({ ...(product ?? ({} as Product)), category: category ?? "ring", material: material ?? "", design: product?.design }, optionsQ.data), ...appearanceEdit, productType: category ?? "ring" },
+        optionsQ.data,
+      ).config
+    : null;
 
   const onSubmit = form.handleSubmit(async (values) => {
     setError(null);
     try {
       const v = productSchema.parse(values);
-      await repos.catalog.saveProduct({ ...v, id: product?.id });
+      const { productType: _t, ...design } = appearance ?? {};
+      void _t;
+      await repos.catalog.saveProduct({ ...v, id: product?.id, design: appearance ? design : product?.design });
       toast.success(product ? "Product saved." : "Product added to the shop.");
       router.push("/admin/products");
     } catch (e) {
@@ -112,6 +129,8 @@ export function ProductForm({ product }: { product?: Product }) {
       <Field label="Description" error={errors.description?.message}>
         <Textarea rows={4} {...form.register("description")} />
       </Field>
+
+      {appearance && optionsQ.data && <AppearanceEditor config={appearance} options={optionsQ.data} onChange={(p) => setAppearance({ ...appearanceEdit, ...p })} />}
 
       <Controller
         control={form.control}
@@ -190,5 +209,52 @@ function PhotoManager({ value, onChange, error }: { value: string[]; onChange: (
         />
       )}
     </div>
+  );
+}
+
+/** How the product is drawn in 3D in the shop (metal, finish, stones). Piece type comes from the category. */
+function AppearanceEditor({ config, options, onChange }: { config: DesignConfig; options: CustomizationOptions; onChange: (p: Partial<DesignConfig>) => void }) {
+  const material = options.materials.find((m) => m.id === config.materialId);
+  const pt = options.productTypes.find((p) => p.type === config.productType);
+  const gem = options.gemstones.find((g) => g.id === config.gemstoneId);
+  const hasStone = Boolean(gem && !gem.isNone);
+  const pick = (label: string, value: string, items: { id: string; label: string }[], set: (v: string) => void) => (
+    <div className="space-y-1.5">
+      <Label>{label}</Label>
+      <Select value={value} onValueChange={set}>
+        <SelectTrigger className="w-full" aria-label={label}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {items.map((i) => (
+            <SelectItem key={i.id} value={i.id}>
+              {i.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+  return (
+    <fieldset className="space-y-3 rounded-xl border border-line p-4">
+      <legend className="px-1 text-sm font-medium">3D appearance in the shop</legend>
+      <div className="grid gap-4 md:grid-cols-[1fr_16rem]">
+        <div className="grid content-start gap-3 sm:grid-cols-2">
+          {pick("Metal", config.materialId, options.materials, (v) => onChange({ materialId: v }))}
+          {pick("Color / finish", config.finishId, options.finishes.filter((f) => material?.finishIds.includes(f.id)), (v) => onChange({ finishId: v }))}
+          {(pt?.maxStones ?? 0) > 0 && pick("Gemstone", config.gemstoneId, options.gemstones, (v) => onChange({ gemstoneId: v }))}
+          {hasStone && pick("Cut", config.cutId ?? "", options.cuts, (v) => onChange({ cutId: v }))}
+          {hasStone &&
+            pick(
+              "Number of stones",
+              String(config.stoneQuantity),
+              Array.from({ length: pt?.maxStones ?? 1 }, (_, i) => ({ id: String(i + 1), label: String(i + 1) })),
+              (v) => onChange({ stoneQuantity: Number(v) }),
+            )}
+          <p className="text-xs text-muted-foreground sm:col-span-2">Customers can rotate and zoom this model on the shop page. It doesn&apos;t change the price you set above.</p>
+        </div>
+        <LazyJewelryViewer config={config} options={options} showControls={false} className="aspect-square w-full" label="3D preview of this product" />
+      </div>
+    </fieldset>
   );
 }
