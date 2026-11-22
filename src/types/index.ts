@@ -79,6 +79,40 @@ export interface CutOption {
   active: boolean;
 }
 
+/** How the 3D model builds a chain. Fixed list — each one has its own geometry. */
+export const CHAIN_PATTERNS = [
+  "cable", "rolo", "paperclip", "mariner", "figaro", "satellite", "bead",
+  "curb", "cuban", "herringbone", "omega",
+  "rope", "singapore", "wheat", "franco", "byzantine", "bismarck",
+  "box", "venetian", "snake", "popcorn",
+] as const;
+export type ChainPattern = (typeof CHAIN_PATTERNS)[number];
+export type ChainFamily = "rings" | "flat" | "woven" | "tube";
+
+/** Necklace chain style (owner sets the weight factor; the 3D pattern is fixed). */
+export interface ChainStyleOption {
+  id: ID;
+  pattern: ChainPattern;
+  family: ChainFamily;
+  label: string;
+  description: string;
+  /** Metal used compared with a plain cable chain (cable = 1.00). Multiplies the estimated weight. */
+  weightFactor: number;
+  active: boolean;
+}
+
+export type ClaspKind = "lobster" | "spring_ring" | "toggle" | "box";
+
+export interface ClaspOption {
+  id: ID;
+  kind: ClaspKind;
+  label: string;
+  description: string;
+  /** Added to the estimated price. */
+  fee: number;
+  active: boolean;
+}
+
 /** Font for name pendants (owner can rename or turn off; files ship with the app). */
 export interface FontOption {
   id: ID;
@@ -108,6 +142,8 @@ export interface CustomizationOptions {
   cuts: CutOption[];
   sizes: SizeOption[];
   fonts: FontOption[];
+  chainStyles: ChainStyleOption[];
+  clasps: ClaspOption[];
 }
 
 // ---------- Catalog (FR-12, FR-13, FR-24, FR-25, FR-34) ----------
@@ -207,6 +243,9 @@ export interface DesignConfig {
   /** Name pendants only: the name and its font. */
   nameText?: string;
   fontId?: ID | null;
+  /** Necklaces only: chain style and clasp. */
+  chainStyleId?: ID | null;
+  claspId?: ID | null;
 }
 
 export interface EstimateBreakdown {
@@ -214,6 +253,7 @@ export interface EstimateBreakdown {
   stones: number;
   labor: number;
   finish: number;
+  clasp: number;
 }
 
 export interface Estimate {
@@ -241,6 +281,8 @@ export interface DesignLabels {
   size: string;
   name?: string | null;
   font?: string | null;
+  chain?: string | null;
+  clasp?: string | null;
 }
 
 export interface Quotation {

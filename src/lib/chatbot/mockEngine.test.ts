@@ -33,8 +33,8 @@ describe("custom order flow (FR-36)", () => {
     const r1 = last("I want a necklace");
     expect(r1.reply).toMatch(/material/i);
     const r2 = last("I want a necklace", "Sterling Silver 925", "Polished");
-    expect(r2.reply).toMatch(/Gemstones aren't available/);
-    expect(r2.reply).toMatch(/size/i);
+    expect(r2.reply).toMatch(/chain style/i);
+    expect(r2.quickReplies).toContain("Figaro");
   });
 
   it("only offers finishes allowed for the chosen material", () => {
@@ -91,6 +91,19 @@ describe("FAQ answers (FR-38)", () => {
   it("answers payment methods and products", () => {
     expect(last("Do you accept GCash?").reply).toMatch(/GCash/);
     expect(last("Ask about products").reply).toMatch(/pieces in the shop/);
+  });
+});
+
+describe("necklace flow with chain style and clasp", () => {
+  it("asks for chain, length and clasp and returns a complete draft", () => {
+    const r = last("I want a necklace", "18K Gold", "Yellow", "Rope", "20 in · Matinee", "Toggle", "No notes");
+    const cfg = (r.draft as { config: DesignConfig }).config;
+    expect(cfg).toMatchObject({ productType: "necklace", chainStyleId: "chain-rope", claspId: "clasp-toggle", sizeId: "size-necklace-20in", gemstoneId: "gem-none" });
+    expect(() => estimate(cfg, kb.options)).not.toThrow();
+    expect(r.reply).toContain("Rope chain with toggle clasp");
+  });
+  it("understands a style typed in lowercase", () => {
+    expect(last("I want a necklace", "18K Gold", "Yellow", "cuban please").reply).toMatch(/Cuban \(Miami\) — a thick/);
   });
 });
 

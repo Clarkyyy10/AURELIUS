@@ -343,3 +343,27 @@ interface FontOption { id: string; label: string; file: string /* /fonts/*.typef
 
 Test cases: 14K Gold, Yellow, Medium → 3.15 g, ₱12,195 · 18K Gold, Yellow, Small → 3.02 g, ₱14,484 ·
 Silver 925, Polished, Medium → 2.50 g, ₱2,038 · Stainless Steel, Gold tone, Large → 2.50 g, ₱2,200.
+
+## 9. Necklace chain styles, clasps and lengths (added after Phase 1 review — see decisions D-23, D-24)
+
+```ts
+type ChainPattern = "cable" | "rolo" | "paperclip" | "mariner" | "figaro" | "satellite" | "bead" | "curb" | "cuban"
+  | "herringbone" | "omega" | "rope" | "singapore" | "wheat" | "franco" | "byzantine" | "bismarck" | "box" | "venetian" | "snake" | "popcorn";
+interface ChainStyleOption { id; pattern: ChainPattern; family: "rings" | "flat" | "woven" | "tube"; label; description; weightFactor; active }
+interface ClaspOption { id; kind: "lobster" | "spring_ring" | "toggle" | "box"; label; description; fee; active }
+// CustomizationOptions gains chainStyles and clasps; DesignConfig gains chainStyleId and claspId (necklaces only)
+```
+
+**Updated formula** (necklaces; other pieces use chain_factor = 1 and clasp fee = 0):
+```
+est_weight_g = round2( baseWeightG × size_factor × density_ratio × chain.weightFactor )
+est_price    = round0( est_weight_g × ratePerGram + stone_price + laborFee + finish.fee + clasp.fee )
+```
+
+Necklace lengths: 14 in Choker 0.78 · 16 in Collar 0.89 · **18 in Princess 1.00** · 20/22/24 in Matinee 1.11/1.22/1.33 · 30 in Opera 1.67.
+Seed weight factors (demo): Cable 1.00 · Rolo 1.10 · Paperclip 0.85 · Mariner 1.25 · Figaro 1.15 · Satellite 1.05 · Bead 0.90 ·
+Curb 1.30 · Cuban 1.80 · Herringbone 1.40 · Omega 1.60 · Rope 1.70 · Singapore 1.10 · Wheat 1.45 · Franco 1.75 · Byzantine 1.90 ·
+Bismarck 1.85 · Box 1.20 · Venetian 1.25 · Snake 1.50 · Popcorn 1.30. Clasp fees (demo): Lobster ₱0 · Spring ring ₱0 · Toggle ₱450 · Box ₱650.
+
+Test cases: 14K Yellow 14 in Cuban + box clasp → 10.61 g, ₱37,663 · Silver Polished 22 in Rope + toggle → 12.44 g, ₱3,632 ·
+18K White 24 in Paperclip + spring ring → 10.24 g, ₱45,008 · Steel Black 30 in Byzantine + lobster → 14.66 g, ₱2,886.

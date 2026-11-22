@@ -45,6 +45,12 @@ export function EstimateBar({ estimate, error, className, action }: { estimate: 
               <dd className="tabular text-right">{formatPesoExact(estimate.breakdown.labor)}</dd>
               <dt>Finish</dt>
               <dd className="tabular text-right">{formatPesoExact(estimate.breakdown.finish)}</dd>
+              {estimate.breakdown.clasp > 0 && (
+                <>
+                  <dt>Clasp</dt>
+                  <dd className="tabular text-right">{formatPesoExact(estimate.breakdown.clasp)}</dd>
+                </>
+              )}
               <dt className="border-t border-line pt-1 font-medium">Estimate (rounded to the nearest peso)</dt>
               <dd className="tabular border-t border-line pt-1 text-right font-medium">{formatPeso(estimate.price)}</dd>
             </dl>

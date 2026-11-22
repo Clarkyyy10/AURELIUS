@@ -20,7 +20,7 @@ export const PRICE_GUARDRAIL =
 
 type State =
   | { flow: "idle" }
-  | { flow: "custom"; step: "type" | "material" | "finish" | "gem" | "cut" | "qty" | "size" | "name" | "font" | "notes"; config: Partial<DesignConfig> }
+  | { flow: "custom"; step: "type" | "material" | "finish" | "chain" | "gem" | "cut" | "qty" | "size" | "clasp" | "name" | "font" | "notes"; config: Partial<DesignConfig> }
   | { flow: "service"; step: "itemType" | "item" | "services" | "details"; fields: NonNullable<Extract<ChatDraft, { kind: "service_request" }>["fields"]> };
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
@@ -102,6 +102,10 @@ function askCustom(state: Extract<State, { flow: "custom" }>, kb: KnowledgeBase,
       const sizes = o.sizes.filter((s) => s.productType === c.productType).sort((a, b) => a.sortOrder - b.sortOrder);
       return { reply: `${p}What size? If you're not sure, choose the middle size — you can change it later.`, quickReplies: sizes.map((s) => s.label) };
     }
+    case "chain":
+      return { reply: `${p}Which chain style? Popular choices are Cable, Rope, Box, Figaro and Cuban — tap one to see it, or type another style.`, quickReplies: (o.chainStyles ?? []).map((c) => c.label) };
+    case "clasp":
+      return { reply: `${p}Which clasp? A lobster claw is the most secure and popular.`, quickReplies: (o.clasps ?? []).map((c) => c.label) };
     case "name":
       return { reply: `${p}What name should the pendant say? Up to 10 letters (Ñ and accents are fine).` };
     case "font":
@@ -144,6 +148,7 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
         c.cutId = null;
         c.stoneQuantity = 0;
       }
+      if (pt().type === "necklace") return next("chain");
       return pt().maxStones > 0 ? next("gem") : pt().type === "name_pendant" ? next("size") : next("size", `Gemstones aren't available for a ${pt().label.toLowerCase()}, so we'll skip that.`);
     }
     case "gem": {
@@ -177,7 +182,19 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       const s = matchOne(text, o.sizes.filter((x) => x.productType === c.productType));
       if (!s) return again("Please choose one of these sizes.");
       c.sizeId = s.id;
-      return c.productType === "name_pendant" ? next("name") : next("notes");
+      return c.productType === "name_pendant" ? next("name") : c.productType === "necklace" ? next("clasp") : next("notes");
+    }
+    case "chain": {
+      const chain = matchOne(text, o.chainStyles ?? []);
+      if (!chain) return again("Please choose one of these chain styles.");
+      c.chainStyleId = chain.id;
+      return next("size", `${chain.label} — ${chain.description.charAt(0).toLowerCase()}${chain.description.slice(1)}`);
+    }
+    case "clasp": {
+      const clasp = matchOne(text, o.clasps ?? []);
+      if (!clasp) return again("Please choose a clasp.");
+      c.claspId = clasp.id;
+      return next("notes");
     }
     case "name": {
       const problem = nameProblem(text);
@@ -198,8 +215,9 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       const g = o.gemstones.find((x) => x.id === c.gemstoneId);
       const cut = o.cuts.find((x) => x.id === c.cutId);
       const s = o.sizes.find((x) => x.id === c.sizeId);
+      const chained = c.productType === "necklace" ? ` · ${(o.chainStyles ?? []).find((x) => x.id === c.chainStyleId)?.label} chain with ${(o.clasps ?? []).find((x) => x.id === c.claspId)?.label.toLowerCase()} clasp` : "";
       const named = c.productType === "name_pendant" ? ` “${c.nameText}” in ${(o.fonts ?? []).find((x) => x.id === c.fontId)?.label.toLowerCase()}` : "";
-      const summary = [`${f?.label} ${m?.label} ${pt().label.toLowerCase()}${named}`, g && !g.isNone ? `${g.label}, ${cut?.label} cut × ${c.stoneQuantity}` : "no gemstone", `size ${s?.label}`].join(" · ");
+      const summary = [`${f?.label} ${m?.label} ${pt().label.toLowerCase()}${named}`, g && !g.isNone ? `${g.label}, ${cut?.label} cut × ${c.stoneQuantity}` : "no gemstone", `size ${s?.label}`].join(" · ") + chained;
       return {
         state: { flow: "idle" },
         result: {

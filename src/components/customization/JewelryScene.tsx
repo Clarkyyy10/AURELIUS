@@ -10,7 +10,8 @@ import { Center, ContactShadows, Environment, Lightformer, OrbitControls, Perspe
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import type { CustomizationOptions, DesignConfig, ProductType } from "@/types";
-import { BraceletModel, EarringsModel, NamePendantModel, NecklaceModel, PendantModel, RingModel, type ModelProps } from "./models";
+import { BraceletModel, EarringsModel, NamePendantModel, PendantModel, RingModel, type ModelProps } from "./models";
+import { NecklaceModel } from "./chains";
 
 const MODELS: Record<ProductType, React.ComponentType<ModelProps>> = {
   ring: RingModel,
@@ -50,6 +51,8 @@ export function useResolved(config: DesignConfig, options: CustomizationOptions)
       nameText: config.nameText,
       fontFile: font?.file,
       scriptFont: font ? font.cssFamily.includes("cursive") : undefined,
+      chainPattern: (options.chainStyles ?? []).find((c) => c.id === config.chainStyleId)?.pattern,
+      claspKind: (options.clasps ?? []).find((c) => c.id === config.claspId)?.kind,
     };
   }, [config, options]);
 }
@@ -141,7 +144,7 @@ export interface JewelrySceneProps {
 export function JewelryScene({ config, options, autoRotate, enableRotate = true, enableZoom = true, onInteract, fitRef, background = "#F6F1E9" }: JewelrySceneProps) {
   const resolved = useResolved(config, options);
   const [shadowY, setShadowY] = useState(-1.2);
-  const fitKey = `${config.productType}|${config.sizeId}|${config.gemstoneId === "gem-none" ? 0 : config.stoneQuantity}|${config.nameText ?? ""}|${config.fontId ?? ""}`;
+  const fitKey = `${config.productType}|${config.sizeId}|${config.gemstoneId === "gem-none" ? 0 : config.stoneQuantity}|${config.nameText ?? ""}|${config.fontId ?? ""}|${config.chainStyleId ?? ""}|${config.claspId ?? ""}`;
   const Model = MODELS[config.productType];
   const piece = useRef<THREE.Group>(null);
 
@@ -165,6 +168,8 @@ export function JewelryScene({ config, options, autoRotate, enableRotate = true,
         <Lightformer form="rect" intensity={5} position={[-5, 1.5, 1]} scale={[1.2, 6, 1]} rotation={[0, Math.PI / 2, 0]} />
         <Lightformer form="rect" intensity={5} position={[5, 1.5, 1]} scale={[1.2, 6, 1]} rotation={[0, -Math.PI / 2, 0]} />
         <Lightformer form="rect" intensity={3} position={[0, 1, 6]} scale={[6, 1, 1]} color="#ffffff" />
+        {/* soft low front light so flat chains (herringbone, omega) and plates don't turn dark */}
+        <Lightformer form="rect" intensity={2.2} position={[0, -1.5, 6]} scale={[8, 2, 1]} color="#fff6e8" />
         <Lightformer form="ring" intensity={2.5} position={[0, 2, -6]} scale={4} color="#ffe6bd" />
         <Lightformer form="rect" intensity={1.2} position={[0, -4, 0]} scale={[10, 10, 1]} rotation={[-Math.PI / 2, 0, 0]} color="#f3e8d8" />
       </Environment>

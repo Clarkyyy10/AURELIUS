@@ -37,6 +37,14 @@ describe("normalizeConfig", () => {
     expect(config.stoneQuantity).toBe(1);
   });
 
+  it("gives necklaces a chain style and clasp, and removes them from other pieces", () => {
+    const n = normalizeConfig({ productType: "necklace" }, options).config;
+    expect(n).toMatchObject({ chainStyleId: "chain-cable", claspId: "clasp-lobster", sizeId: "size-necklace-18in" });
+    const r = normalizeConfig({ productType: "ring", chainStyleId: "chain-rope", claspId: "clasp-box" }, options).config;
+    expect(r.chainStyleId).toBeUndefined();
+    expect(r.claspId).toBeUndefined();
+  });
+
   it("resets the size when switching piece type", () => {
     const { config } = normalizeConfig({ productType: "bracelet", sizeId: "size-ring-us9" }, options);
     expect(config.sizeId).toBe("size-bracelet-7in");

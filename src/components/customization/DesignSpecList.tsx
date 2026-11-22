@@ -10,6 +10,8 @@ const ROWS: [keyof DesignLabels, string][] = [
   ["gemstone", "Gemstone"],
   ["cut", "Cut"],
   ["size", "Size"],
+  ["chain", "Chain style"],
+  ["clasp", "Clasp"],
 ];
 
 /** Read-only list of a design's specifications. `highlight` marks changed fields (version compare). */

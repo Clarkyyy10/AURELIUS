@@ -12,6 +12,8 @@ export function activeOptions(o: CustomizationOptions): CustomizationOptions {
     cuts: o.cuts.filter((x) => x.active),
     sizes: o.sizes.filter((x) => x.active && o.productTypes.some((p) => p.type === x.productType && p.active)),
     fonts: (o.fonts ?? []).filter((x) => x.active),
+    chainStyles: (o.chainStyles ?? []).filter((x) => x.active),
+    clasps: (o.clasps ?? []).filter((x) => x.active),
   };
 }
 
@@ -26,6 +28,12 @@ export function validateOptions(o: CustomizationOptions): void {
   need(o.gemstones, "gemstone option");
   need(o.cuts, "cut");
   if (o.productTypes.some((p) => p.type === "name_pendant" && p.active)) need(o.fonts ?? [], "font for name pendants");
+  if (o.productTypes.some((p) => p.type === "necklace" && p.active)) {
+    need(o.chainStyles ?? [], "chain style");
+    need(o.clasps ?? [], "clasp");
+  }
+  for (const c of o.chainStyles ?? []) if (!(c.weightFactor > 0) || c.weightFactor > 10) throw new UserFacingError(`${c.label} weight factor must be greater than 0.`);
+  for (const c of o.clasps ?? []) if (!(c.fee >= 0) || !Number.isFinite(c.fee)) throw new UserFacingError(`${c.label} fee must be 0 or more.`);
   const nums: [number, string][] = [
     ...o.productTypes.flatMap((p): [number, string][] => [[p.baseWeightG, `${p.label} base weight`], [p.laborFee, `${p.label} labor fee`], [p.maxStones, `${p.label} max stones`]]),
     ...o.materials.flatMap((m): [number, string][] => [[m.ratePerGram, `${m.label} rate per gram`], [m.densityRatio, `${m.label} density ratio`]]),

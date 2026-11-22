@@ -20,7 +20,7 @@ function config(
   cut: string | null = null,
   qty = 0,
 ): DesignConfig {
-  const sizeOpt = options.sizes.find((s) => s.productType === productType && s.label === size);
+  const sizeOpt = options.sizes.find((s) => s.productType === productType && (s.label === size || s.label.startsWith(`${size} · `)));
   if (!sizeOpt) throw new Error(`No size ${size} for ${productType}`);
   return {
     productType,
@@ -64,7 +64,49 @@ const cases: [number, DesignConfig, number, number][] = [
   [22, { ...config("name_pendant", "Sterling Silver 925", "Polished", "Medium (13 mm letters)"), nameText: "Niño", fontId: "font-playfair" }, 2.5, 2038],
   // 2.5 × 1.3 × 0.77 = 2.5025 → 2.50 g → 2.50 × 40 + 1800 + 300 = 2,200
   [23, { ...config("name_pendant", "Stainless Steel", "Gold tone", "Large (16 mm letters)"), nameText: "J & R", fontId: "font-montserrat" }, 2.5, 2200],
+  // Necklaces with chain style (weight factor) and clasp (fee) — base 6.0 g, labor ₱2,000:
+  // 6 × 0.78 × 1.26 × 1.80 (Cuban) = 10.61424 → 10.61 g → 10.61 × 3300 + 2000 + 650 (box clasp) = 37,663
+  [24, { ...config("necklace", "14K Gold", "Yellow", "14 in"), chainStyleId: "chain-cuban", claspId: "clasp-box" }, 10.61, 37663],
+  // 6 × 1.22 × 1.00 × 1.70 (rope) = 12.444 → 12.44 g → 12.44 × 95 + 2000 + 450 (toggle) = 3631.8 → 3,632
+  [25, { ...config("necklace", "Sterling Silver 925", "Polished", "22 in"), chainStyleId: "chain-rope", claspId: "clasp-toggle" }, 12.44, 3632],
+  // 6 × 1.33 × 1.51 × 0.85 (paperclip) = 10.24233 → 10.24 g → 10.24 × 4200 + 2000 + 0 (spring ring) = 45,008
+  [26, { ...config("necklace", "18K Gold", "White", "24 in"), chainStyleId: "chain-paperclip", claspId: "clasp-spring-ring" }, 10.24, 45008],
+  // 6 × 1.67 × 0.77 × 1.90 (Byzantine) = 14.65926 → 14.66 g → 14.66 × 40 + 2000 + 300 (black) + 0 (lobster) = 2886.4 → 2,886
+  [27, { ...config("necklace", "Stainless Steel", "Black", "30 in"), chainStyleId: "chain-byzantine", claspId: "clasp-lobster" }, 14.66, 2886],
 ];
+
+/** Independent reference: plain decimal arithmetic with half-up rounding (how the owner computes by hand). */
+function reference(base: number, factor: number, density: number, chain: number, rate: number, extras: number) {
+  const round = (x: number, d: number) => Math.round((x + Number.EPSILON) * 10 ** d) / 10 ** d;
+  const weight = round(Number((base * factor * density * chain).toFixed(8)), 2);
+  return { weight, price: round(Number((weight * rate + extras).toFixed(6)), 0) };
+}
+
+describe("estimate() — every chain style and clasp (necklaces)", () => {
+  const sizes = options.sizes.filter((s) => s.productType === "necklace");
+  const mat = options.materials.find((m) => m.id === "mat-14k")!;
+  it.each(options.chainStyles.map((c, i) => [c.label, c, options.clasps[i % options.clasps.length], sizes[i % sizes.length]] as const))(
+    "%s matches the hand formula",
+    (_label, chain, clasp, size) => {
+      const cfg: DesignConfig = { ...config("necklace", "14K Gold", "Rose", "18 in"), sizeId: size.id, chainStyleId: chain.id, claspId: clasp.id };
+      const expected = reference(6, size.factor, mat.densityRatio, chain.weightFactor, mat.ratePerGram, 2000 + 500 + clasp.fee);
+      const result = estimate(cfg, options);
+      expect(result.weightG).toBe(expected.weight);
+      expect(result.price).toBe(expected.price);
+      expect(result.breakdown.clasp).toBe(clasp.fee);
+    },
+  );
+
+  it("designs saved before chain styles keep the plain-chain estimate", () => {
+    const legacy = config("necklace", "14K Gold", "Rose", "20 in");
+    expect(estimate(legacy, options)).toMatchObject({ weightG: 8.39, price: 30187 });
+  });
+
+  it("refuses an unknown chain style or clasp", () => {
+    expect(() => estimate({ ...config("necklace", "14K Gold", "Rose", "20 in"), chainStyleId: "chain-gone" }, options)).toThrow("Choose a chain style");
+    expect(() => estimate({ ...config("necklace", "14K Gold", "Rose", "20 in"), claspId: "clasp-gone" }, options)).toThrow("Choose a clasp");
+  });
+});
 
 describe("estimate() — required and coverage cases", () => {
   it.each(cases)("case %i", (_n, cfg, weight, price) => {
@@ -86,6 +128,7 @@ describe("estimate() — required and coverage cases", () => {
     expect(used.gemstones.size).toBe(options.gemstones.length);
     expect(used.cuts.size).toBe(options.cuts.length);
     expect(used.sizes.size).toBe(options.sizes.length);
+    expect(new Set(cases.map(([, c]) => c.claspId).filter(Boolean)).size).toBe(options.clasps.length);
     expect(cases.length).toBeGreaterThanOrEqual(20);
   });
 });
@@ -105,7 +148,7 @@ describe("estimate() — rounding and breakdown", () => {
 
   it("returns a breakdown that adds up to the unrounded total", () => {
     const r = estimate(cases[0][1], options);
-    expect(r.breakdown).toEqual({ metal: 19026, stones: 3500, labor: 1500, finish: 0 });
+    expect(r.breakdown).toEqual({ metal: 19026, stones: 3500, labor: 1500, finish: 0, clasp: 0 });
     const r2 = estimate(cases[1][1], options);
     expect(r2.breakdown.metal + r2.breakdown.stones + r2.breakdown.labor + r2.breakdown.finish).toBeCloseTo(2263.5, 6);
   });

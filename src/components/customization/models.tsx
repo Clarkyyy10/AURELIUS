@@ -3,12 +3,12 @@
 // Procedural jewelry models (frontend-spec §5.4) — no external files needed in Phase 1.
 // Every model reads only the resolved options, so the viewer always matches the selection (NFR).
 
-import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo } from "react";
 import { useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
-import type { CutOption, FinishOption, GemstoneOption } from "@/types";
+import type { ChainPattern, ClaspKind, CutOption, FinishOption, GemstoneOption } from "@/types";
 
 export interface ModelProps {
   finish: FinishOption;
@@ -21,6 +21,9 @@ export interface ModelProps {
   fontFile?: string;
   /** Script fonts join their letters; other fonts get a connecting bar. */
   scriptFont?: boolean;
+  /** Necklaces only */
+  chainPattern?: ChainPattern;
+  claspKind?: ClaspKind;
 }
 
 // ---------------------------------------------------------------- materials
@@ -196,67 +199,6 @@ export function PendantModel({ finish, gem, cut, stones, sizeFactor }: ModelProp
             </group>
           );
         })}
-    </group>
-  );
-}
-
-// ---------------------------------------------------------------- necklace (instanced links)
-
-export function NecklaceModel({ finish, sizeFactor }: ModelProps) {
-  const ref = useRef<THREE.InstancedMesh>(null);
-  const { curve, count } = useMemo(() => {
-    const w = 1.2 * sizeFactor;
-    const d = 1.7 * sizeFactor;
-    const c = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-w, 1.0, 0),
-      new THREE.Vector3(-w * 0.95, 0.2, 0.1),
-      new THREE.Vector3(-w * 0.6, -d * 0.55, 0.15),
-      new THREE.Vector3(0, -d * 0.8, 0.18),
-      new THREE.Vector3(w * 0.6, -d * 0.55, 0.15),
-      new THREE.Vector3(w * 0.95, 0.2, 0.1),
-      new THREE.Vector3(w, 1.0, 0),
-    ]);
-    return { curve: c, count: Math.round(c.getLength() / 0.085) };
-  }, [sizeFactor]);
-
-  useLayoutEffect(() => {
-    const mesh = ref.current;
-    if (!mesh) return;
-    const m = new THREE.Matrix4();
-    const q = new THREE.Quaternion();
-    const twist = new THREE.Quaternion();
-    for (let i = 0; i < count; i++) {
-      const t = i / (count - 1);
-      const p = curve.getPointAt(t);
-      const tan = curve.getTangentAt(t);
-      q.setFromUnitVectors(new THREE.Vector3(1, 0, 0), tan);
-      twist.setFromAxisAngle(new THREE.Vector3(1, 0, 0), i % 2 ? Math.PI / 2 : 0);
-      q.multiply(twist);
-      m.compose(p, q, new THREE.Vector3(1, 1, 1));
-      mesh.setMatrixAt(i, m);
-    }
-    mesh.instanceMatrix.needsUpdate = true;
-    mesh.computeBoundingBox();
-    mesh.computeBoundingSphere();
-  }, [curve, count]);
-
-  const end = curve.getPointAt(1);
-  const start = curve.getPointAt(0);
-  return (
-    <group name="necklace" position={[0, 0.3, 0]}>
-      <instancedMesh ref={ref} args={[undefined, undefined, count]} name="metal" key={count}>
-        <torusGeometry args={[0.05, 0.016, 8, 20]} />
-        <MetalMaterial finish={finish} />
-      </instancedMesh>
-      {/* clasp */}
-      <mesh position={[start.x, start.y + 0.05, start.z]}>
-        <torusGeometry args={[0.07, 0.022, 12, 32]} />
-        <MetalMaterial finish={finish} />
-      </mesh>
-      <mesh position={[end.x, end.y + 0.06, end.z]}>
-        <capsuleGeometry args={[0.035, 0.1, 6, 12]} />
-        <MetalMaterial finish={finish} />
-      </mesh>
     </group>
   );
 }

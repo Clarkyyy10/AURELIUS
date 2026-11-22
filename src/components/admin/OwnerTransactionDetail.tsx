@@ -269,6 +269,12 @@ function OwnerDesign({ tx }: { tx: CustomOrderRequest }) {
             <dd className="tabular text-right">{formatPesoExact(current.breakdown.labor)}</dd>
             <dt>Finish</dt>
             <dd className="tabular text-right">{formatPesoExact(current.breakdown.finish)}</dd>
+            {current.breakdown.clasp > 0 && (
+              <>
+                <dt>Clasp</dt>
+                <dd className="tabular text-right">{formatPesoExact(current.breakdown.clasp)}</dd>
+              </>
+            )}
             <dt className="font-medium">Total today</dt>
             <dd className="tabular text-right font-medium">
               <MoneyText value={current.price} />

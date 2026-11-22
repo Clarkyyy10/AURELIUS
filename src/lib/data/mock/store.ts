@@ -122,7 +122,7 @@ export const useDemoStore = create<DemoState>()(
     }),
     {
       name: STORAGE_KEY,
-      version: 4,
+      version: 5,
       // v2: products gained a 3D "design". Copy it from the seed for products saved before that.
       migrate: (persisted, from) => {
         const state = persisted as DemoState;
@@ -143,6 +143,24 @@ export const useDemoStore = create<DemoState>()(
         if (from < 4 && state?.options) {
           const fonts = (state.options.fonts ??= []);
           for (const font of seedOptions().fonts) if (!fonts.some((x) => x.id === font.id)) fonts.push(font);
+        }
+        // v5: necklace chain styles, clasps, and named lengths (14–30 in).
+        if (from < 5 && state?.options) {
+          const seed = seedOptions();
+          state.options.chainStyles ??= seed.chainStyles;
+          state.options.clasps ??= seed.clasps;
+          for (const sz of seed.sizes.filter((x) => x.productType === "necklace")) {
+            const existing = state.options.sizes.find((x) => x.id === sz.id);
+            if (existing) {
+              if (existing.label === sz.label.split(" · ")[0]) existing.label = sz.label;
+              existing.sortOrder = sz.sortOrder;
+            } else state.options.sizes.push(sz);
+          }
+          const seedProductsNow = seedProducts(new Date());
+          for (const p of state.products ?? []) {
+            const sp = seedProductsNow.find((x) => x.id === p.id);
+            if (p.category === "necklace" && sp?.design?.chainStyleId && !p.design?.chainStyleId) p.design = { ...p.design, chainStyleId: sp.design.chainStyleId, claspId: sp.design.claspId };
+          }
         }
         return state;
       },

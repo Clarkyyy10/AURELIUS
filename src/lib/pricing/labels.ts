@@ -14,6 +14,8 @@ export function designLabels(config: DesignConfig, options: CustomizationOptions
     size: options.sizes.find((s) => s.id === config.sizeId)?.label ?? "—",
     name: config.productType === "name_pendant" ? (config.nameText ?? "").trim() || null : null,
     font: config.productType === "name_pendant" ? ((options.fonts ?? []).find((x) => x.id === config.fontId)?.label ?? null) : null,
+    chain: config.productType === "necklace" ? ((options.chainStyles ?? []).find((x) => x.id === config.chainStyleId)?.label ?? null) : null,
+    clasp: config.productType === "necklace" ? ((options.clasps ?? []).find((x) => x.id === config.claspId)?.label ?? null) : null,
   };
 }
 

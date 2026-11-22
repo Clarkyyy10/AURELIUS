@@ -3,6 +3,8 @@
 
 import type {
   CustomizationOptions,
+  ChainStyleOption,
+  ClaspOption,
   CutOption,
   FinishOption,
   FontOption,
@@ -60,7 +62,7 @@ export const seedCuts: CutOption[] = [
 
 function sizes(type: ProductType, list: [label: string, factor: number, isDefault?: boolean][]): SizeOption[] {
   return list.map(([label, factor, isDefault], i) => ({
-    id: `size-${type}-${label.toLowerCase().replace(/[^a-z0-9.]+/g, "").replace(/\./g, "_")}`,
+    id: `size-${type}-${label.split(" · ")[0].toLowerCase().replace(/[^a-z0-9.]+/g, "").replace(/\./g, "_")}`,
     productType: type,
     label,
     factor,
@@ -72,11 +74,67 @@ function sizes(type: ProductType, list: [label: string, factor: number, isDefaul
 
 export const seedSizes: SizeOption[] = [
   ...sizes("ring", [["US 5", 0.9], ["US 6", 0.95], ["US 7", 1.0, true], ["US 8", 1.05], ["US 9", 1.1], ["US 10", 1.15]]),
-  ...sizes("necklace", [["16 in", 0.89], ["18 in", 1.0, true], ["20 in", 1.11]]),
+  // Necklace lengths with their common names; factor = length ÷ 18 in.
+  ...sizes("necklace", [
+    ["14 in · Choker", 0.78],
+    ["16 in · Collar", 0.89],
+    ["18 in · Princess", 1.0, true],
+    ["20 in · Matinee", 1.11],
+    ["22 in · Matinee", 1.22],
+    ["24 in · Matinee", 1.33],
+    ["30 in · Opera", 1.67],
+  ]),
   ...sizes("bracelet", [["6.5 in", 0.93], ["7 in", 1.0, true], ["7.5 in", 1.07]]),
   ...sizes("pendant", [["Small", 0.8], ["Medium", 1.0, true], ["Large", 1.25]]),
   ...sizes("name_pendant", [["Small (10 mm letters)", 0.8], ["Medium (13 mm letters)", 1.0, true], ["Large (16 mm letters)", 1.3]]),
   ...sizes("earrings", [["Small", 0.8], ["Medium", 1.0, true], ["Large", 1.25]]),
+];
+
+type C = [pattern: ChainStyleOption["pattern"], family: ChainStyleOption["family"], label: string, weightFactor: number, description: string];
+
+/**
+ * Necklace chain styles (research: jeweler and retailer chain guides). Weight factors are DEMO values
+ * relative to a plain cable chain; the owner replaces them in Customization & Rates.
+ */
+const chains: C[] = [
+  ["cable", "rings", "Cable", 1.0, "Identical oval links, each turned 90° to the next. The classic, strong pendant chain."],
+  ["rolo", "rings", "Rolo (Belcher)", 1.1, "Round, slightly domed links joined like a cable chain. Bold but simple."],
+  ["paperclip", "rings", "Paperclip", 0.85, "Long, flat, elongated links with an open, modern look."],
+  ["mariner", "rings", "Mariner (Anchor)", 1.25, "Oval links with a bar across the middle, like a ship's anchor chain. Sturdy."],
+  ["figaro", "rings", "Figaro", 1.15, "Italian pattern: three short flat links, then one long link, repeated."],
+  ["satellite", "rings", "Satellite", 1.05, "A fine cable chain with small metal beads spaced evenly along it."],
+  ["bead", "rings", "Bead (Ball)", 0.9, "Small metal balls joined by short connectors."],
+  ["curb", "flat", "Curb", 1.3, "Uniform links twisted so they lie flat against the skin."],
+  ["cuban", "flat", "Cuban (Miami)", 1.8, "A thick, tightly packed curb chain. Bold and very strong."],
+  ["herringbone", "flat", "Herringbone", 1.4, "Flat V-shaped links in alternating rows for a smooth, liquid-metal look."],
+  ["omega", "flat", "Omega", 1.6, "Smooth metal plates over a flexible core. Holds a neat collar shape."],
+  ["rope", "woven", "Rope", 1.7, "Strands of links twisted together like a cord. Shiny and rounded."],
+  ["singapore", "woven", "Singapore", 1.1, "A single fine curb chain twisted along its length, so it sparkles as it moves."],
+  ["wheat", "woven", "Wheat (Spiga)", 1.45, "Four strands of twisted oval links braided to look like an ear of wheat."],
+  ["franco", "woven", "Franco", 1.75, "Tightly woven V-shaped links forming a dense, square-sided chain."],
+  ["byzantine", "woven", "Byzantine", 1.9, "An intricate weave of small paired rings (2-2-2 pattern) with a knotted, rope-like texture."],
+  ["bismarck", "woven", "Bismarck", 1.85, "Two curb chains joined side by side into a wide, flat, woven band."],
+  ["box", "tube", "Box", 1.2, "Square links that form a smooth, boxy chain. Strong and resists tangling."],
+  ["venetian", "tube", "Venetian box", 1.25, "A tighter, slightly heavier box chain with perfectly square links."],
+  ["snake", "tube", "Snake", 1.5, "Tightly fitted segments forming a smooth, round, flexible tube."],
+  ["popcorn", "tube", "Popcorn", 1.3, "A light, hollow tube with a bumpy, beaded texture."],
+];
+
+export const seedChainStyles: ChainStyleOption[] = chains.map(([pattern, family, label, weightFactor, description]) => ({
+  id: `chain-${pattern}`,
+  pattern,
+  family,
+  label,
+  description,
+  weightFactor,
+  active: true,
+}));
+
+export const seedClasps: ClaspOption[] = [
+  { id: "clasp-lobster", kind: "lobster", label: "Lobster claw", description: "Spring-loaded hook. Secure and the most popular choice.", fee: 0, active: true },
+  { id: "clasp-spring-ring", kind: "spring_ring", label: "Spring ring", description: "Small round clasp with a tiny lever. Best for light chains.", fee: 0, active: true },
+  { id: "clasp-toggle", kind: "toggle", label: "Toggle", description: "A bar slips through a ring. Easy to put on by yourself; decorative.", fee: 450, active: true },
+  { id: "clasp-box", kind: "box", label: "Box clasp", description: "A tab clicks into a small box. Very secure for heavier chains.", fee: 650, active: true },
 ];
 
 // Script fonts first (their letters join), then classic fonts (joined by a bar under the letters).
@@ -104,5 +162,7 @@ export function seedOptions(): CustomizationOptions {
     cuts: seedCuts,
     sizes: seedSizes,
     fonts: seedFonts,
+    chainStyles: seedChainStyles,
+    clasps: seedClasps,
   });
 }

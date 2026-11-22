@@ -63,6 +63,17 @@ export function normalizeConfig(input: Partial<DesignConfig> & { productType?: P
     delete c.fontId;
   }
 
+  // Necklaces: always have a chain style and a clasp (first active ones by default).
+  if (type.type === "necklace") {
+    const chains = options.chainStyles ?? [];
+    const clasps = options.clasps ?? [];
+    if (!chains.some((x) => x.id === c.chainStyleId)) c.chainStyleId = chains[0]?.id ?? null;
+    if (!clasps.some((x) => x.id === c.claspId)) c.claspId = clasps[0]?.id ?? null;
+  } else {
+    delete c.chainStyleId;
+    delete c.claspId;
+  }
+
   if (c.engravingText) c.engravingText = c.engravingText.slice(0, 20);
   if (c.notes) c.notes = c.notes.slice(0, 500);
   return { config: c, notices };

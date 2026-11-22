@@ -8,8 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import type { CustomizationOptions, DesignConfig, ProductType } from "@/types";
+import type { ChainFamily, CustomizationOptions, DesignConfig, ProductType } from "@/types";
 import { NAME_MAX, nameProblem } from "@/lib/pricing/name";
+
+const CHAIN_GROUPS: [ChainFamily, string][] = [
+  ["rings", "Linked rings"],
+  ["flat", "Flat links"],
+  ["woven", "Woven and twisted"],
+  ["tube", "Smooth and tube chains"],
+];
 
 export function PieceIcon({ type, className }: { type: ProductType; className?: string }) {
   const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
@@ -61,7 +68,7 @@ export function PieceIcon({ type, className }: { type: ProductType; className?: 
 
 const MEASURE: Partial<Record<ProductType, string>> = {
   ring: "Wrap a thin strip of paper around the base of your finger, mark where it meets, and measure the length (inner circumference). US 7 ≈ 54.4 mm. You can also bring a ring that fits to the store.",
-  necklace: "Measure the full length of a necklace you like, from clasp end to clasp end. 18 in sits just below the collarbone.",
+  necklace: "Measure a necklace you like from clasp end to clasp end. Choker (14 in) sits around the neck, Princess (18 in) just below the collarbone, Matinee (20–24 in) on the upper chest, Opera (30 in) mid-chest.",
   bracelet: "Measure around your wrist bone with a soft tape and add about 0.5 in (1.3 cm) for comfort.",
   pendant: "Small is about 1.5 cm tall, Medium about 2 cm, Large about 2.5 cm.",
   earrings: "Small is about 6 mm across, Medium about 8 mm, Large about 10 mm.",
@@ -105,7 +112,8 @@ export function OptionsPanel({
   const gem = options.gemstones.find((g) => g.id === config.gemstoneId);
   const hasStone = Boolean(gem && !gem.isNone);
   const sizes = options.sizes.filter((s) => s.productType === config.productType).sort((a, b) => a.sortOrder - b.sortOrder);
-  const sections = ["type", "material", "finish", "name", "gem", "size", "extras"];
+  const sections = ["type", "material", "finish", "name", "chain", "gem", "size", "extras"];
+  const isNecklace = config.productType === "necklace";
   const isName = config.productType === "name_pendant";
   const fonts = options.fonts ?? [];
   const problem = config.nameText ? nameProblem(config.nameText) : null;
@@ -208,7 +216,47 @@ export function OptionsPanel({
         </AccordionItem>
       )}
 
-      {!isName && (
+      {isNecklace && (
+        <AccordionItem value="chain">
+          <AccordionTrigger className="text-base font-semibold">4. Chain style and clasp</AccordionTrigger>
+          <AccordionContent className="space-y-4">
+            <div role="radiogroup" aria-label="Chain style" className="space-y-3">
+              {CHAIN_GROUPS.map(([family, title]) => {
+                const list = (options.chainStyles ?? []).filter((c) => c.family === family);
+                if (list.length === 0) return null;
+                return (
+                  <div key={family}>
+                    <p className="mb-1.5 text-xs font-medium text-muted-foreground">{title}</p>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {list.map((c) => (
+                        <Choice key={c.id} selected={c.id === config.chainStyleId} onClick={() => onChange({ chainStyleId: c.id })} className="px-3 py-2 text-left" label={c.label}>
+                          <span className="block font-medium">{c.label}</span>
+                          <span className="block text-xs leading-snug text-muted-foreground">{c.description}</span>
+                        </Choice>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div>
+              <p className="mb-2 text-sm font-medium" id="clasp-label">
+                Clasp
+              </p>
+              <div role="radiogroup" aria-labelledby="clasp-label" className="grid gap-2 sm:grid-cols-2">
+                {(options.clasps ?? []).map((c) => (
+                  <Choice key={c.id} selected={c.id === config.claspId} onClick={() => onChange({ claspId: c.id })} className="px-3 py-2 text-left" label={c.label}>
+                    <span className="block font-medium">{c.label}</span>
+                    <span className="block text-xs leading-snug text-muted-foreground">{c.description}</span>
+                  </Choice>
+                ))}
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      )}
+
+      {!isName && !isNecklace && (
       <AccordionItem value="gem">
         <AccordionTrigger className="text-base font-semibold">4. Gemstone</AccordionTrigger>
         <AccordionContent>

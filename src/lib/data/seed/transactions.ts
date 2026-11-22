@@ -227,7 +227,7 @@ export function seedCustomOrders(now: Date, options: CustomizationOptions): Cust
       quotation: quoted(h, est, 4000, 14, "accepted"),
       payments: [dpPaid(h, 4000)],
     })),
-    make(MARIA_ID, 20, [cfg({ productType: "necklace", sizeId: "size-necklace-18in", finishId: "fin-rose" })], [...afterAccept, ["confirmed", "owner"], ["in_production", "owner"]], (h, est) => ({
+    make(MARIA_ID, 20, [cfg({ productType: "necklace", sizeId: "size-necklace-18in", finishId: "fin-rose", chainStyleId: "chain-figaro", claspId: "clasp-toggle" })], [...afterAccept, ["confirmed", "owner"], ["in_production", "owner"]], (h, est) => ({
       quotation: quoted(h, est, 15000, 21, "accepted"),
       payments: [dpPaid(h, 15000)],
     })),
