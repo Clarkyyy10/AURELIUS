@@ -8,7 +8,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import type { ChainPattern, ClaspKind, FinishOption } from "@/types";
-import { MetalMaterial, type ModelProps } from "./models";
+import { MetalMaterial } from "./models";
 
 /** Base link size (chain gauge) in scene units. */
 const G = 0.05;
@@ -313,35 +313,6 @@ export function Clasp({ kind, start, end, finish }: { kind: ClaspKind; start: TH
         </group>
       );
   }
-}
-
-/** Necklace model for the scene: the chosen chain style and clasp (plain cable + lobster by default). */
-export function NecklaceModel({ finish, sizeFactor, chainPattern, claspKind }: ModelProps) {
-  return <ChainNecklace pattern={chainPattern ?? "cable"} claspKind={claspKind ?? "lobster"} finish={finish} sizeFactor={sizeFactor} />;
-}
-
-export function ChainNecklace({ pattern, claspKind, finish, sizeFactor }: { pattern: ChainPattern; claspKind: ClaspKind; finish: FinishOption; sizeFactor: number }) {
-  const { curve, length } = useMemo(() => {
-    const w = 1.2 * Math.sqrt(sizeFactor);
-    const d = 1.7 * sizeFactor;
-    const c = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(-w, 1.0, 0),
-      new THREE.Vector3(-w * 0.95, 0.2, 0.1),
-      new THREE.Vector3(-w * 0.6, -d * 0.55, 0.15),
-      new THREE.Vector3(0, -d * 0.8, 0.18),
-      new THREE.Vector3(w * 0.6, -d * 0.55, 0.15),
-      new THREE.Vector3(w * 0.95, 0.2, 0.1),
-      new THREE.Vector3(w, 1.0, 0),
-    ]);
-    return { curve: c, length: c.getLength() };
-  }, [sizeFactor]);
-
-  return (
-    <group name="necklace" position={[0, 0.3, 0]}>
-      <ChainAlong pattern={pattern} curve={curve} length={length} finish={finish} />
-      <Clasp kind={claspKind} start={curve.getPointAt(0)} end={curve.getPointAt(1)} finish={finish} />
-    </group>
-  );
 }
 
 /** Any chain style laid along a curve that lies in the x–y plane (necklaces, bracelets, anklets). */

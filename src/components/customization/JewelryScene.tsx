@@ -17,7 +17,7 @@ import { EarringsModel } from "./earrings";
 import { RingModel, ToeRingModel } from "./rings";
 import { TextureContext } from "./stones";
 import { chosenOption } from "@/lib/pricing/design";
-import { NecklaceModel } from "./chains";
+import { NecklaceModel } from "./necklaces";
 
 const MODELS: Record<ProductType, React.ComponentType<ModelProps>> = {
   ring: RingModel,
