@@ -122,7 +122,7 @@ export const useDemoStore = create<DemoState>()(
     }),
     {
       name: STORAGE_KEY,
-      version: 6,
+      version: 7,
       // v2: products gained a 3D "design". Copy it from the seed for products saved before that.
       migrate: (persisted, from) => {
         const state = persisted as DemoState;
@@ -180,6 +180,20 @@ export const useDemoStore = create<DemoState>()(
           for (const p of state.products ?? []) {
             const sp = seedProductsNow.find((x) => x.id === p.id && x.name === p.name);
             if (sp?.design?.choices && !p.design?.choices) p.design = { ...p.design, ...sp.design };
+          }
+        }
+        // v7 (and later): keep the structural rules of each design option in step with the app
+        // (stone rules, chain use, text length, piece types). Names, factors, fees and on/off stay the owner's.
+        if (from < 7 && state?.options?.designOptions) {
+          const seeds = seedOptions().designOptions;
+          for (const d of state.options.designOptions) {
+            const seed = seeds.find((x) => x.id === d.id);
+            if (!seed) continue;
+            d.productTypes = seed.productTypes;
+            d.stones = seed.stones;
+            d.usesChain = seed.usesChain;
+            d.textMax = seed.textMax;
+            d.requiresSurface = seed.requiresSurface;
           }
         }
         return state;

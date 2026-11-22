@@ -10,7 +10,8 @@ import { Center, ContactShadows, Environment, Lightformer, OrbitControls, Perspe
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import type { CustomizationOptions, DesignConfig, ProductType } from "@/types";
-import { BraceletModel, EarringsModel, NamePendantModel, PendantModel, type ModelProps } from "./models";
+import { BraceletModel, NamePendantModel, PendantModel, type ModelProps } from "./models";
+import { EarringsModel } from "./earrings";
 import { RingModel, ToeRingModel } from "./rings";
 import { TextureContext } from "./stones";
 import { chosenOption } from "@/lib/pricing/design";

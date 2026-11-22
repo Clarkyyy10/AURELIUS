@@ -66,15 +66,15 @@ const shanks = rows("shank", ["ring"], [
 ]);
 
 const earringStyles = rows("style", ["earrings"], [
-  ["stud", "Studs", "Close to the ear", 1, 0, "Sit right on the earlobe. Easy to wear every day.", S(0, 2, 0)],
-  ["huggie", "Huggies", "Close to the ear", 0.9, 300, "Small hoops that hug the earlobe snugly.", S(0, 2, 0)],
-  ["hoop", "Hoops", "Close to the ear", 1.6, 400, "Classic round hoops that loop through the ear."],
+  ["stud", "Studs", "Close to the ear", 1, 0, "Sit right on the earlobe. Easy to wear every day.", S(0, 2, 2)],
+  ["huggie", "Huggies", "Close to the ear", 0.9, 300, "Small hoops that hug the earlobe snugly.", S(0, 2, 2)],
+  ["hoop", "Hoops", "Close to the ear", 1.6, 400, "Classic round hoops that loop through the ear.", S(0, 2, 2)],
   ["drop", "Drops", "Drops and dangles", 1.2, 400, "A stone or shape that hangs just below the lobe.", S(0, 2, 2)],
   ["dangle", "Dangles", "Drops and dangles", 1.4, 600, "Longer earrings that swing as you move.", S(0, 2, 2)],
   ["chandelier", "Chandelier", "Drops and dangles", 2.2, 1500, "Ornate, branching dangles — made for special occasions.", S(0, 2, 2)],
-  ["threader", "Threaders", "Drops and dangles", 1.1, 500, "A fine chain pulled through the piercing so it hangs on both sides.", S(0, 2, 0)],
+  ["threader", "Threaders", "Drops and dangles", 1.1, 500, "A fine chain pulled through the piercing so it hangs on both sides.", S(0, 2, 2)],
   ["climber", "Climbers", "Ear styling", 1.3, 900, "A line of stones that climbs up the ear from the lobe.", S(0, 10, 6)],
-  ["ear_cuff", "Ear cuff", "Ear styling", 1.2, 500, "Clips around the outer ear — no piercing needed."],
+  ["ear_cuff", "Ear cuff", "Ear styling", 1.2, 500, "Clips around the outer ear — no piercing needed.", S(0, 2, 2)],
   ["jacket", "Jackets", "Ear styling", 1.5, 900, "A stud in front with a second piece that frames the lobe from behind.", S(0, 2, 2)],
 ]);
 

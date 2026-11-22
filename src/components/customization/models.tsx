@@ -127,51 +127,6 @@ export function BraceletModel({ finish, sizeFactor }: ModelProps) {
   );
 }
 
-// ---------------------------------------------------------------- earrings (two studs)
-
-export function EarringsModel({ finish, gem, cut, stones, sizeFactor }: ModelProps) {
-  const r = 0.26 * sizeFactor;
-  // Stones are counted per pair: with 2 stones each earring has one; with 1 stone only the left one does.
-  const perEarring = [stones >= 1, stones >= 2];
-  return (
-    <group name="earrings" rotation={[0.15, 0, 0]}>
-      {[-0.55, 0.55].map((x, i) => (
-        <group key={x} position={[x, 0, 0]}>
-          {/* post */}
-          <mesh position={[0, 0, -0.35]} rotation={[Math.PI / 2, 0, 0]}>
-            <cylinderGeometry args={[0.025, 0.025, 0.6, 8]} />
-            <MetalMaterial finish={finish} />
-          </mesh>
-          {gem && perEarring[i] ? (
-            <group rotation={[Math.PI / 2, 0, 0]}>
-              <mesh position={[0, -r * 0.35, 0]} name="metal">
-                <cylinderGeometry args={[r * 0.95, r * 0.55, r * 0.6, 24, 1]} />
-                <MetalMaterial finish={finish} />
-              </mesh>
-              <Prongs r={r} finish={finish} height={r * 1.0} />
-              <group position={[0, r * 0.25, 0]}>
-                <Stone gem={gem} cut={cut} r={r} />
-              </group>
-            </group>
-          ) : (
-            <group rotation={[Math.PI / 2, 0, 0]}>
-              {/* polished dome stud with a flat back */}
-              <mesh scale={[1, 0.85, 1]} name="metal">
-                <sphereGeometry args={[r * 0.9, 32, 24, 0, Math.PI * 2, 0, Math.PI / 2]} />
-                <MetalMaterial finish={finish} />
-              </mesh>
-              <mesh position={[0, -0.01, 0]} name="metal">
-                <cylinderGeometry args={[r * 0.9, r * 0.9, 0.03, 32]} />
-                <MetalMaterial finish={finish} />
-              </mesh>
-            </group>
-          )}
-        </group>
-      ))}
-    </group>
-  );
-}
-
 // ---------------------------------------------------------------- name pendant
 
 /**
