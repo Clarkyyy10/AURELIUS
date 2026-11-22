@@ -93,3 +93,17 @@ describe("FAQ answers (FR-38)", () => {
     expect(last("Ask about products").reply).toMatch(/pieces in the shop/);
   });
 });
+
+describe("name pendant flow", () => {
+  it("asks for the name and font and returns a complete draft", () => {
+    const r = last("I want a name pendant", "14K Gold", "Rose", "Medium (13 mm letters)", "Andrea", "Casual script", "No notes");
+    expect(r.draft?.kind).toBe("custom_order");
+    const cfg = (r.draft as { config: DesignConfig }).config;
+    expect(cfg).toMatchObject({ productType: "name_pendant", materialId: "mat-14k", finishId: "fin-rose", nameText: "Andrea", fontId: "font-dancing-script" });
+    expect(() => estimate(cfg, kb.options)).not.toThrow();
+    expect(r.reply).toContain("“Andrea” in casual script");
+  });
+  it("rejects names that are too long", () => {
+    expect(last("I want a name pendant", "14K Gold", "Rose", "Medium (13 mm letters)", "Maximiliano Jr").reply).toMatch(/up to 10 characters/);
+  });
+});

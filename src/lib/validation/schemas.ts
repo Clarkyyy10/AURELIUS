@@ -248,7 +248,7 @@ export const productSchema = z.object({
     .trim()
     .min(3, "Enter a web address name (at least 3 characters).")
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use lowercase letters, numbers and dashes only, like classic-solitaire-ring."),
-  category: z.enum(["ring", "pendant", "necklace", "bracelet", "earrings"], { error: "Choose a category." }),
+  category: z.enum(["ring", "pendant", "name_pendant", "necklace", "bracelet", "earrings"], { error: "Choose a category." }),
   material: z.string().trim().min(2, "Enter the material, like 18K Gold."),
   price: peso("price").refine((v) => v > 0, { message: "Enter a price greater than ₱0." }),
   description: z.string().trim().min(10, "Write a description of at least 10 characters.").max(1000, "Keep the description to 1,000 characters or fewer."),

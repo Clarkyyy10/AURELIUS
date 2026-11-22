@@ -51,7 +51,11 @@ const shapes = {
     .join(""),
 };
 
-const names = { ring: "Ring", pendant: "Pendant", necklace: "Necklace", bracelet: "Bracelet", earrings: "Earrings" };
+shapes.name_pendant = () => `<path d="M120 120 Q300 200 480 120" fill="none" stroke="url(#m)" stroke-width="4"/>
+    <text x="300" y="360" text-anchor="middle" font-family="Brush Script MT, Segoe Script, cursive" font-size="170" font-style="italic" fill="url(#m)" stroke="#8A6A3B" stroke-width="2">Maria</text>
+    <circle cx="128" cy="300" r="10" fill="none" stroke="url(#m)" stroke-width="5"/><circle cx="472" cy="300" r="10" fill="none" stroke="url(#m)" stroke-width="5"/>`;
+
+const names = { name_pendant: "Name pendant", ring: "Ring", pendant: "Pendant", necklace: "Necklace", bracelet: "Bracelet", earrings: "Earrings" };
 for (const [type, draw] of Object.entries(shapes))
   for (const [tone, t] of Object.entries(tones)) writeFileSync(join(out, `${type}-${tone}.svg`), frame(draw(), t, `${names[type]} placeholder image`));
 

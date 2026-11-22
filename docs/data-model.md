@@ -322,3 +322,23 @@ Under assessment, In progress, Completed, Ready for claiming, Claimed, Declined,
 
 Every status change appends to a `history: { status, at, by: "customer" | "owner", note? }[]` on the
 record and creates the notifications in §5.6.
+
+## 8. Name pendants (added after Phase 1 review — see decisions D-21, D-22)
+
+```ts
+type ProductType = "ring" | "pendant" | "name_pendant" | "necklace" | "bracelet" | "earrings";
+interface FontOption { id: string; label: string; file: string /* /fonts/*.typeface.json */; cssFamily: string; active: boolean }
+// CustomizationOptions gains `fonts: FontOption[]`
+// DesignConfig gains `nameText?: string` (1–10 chars) and `fontId?: string | null` (name pendants only)
+```
+
+| Name pendant seed | Value |
+|---|---|
+| Base weight | 2.5 g (typical 6-letter name, Medium) |
+| Labor fee | ₱1,800 |
+| Max stones | 0 |
+| Sizes | Small (10 mm letters) 0.80 · **Medium (13 mm letters) 1.00** · Large (16 mm letters) 1.30 |
+| Fonts | Elegant script · Casual script · Classic serif · Modern block |
+
+Test cases: 14K Gold, Yellow, Medium → 3.15 g, ₱12,195 · 18K Gold, Yellow, Small → 3.02 g, ₱14,484 ·
+Silver 925, Polished, Medium → 2.50 g, ₱2,038 · Stainless Steel, Gold tone, Large → 2.50 g, ₱2,200.

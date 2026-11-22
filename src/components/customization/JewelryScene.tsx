@@ -10,11 +10,12 @@ import { Center, ContactShadows, Environment, Lightformer, OrbitControls, Perspe
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import type { CustomizationOptions, DesignConfig, ProductType } from "@/types";
-import { BraceletModel, EarringsModel, NecklaceModel, PendantModel, RingModel, type ModelProps } from "./models";
+import { BraceletModel, EarringsModel, NamePendantModel, NecklaceModel, PendantModel, RingModel, type ModelProps } from "./models";
 
 const MODELS: Record<ProductType, React.ComponentType<ModelProps>> = {
   ring: RingModel,
   pendant: PendantModel,
+  name_pendant: NamePendantModel,
   necklace: NecklaceModel,
   bracelet: BraceletModel,
   earrings: EarringsModel,
@@ -23,6 +24,7 @@ const MODELS: Record<ProductType, React.ComponentType<ModelProps>> = {
 const CAMERA: Record<ProductType, [number, number, number]> = {
   ring: [0, 0.7, 6.6],
   pendant: [0, 0.2, 4.4],
+  name_pendant: [0, 0.3, 5],
   necklace: [0, 0, 6.2],
   bracelet: [0, 0.6, 5.6],
   earrings: [0, 0.3, 3.8],
@@ -37,7 +39,18 @@ export function useResolved(config: DesignConfig, options: CustomizationOptions)
     const cut = gem ? (options.cuts.find((c) => c.id === config.cutId) ?? null) : null;
     const size = options.sizes.find((s) => s.id === config.sizeId);
     const type = options.productTypes.find((p) => p.type === config.productType);
-    return { finish, gem, cut, stones: gem ? config.stoneQuantity : 0, sizeFactor: size?.factor ?? 1, modelUrl: type?.modelUrl };
+    const font = config.productType === "name_pendant" ? ((options.fonts ?? []).find((x) => x.id === config.fontId) ?? options.fonts?.[0]) : undefined;
+    return {
+      finish,
+      gem,
+      cut,
+      stones: gem ? config.stoneQuantity : 0,
+      sizeFactor: size?.factor ?? 1,
+      modelUrl: type?.modelUrl,
+      nameText: config.nameText,
+      fontFile: font?.file,
+      scriptFont: font ? font.cssFamily.includes("cursive") : undefined,
+    };
   }, [config, options]);
 }
 
@@ -128,7 +141,7 @@ export interface JewelrySceneProps {
 export function JewelryScene({ config, options, autoRotate, enableRotate = true, enableZoom = true, onInteract, fitRef, background = "#F6F1E9" }: JewelrySceneProps) {
   const resolved = useResolved(config, options);
   const [shadowY, setShadowY] = useState(-1.2);
-  const fitKey = `${config.productType}|${config.sizeId}|${config.gemstoneId === "gem-none" ? 0 : config.stoneQuantity}`;
+  const fitKey = `${config.productType}|${config.sizeId}|${config.gemstoneId === "gem-none" ? 0 : config.stoneQuantity}|${config.nameText ?? ""}|${config.fontId ?? ""}`;
   const Model = MODELS[config.productType];
   const piece = useRef<THREE.Group>(null);
 

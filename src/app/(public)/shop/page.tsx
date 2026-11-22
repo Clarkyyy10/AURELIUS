@@ -17,7 +17,7 @@ import { useQuery } from "@/lib/data/hooks";
 import type { ProductFilter } from "@/lib/data/repositories";
 import { PRODUCT_TYPES } from "@/types";
 
-const CATEGORY_LABEL: Record<string, string> = { ring: "Rings", pendant: "Pendants", necklace: "Necklaces", bracelet: "Bracelets", earrings: "Earrings" };
+const CATEGORY_LABEL: Record<string, string> = { ring: "Rings", pendant: "Pendants", name_pendant: "Name pendants", necklace: "Necklaces", bracelet: "Bracelets", earrings: "Earrings" };
 const ALL = "all";
 
 /** FR-12 / FR-13 — catalog with filters synced to the URL. */

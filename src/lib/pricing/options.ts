@@ -11,6 +11,7 @@ export function activeOptions(o: CustomizationOptions): CustomizationOptions {
     gemstones: o.gemstones.filter((x) => x.active),
     cuts: o.cuts.filter((x) => x.active),
     sizes: o.sizes.filter((x) => x.active && o.productTypes.some((p) => p.type === x.productType && p.active)),
+    fonts: (o.fonts ?? []).filter((x) => x.active),
   };
 }
 
@@ -24,6 +25,7 @@ export function validateOptions(o: CustomizationOptions): void {
   need(o.finishes, "finish");
   need(o.gemstones, "gemstone option");
   need(o.cuts, "cut");
+  if (o.productTypes.some((p) => p.type === "name_pendant" && p.active)) need(o.fonts ?? [], "font for name pendants");
   const nums: [number, string][] = [
     ...o.productTypes.flatMap((p): [number, string][] => [[p.baseWeightG, `${p.label} base weight`], [p.laborFee, `${p.label} labor fee`], [p.maxStones, `${p.label} max stones`]]),
     ...o.materials.flatMap((m): [number, string][] => [[m.ratePerGram, `${m.label} rate per gram`], [m.densityRatio, `${m.label} density ratio`]]),

@@ -18,6 +18,7 @@ import type {
   ProductTypeOption,
   SizeOption,
 } from "@/types";
+import { nameProblem } from "./name";
 
 /** Factors and ratios are stored with up to 4 decimals. */
 const FACTOR_SCALE = 10_000;
@@ -67,6 +68,12 @@ export function resolveSelection(config: DesignConfig, options: CustomizationOpt
   if (!gemstone) throw new EstimateError("Choose a gemstone (or None) to see an estimate.");
   if (!size) throw new EstimateError("Choose a size to see an estimate.");
   if (size.productType !== productType.type) throw new EstimateError("The chosen size doesn't match the piece type.");
+
+  if (productType.type === "name_pendant") {
+    const problem = nameProblem(config.nameText);
+    if (problem) throw new EstimateError(problem);
+    if (!(options.fonts ?? []).some((x) => x.id === config.fontId)) throw new EstimateError("Choose a font for the name.");
+  }
 
   const hasStone = !gemstone.isNone && gemstone.basePrice > 0;
   if (hasStone && !cut) throw new EstimateError("Choose a gemstone cut to see an estimate.");

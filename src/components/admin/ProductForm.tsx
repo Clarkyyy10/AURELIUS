@@ -25,7 +25,7 @@ import { slugify } from "@/lib/utils/format";
 import { PHOTO_TYPES, productSchema, type ProductInput } from "@/lib/validation/schemas";
 import { PRODUCT_TYPES, type CustomizationOptions, type DesignConfig, type Product } from "@/types";
 
-const CATEGORY: Record<string, string> = { ring: "Ring", pendant: "Pendant", necklace: "Necklace", bracelet: "Bracelet", earrings: "Earrings" };
+const CATEGORY: Record<string, string> = { ring: "Ring", pendant: "Pendant", name_pendant: "Name pendant", necklace: "Necklace", bracelet: "Bracelet", earrings: "Earrings" };
 
 /** FR-24 — add or edit a product. */
 export function ProductForm({ product }: { product?: Product }) {

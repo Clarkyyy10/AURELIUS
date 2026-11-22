@@ -5,6 +5,7 @@ import type {
   CustomizationOptions,
   CutOption,
   FinishOption,
+  FontOption,
   GemstoneOption,
   MaterialOption,
   ProductType,
@@ -15,6 +16,8 @@ import type {
 export const seedProductTypes: ProductTypeOption[] = [
   { id: "pt-ring", type: "ring", label: "Ring", baseWeightG: 3.0, laborFee: 1500, maxStones: 5, active: true },
   { id: "pt-pendant", type: "pendant", label: "Pendant", baseWeightG: 2.0, laborFee: 1000, maxStones: 3, active: true },
+  // Base weight assumes a typical name of about 6 letters at Medium size; the owner confirms the final weight and price.
+  { id: "pt-name-pendant", type: "name_pendant", label: "Name pendant", baseWeightG: 2.5, laborFee: 1800, maxStones: 0, active: true },
   { id: "pt-necklace", type: "necklace", label: "Necklace", baseWeightG: 6.0, laborFee: 2000, maxStones: 0, active: true },
   { id: "pt-bracelet", type: "bracelet", label: "Bracelet", baseWeightG: 8.0, laborFee: 1200, maxStones: 0, active: true },
   { id: "pt-earrings", type: "earrings", label: "Earrings (pair)", baseWeightG: 2.4, laborFee: 800, maxStones: 2, active: true },
@@ -72,7 +75,15 @@ export const seedSizes: SizeOption[] = [
   ...sizes("necklace", [["16 in", 0.89], ["18 in", 1.0, true], ["20 in", 1.11]]),
   ...sizes("bracelet", [["6.5 in", 0.93], ["7 in", 1.0, true], ["7.5 in", 1.07]]),
   ...sizes("pendant", [["Small", 0.8], ["Medium", 1.0, true], ["Large", 1.25]]),
+  ...sizes("name_pendant", [["Small (10 mm letters)", 0.8], ["Medium (13 mm letters)", 1.0, true], ["Large (16 mm letters)", 1.3]]),
   ...sizes("earrings", [["Small", 0.8], ["Medium", 1.0, true], ["Large", 1.25]]),
+];
+
+export const seedFonts: FontOption[] = [
+  { id: "font-great-vibes", label: "Elegant script", file: "/fonts/great-vibes.typeface.json", cssFamily: "'Great Vibes', cursive", active: true },
+  { id: "font-dancing-script", label: "Casual script", file: "/fonts/dancing-script.typeface.json", cssFamily: "'Dancing Script', cursive", active: true },
+  { id: "font-playfair", label: "Classic serif", file: "/fonts/playfair-display.typeface.json", cssFamily: "'Playfair Display', serif", active: true },
+  { id: "font-montserrat", label: "Modern block", file: "/fonts/montserrat.typeface.json", cssFamily: "'Montserrat', sans-serif", active: true },
 ];
 
 export function seedOptions(): CustomizationOptions {
@@ -83,5 +94,6 @@ export function seedOptions(): CustomizationOptions {
     gemstones: seedGemstones,
     cuts: seedCuts,
     sizes: seedSizes,
+    fonts: seedFonts,
   });
 }

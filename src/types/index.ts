@@ -29,7 +29,7 @@ export interface StoreSettings {
 }
 
 // ---------- Customization options and rates (FR-01 to FR-04, FR-47) ----------
-export const PRODUCT_TYPES = ["ring", "pendant", "necklace", "bracelet", "earrings"] as const;
+export const PRODUCT_TYPES = ["ring", "pendant", "name_pendant", "necklace", "bracelet", "earrings"] as const;
 export type ProductType = (typeof PRODUCT_TYPES)[number];
 
 export interface ProductTypeOption {
@@ -79,6 +79,17 @@ export interface CutOption {
   active: boolean;
 }
 
+/** Font for name pendants (owner can rename or turn off; files ship with the app). */
+export interface FontOption {
+  id: ID;
+  label: string;
+  /** three.js typeface JSON in /public/fonts */
+  file: string;
+  /** CSS font-family used to preview the name in the options panel */
+  cssFamily: string;
+  active: boolean;
+}
+
 export interface SizeOption {
   id: ID;
   productType: ProductType;
@@ -96,6 +107,7 @@ export interface CustomizationOptions {
   gemstones: GemstoneOption[];
   cuts: CutOption[];
   sizes: SizeOption[];
+  fonts: FontOption[];
 }
 
 // ---------- Catalog (FR-12, FR-13, FR-24, FR-25, FR-34) ----------
@@ -192,6 +204,9 @@ export interface DesignConfig {
   sizeId: ID;
   engravingText?: string;
   notes?: string;
+  /** Name pendants only: the name and its font. */
+  nameText?: string;
+  fontId?: ID | null;
 }
 
 export interface EstimateBreakdown {
@@ -224,6 +239,8 @@ export interface DesignLabels {
   gemstone: string;
   cut: string | null;
   size: string;
+  name?: string | null;
+  font?: string | null;
 }
 
 export interface Quotation {

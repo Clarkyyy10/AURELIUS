@@ -107,6 +107,7 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                 ["finishes", "Finishes"],
                 ["gems", "Gemstones"],
                 ["cuts", "Cuts"],
+                ["fonts", "Fonts"],
                 ["sizes", "Sizes"],
               ].map(([v, l]) => (
                 <TabsTrigger key={v} value={v} className="min-h-9 px-3">
@@ -195,6 +196,21 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
             <p className="mt-2 text-xs text-muted-foreground">Price is per stone in round cut; the cut multiplier is applied on top.</p>
           </TabsContent>
 
+          <TabsContent value="fonts" className="mt-4">
+            <OptionTable headers={["Name shown to customers", "Preview", "Active"]}>
+              {(draft.fonts ?? []).map((f) => (
+                <tr key={f.id} className="border-t border-line">
+                  <td className="p-2">{text(f.label, (v) => update("fonts", f.id, { label: v }), "Font name")}</td>
+                  <td className="p-2 text-2xl" style={{ fontFamily: f.cssFamily }}>
+                    Maria
+                  </td>
+                  <td className="p-2">{active(f.active, (v) => update("fonts", f.id, { active: v }), `${f.label} active`)}</td>
+                </tr>
+              ))}
+            </OptionTable>
+            <p className="mt-2 text-xs text-muted-foreground">Fonts for name pendants. Each font ships with the app as a 3D letter set, so fonts can be renamed or turned off but not added here.</p>
+          </TabsContent>
+
           <TabsContent value="cuts" className="mt-4">
             <OptionTable headers={["Name", "Price multiplier", "Active"]}>
               {draft.cuts.map((c) => (
@@ -279,7 +295,8 @@ function AddButton({ onClick, label }: { onClick: () => void; label: string }) {
 function FormulaPreview({ options }: { options: CustomizationOptions }) {
   const activeOpts = useMemo(() => activeOptions(options), [options]);
   const [sample, setSample] = useState<Partial<DesignConfig>>({ productType: "ring", materialId: "mat-18k", finishId: "fin-yellow", gemstoneId: "gem-diamond", cutId: "cut-round", stoneQuantity: 1, sizeId: "size-ring-us7" });
-  const cfg = useMemo(() => (activeOpts.productTypes.length ? normalizeConfig(sample, activeOpts).config : null), [sample, activeOpts]);
+  // Name pendants need a name to estimate, so the preview uses a sample name.
+  const cfg = useMemo(() => (activeOpts.productTypes.length ? normalizeConfig({ ...sample, nameText: sample.nameText || "Maria" }, activeOpts).config : null), [sample, activeOpts]);
   const est = cfg ? tryEstimate(cfg, activeOpts) : null;
 
   if (!cfg) return null;

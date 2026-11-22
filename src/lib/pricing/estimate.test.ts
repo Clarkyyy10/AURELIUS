@@ -58,6 +58,12 @@ const cases: [number, DesignConfig, number, number][] = [
   [18, config("earrings", "Stainless Steel", "Black", "Large"), 2.31, 1192],
   [19, config("ring", "18K Gold", "Rose", "US 7", "Sapphire (lab)", "Princess", 5), 4.53, 26201],
   [20, config("earrings", "Sterling Silver 925", "Oxidized", "Large", "Diamond (lab-grown)", "Round", 2), 3.0, 8285],
+  // Name pendants (base 2.5 g, labor ₱1,800): 2.5 × 0.8 × 1.51 = 3.02 g → 3.02 × 4200 + 1800 = 14,484
+  [21, { ...config("name_pendant", "18K Gold", "Yellow", "Small (10 mm letters)"), nameText: "Ana", fontId: "font-great-vibes" }, 3.02, 14484],
+  // 2.5 × 1.0 × 1.00 = 2.50 g → 2.50 × 95 + 1800 = 2037.50 → 2,038 (half-up)
+  [22, { ...config("name_pendant", "Sterling Silver 925", "Polished", "Medium (13 mm letters)"), nameText: "Niño", fontId: "font-playfair" }, 2.5, 2038],
+  // 2.5 × 1.3 × 0.77 = 2.5025 → 2.50 g → 2.50 × 40 + 1800 + 300 = 2,200
+  [23, { ...config("name_pendant", "Stainless Steel", "Gold tone", "Large (16 mm letters)"), nameText: "J & R", fontId: "font-montserrat" }, 2.5, 2200],
 ];
 
 describe("estimate() — required and coverage cases", () => {
@@ -137,5 +143,35 @@ describe("estimate() — invalid selections", () => {
   it("rejects a size from another piece type", () => {
     const cfg = { ...config("ring", "18K Gold", "Yellow", "US 7"), sizeId: "size-necklace-18in" };
     expect(() => estimate(cfg, options)).toThrow("doesn't match");
+  });
+});
+
+describe("name pendants", () => {
+  const named = (nameText: string, fontId: string | null = "font-great-vibes"): DesignConfig => ({
+    productType: "name_pendant",
+    materialId: "mat-14k",
+    finishId: "fin-yellow",
+    gemstoneId: "gem-none",
+    cutId: null,
+    stoneQuantity: 0,
+    sizeId: "size-name_pendant-medium13mmletters",
+    nameText,
+    fontId,
+  });
+
+  it("uses the same formula: 2.5 g × 1.00 × 1.26 = 3.15 g; 3.15 × ₱3,300 + ₱1,800 labor = ₱12,195", () => {
+    expect(estimate(named("Maria"), options)).toMatchObject({ weightG: 3.15, price: 12195 });
+  });
+
+  it("Large size raises the weight: 2.5 × 1.3 × 1.26 = 4.095 → 4.10 g", () => {
+    expect(estimate({ ...named("Maria"), sizeId: "size-name_pendant-large16mmletters" }, options).weightG).toBe(4.1);
+  });
+
+  it("needs a valid name and font", () => {
+    expect(() => estimate(named(""), options)).toThrow("Type the name for your pendant.");
+    expect(() => estimate(named("Maximiliano Jr"), options)).toThrow("up to 10 characters");
+    expect(() => estimate(named("Ana💖"), options)).toThrow("Use letters only");
+    expect(() => estimate(named("Ana", "font-missing"), options)).toThrow("Choose a font");
+    expect(estimate(named("Niño & Ía"), options).price).toBe(12195);
   });
 });

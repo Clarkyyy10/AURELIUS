@@ -142,7 +142,7 @@ function ProductDetail({ product }: { product: Product }) {
             <AvailabilityBadge value={product.availability} />
             <h1 className="mt-2 text-4xl">{product.name}</h1>
             <p className="mt-1 text-muted-foreground">
-              {product.material} · <span className="capitalize">{product.category}</span>
+              {product.material} · {product.category === "name_pendant" ? "Name pendant" : <span className="capitalize">{product.category}</span>}
             </p>
             <p className="mt-3 font-heading text-3xl font-semibold">
               <MoneyText value={product.price} />

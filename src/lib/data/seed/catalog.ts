@@ -48,6 +48,7 @@ const designs: Record<string, Product["design"]> = {
   "Classic Cuff Bracelet": { materialId: "mat-steel", finishId: "fin-silver-tone" },
   "Sapphire Stud Earrings": { materialId: "mat-14k", finishId: "fin-yellow", gemstoneId: "gem-sapphire", cutId: "cut-round", stoneQuantity: 2 },
   "Filigree Bangle": { materialId: "mat-silver", finishId: "fin-oxidized" },
+  "Personalized Name Pendant": { materialId: "mat-14k", finishId: "fin-yellow", nameText: "Maria", fontId: "font-great-vibes" },
 };
 
 const products: P[] = [
@@ -63,6 +64,7 @@ const products: P[] = [
   ["Classic Cuff Bracelet", "bracelet", "Stainless Steel", 1650, "available", "silver", "An open cuff in brushed stainless steel. Does not tarnish and is easy to adjust."],
   ["Sapphire Stud Earrings", "earrings", "14K Gold", 9750, "made_to_order", "gold", "Lab sapphire studs in a four-prong 14K gold setting. Made to order in about two weeks."],
   ["Filigree Bangle", "bracelet", "Sterling Silver 925", 4300, "unavailable", "silver", "A hand-finished filigree bangle. Hidden from the shop until new stock arrives.", true],
+  ["Personalized Name Pendant", "name_pendant", "14K Gold", 12500, "made_to_order", "gold", "Your name (or a loved one's) cut in solid gold or silver. Choose the font and size in the 3D customizer — the owner confirms the final price."],
 ];
 
 export function seedProducts(now: Date): Product[] {

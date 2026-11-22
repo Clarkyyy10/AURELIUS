@@ -3,8 +3,11 @@
 // Procedural jewelry models (frontend-spec §5.4) — no external files needed in Phase 1.
 // Every model reads only the resolved options, so the viewer always matches the selection (NFR).
 
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import { useLoader } from "@react-three/fiber";
 import * as THREE from "three";
+import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
+import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import type { CutOption, FinishOption, GemstoneOption } from "@/types";
 
 export interface ModelProps {
@@ -13,6 +16,11 @@ export interface ModelProps {
   cut: CutOption | null;
   stones: number;
   sizeFactor: number;
+  /** Name pendants only */
+  nameText?: string;
+  fontFile?: string;
+  /** Script fonts join their letters; other fonts get a connecting bar. */
+  scriptFont?: boolean;
 }
 
 // ---------------------------------------------------------------- materials
@@ -319,6 +327,71 @@ export function EarringsModel({ finish, gem, cut, stones, sizeFactor }: ModelPro
             </group>
           )}
         </group>
+      ))}
+    </group>
+  );
+}
+
+// ---------------------------------------------------------------- name pendant
+
+/**
+ * The customer's name as solid 3D metal in the chosen font, with jump rings at both ends and the
+ * chain rising to the neck. Size changes the letter height. An empty name shows a faint "Your name".
+ */
+export function NamePendantModel({ finish, sizeFactor, nameText, fontFile, scriptFont }: ModelProps) {
+  const font = useLoader(FontLoader, fontFile ?? "/fonts/great-vibes.typeface.json");
+  const typed = (nameText ?? "").trim();
+  const text = typed || "Your name";
+  const letter = 0.62 * sizeFactor;
+  const depth = 0.07 * sizeFactor;
+
+  const { geometry, width, height } = useMemo(() => {
+    const g = new TextGeometry(text, { font, size: letter, depth, curveSegments: 10, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.01, bevelSegments: 2 });
+    g.center();
+    g.computeBoundingBox();
+    const b = g.boundingBox!;
+    return { geometry: g, width: b.max.x - b.min.x, height: b.max.y - b.min.y };
+  }, [font, text, letter, depth]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
+  const ringR = 0.06 * sizeFactor;
+  const ends: [number, number][] = [
+    [-width / 2 - ringR * 0.6, height * 0.12],
+    [width / 2 + ringR * 0.6, height * 0.12],
+  ];
+  const chain = useMemo(
+    () =>
+      ends.map(([x, y]) => {
+        const top = new THREE.Vector3(Math.sign(x) * width * 0.18, y + width * 0.55, -0.05);
+        const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(x, y + ringR, 0), new THREE.Vector3(x * 0.85, y + width * 0.25, -0.02), top]);
+        return new THREE.TubeGeometry(curve, 48, 0.012 * Math.max(1, sizeFactor), 6, false);
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [width, height, ringR, sizeFactor],
+  );
+  useEffect(() => () => chain.forEach((c) => c.dispose()), [chain]);
+
+  return (
+    <group name="name_pendant" rotation={[0.08, 0, 0]}>
+      <mesh geometry={geometry} name="metal" castShadow>
+        {typed ? <MetalMaterial finish={finish} /> : <meshStandardMaterial color="#b9b2a6" transparent opacity={0.35} />}
+      </mesh>
+      {!scriptFont && typed && (
+        <mesh position={[0, -height / 2 + 0.03 * sizeFactor, 0]} name="metal">
+          <boxGeometry args={[width * 0.98, 0.05 * sizeFactor, depth * 0.9]} />
+          <MetalMaterial finish={finish} />
+        </mesh>
+      )}
+      {ends.map(([x, y]) => (
+        <mesh key={x} position={[x, y, 0]} rotation={[0, Math.PI / 2, 0]} name="metal">
+          <torusGeometry args={[ringR, ringR * 0.25, 10, 24]} />
+          <MetalMaterial finish={finish} />
+        </mesh>
+      ))}
+      {chain.map((g, i) => (
+        <mesh key={i} geometry={g} name="metal">
+          <MetalMaterial finish={finish} />
+        </mesh>
       ))}
     </group>
   );

@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import type { CustomizationOptions, DesignConfig, ProductType } from "@/types";
+import { NAME_MAX, nameProblem } from "@/lib/pricing/name";
 
 export function PieceIcon({ type, className }: { type: ProductType; className?: string }) {
   const common = { fill: "none", stroke: "currentColor", strokeWidth: 1.6, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
@@ -39,6 +40,13 @@ export function PieceIcon({ type, className }: { type: ProductType; className?: 
           <ellipse cx="12" cy="12" rx="6" ry="3" />
         </g>
       )}
+      {type === "name_pendant" && (
+        <g {...common}>
+          <path d="M3 5c3 3 15 3 18 0" />
+          <path d="M5 16c1-4 2-6 3-6s1 5 2 5 1.5-5 3-5 1 5 2.5 5 1.5-3 3.5-3" />
+          <path d="M4 18h16" />
+        </g>
+      )}
       {type === "earrings" && (
         <g {...common}>
           <circle cx="7" cy="7" r="1.2" />
@@ -57,6 +65,7 @@ const MEASURE: Partial<Record<ProductType, string>> = {
   bracelet: "Measure around your wrist bone with a soft tape and add about 0.5 in (1.3 cm) for comfort.",
   pendant: "Small is about 1.5 cm tall, Medium about 2 cm, Large about 2.5 cm.",
   earrings: "Small is about 6 mm across, Medium about 8 mm, Large about 10 mm.",
+  name_pendant: "The size is the height of the capital letters. Longer names make a wider pendant; the owner confirms the final size and price.",
 };
 
 function Choice({ selected, onClick, children, className, label }: { selected: boolean; onClick: () => void; children: React.ReactNode; className?: string; label?: string }) {
@@ -96,14 +105,17 @@ export function OptionsPanel({
   const gem = options.gemstones.find((g) => g.id === config.gemstoneId);
   const hasStone = Boolean(gem && !gem.isNone);
   const sizes = options.sizes.filter((s) => s.productType === config.productType).sort((a, b) => a.sortOrder - b.sortOrder);
-  const sections = ["type", "material", "finish", "gem", "size", "extras"];
+  const sections = ["type", "material", "finish", "name", "gem", "size", "extras"];
+  const isName = config.productType === "name_pendant";
+  const fonts = options.fonts ?? [];
+  const problem = config.nameText ? nameProblem(config.nameText) : null;
 
   return (
     <Accordion type="multiple" defaultValue={sections} className="w-full">
       <AccordionItem value="type">
         <AccordionTrigger className="text-base font-semibold">1. Piece type</AccordionTrigger>
         <AccordionContent>
-          <div role="radiogroup" aria-label="Piece type" className="grid grid-cols-3 gap-2 sm:grid-cols-5 lg:grid-cols-3 xl:grid-cols-5">
+          <div role="radiogroup" aria-label="Piece type" className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-3 xl:grid-cols-6">
             {options.productTypes.map((p) => (
               <Choice key={p.id} selected={p.type === config.productType} onClick={() => onChange({ productType: p.type })} className={cn("flex flex-col items-center gap-1 px-2 py-3", disabledTypes && p.type !== config.productType && "pointer-events-none opacity-40")}>
                 <PieceIcon type={p.type} className="text-gold-dark" />
@@ -143,6 +155,46 @@ export function OptionsPanel({
         </AccordionContent>
       </AccordionItem>
 
+      {isName && (
+        <AccordionItem value="name">
+          <AccordionTrigger className="text-base font-semibold">4. Name and font</AccordionTrigger>
+          <AccordionContent className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="pendant-name">Name on the pendant</Label>
+              <Input
+                id="pendant-name"
+                maxLength={NAME_MAX}
+                value={config.nameText ?? ""}
+                onChange={(e) => onChange({ nameText: e.target.value })}
+                placeholder="For example: Maria"
+                autoComplete="off"
+                aria-describedby="pendant-name-hint"
+                aria-invalid={Boolean(problem)}
+              />
+              <p id="pendant-name-hint" className={cn("text-xs", problem ? "text-danger" : "text-muted-foreground")}>
+                {problem ?? `Up to ${NAME_MAX} characters (${NAME_MAX - (config.nameText?.length ?? 0)} left). Letters, Ñ and accents are fine.`}
+              </p>
+            </div>
+            <div>
+              <p className="mb-2 text-sm font-medium" id="font-label">
+                Font
+              </p>
+              <div role="radiogroup" aria-labelledby="font-label" className="grid grid-cols-2 gap-2">
+                {fonts.map((f) => (
+                  <Choice key={f.id} selected={f.id === config.fontId} onClick={() => onChange({ fontId: f.id })} className="flex flex-col items-start gap-0.5 px-3 py-2 text-left" label={f.label}>
+                    <span className="block w-full truncate text-2xl leading-tight text-ink" style={{ fontFamily: f.cssFamily }} aria-hidden>
+                      {(config.nameText ?? "").trim() || "Maria"}
+                    </span>
+                    <span className="text-xs text-muted-foreground">{f.label}</span>
+                  </Choice>
+                ))}
+              </div>
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+      )}
+
+      {!isName && (
       <AccordionItem value="gem">
         <AccordionTrigger className="text-base font-semibold">4. Gemstone</AccordionTrigger>
         <AccordionContent>
@@ -200,6 +252,8 @@ export function OptionsPanel({
           )}
         </AccordionContent>
       </AccordionItem>
+
+      )}
 
       <AccordionItem value="size">
         <AccordionTrigger className="text-base font-semibold">5. Size</AccordionTrigger>

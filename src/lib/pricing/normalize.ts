@@ -3,6 +3,7 @@
 
 import type { CustomizationOptions, DesignConfig, ProductType } from "@/types";
 import { defaultConfig } from "./labels";
+import { NAME_MAX } from "./name";
 
 export interface NormalizeResult {
   config: DesignConfig;
@@ -50,6 +51,16 @@ export function normalizeConfig(input: Partial<DesignConfig> & { productType?: P
   } else {
     c.cutId = null;
     c.stoneQuantity = 0;
+  }
+
+  // Name pendants: keep the name as typed (max 10) and make sure a font is chosen.
+  if (type.type === "name_pendant") {
+    const fonts = options.fonts ?? [];
+    if (!fonts.some((x) => x.id === c.fontId)) c.fontId = fonts[0]?.id ?? null;
+    c.nameText = (c.nameText ?? "").slice(0, NAME_MAX);
+  } else {
+    delete c.nameText;
+    delete c.fontId;
   }
 
   if (c.engravingText) c.engravingText = c.engravingText.slice(0, 20);

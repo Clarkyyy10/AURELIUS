@@ -2,6 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Inter } from "next/font/google";
 import { Providers } from "@/components/layout/Providers";
 import "./globals.css";
+// Name-pendant fonts (SIL Open Font License), bundled locally. Files load only when used.
+import "@fontsource/great-vibes/latin-400.css";
+import "@fontsource/dancing-script/latin-700.css";
+import "@fontsource/playfair-display/latin-700.css";
+import "@fontsource/montserrat/latin-700.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 const cormorant = Cormorant_Garamond({
