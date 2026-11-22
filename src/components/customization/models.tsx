@@ -345,30 +345,55 @@ export function NamePendantModel({ finish, sizeFactor, nameText, fontFile, scrip
   const letter = 0.62 * sizeFactor;
   const depth = 0.07 * sizeFactor;
 
-  const { geometry, width, height } = useMemo(() => {
+  const ringR = 0.06 * sizeFactor;
+
+  const { geometry, width, height, rings } = useMemo(() => {
     const g = new TextGeometry(text, { font, size: letter, depth, curveSegments: 10, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.01, bevelSegments: 2 });
     g.center();
     g.computeBoundingBox();
     const b = g.boundingBox!;
-    return { geometry: g, width: b.max.x - b.min.x, height: b.max.y - b.min.y };
-  }, [font, text, letter, depth]);
+    const h = b.max.y - b.min.y;
+
+    // Attach the jump rings to the real metal: the outermost point of the first and last letters,
+    // looking only at their upper part so the chain hangs evenly (e.g. a "c" curves inward and a
+    // "k" ends low, so the bounding box edge would leave the rings floating).
+    const pos = g.attributes.position;
+    const minY = b.min.y + h * 0.35;
+    let left: [number, number] = [b.min.x, 0];
+    let right: [number, number] = [b.max.x, 0];
+    let lx = Infinity;
+    let rx = -Infinity;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      const y = pos.getY(i);
+      if (y < minY) continue;
+      if (x < lx) [lx, left] = [x, [x, y]];
+      if (x > rx) [rx, right] = [x, [x, y]];
+    }
+    // Each ring overlaps its letter by half a ring, so it is visibly joined to the metal.
+    const overlap = ringR * 0.75;
+    return {
+      geometry: g,
+      width: b.max.x - b.min.x,
+      height: h,
+      rings: [
+        [left[0] - overlap, left[1]],
+        [right[0] + overlap, right[1]],
+      ] as [number, number][],
+    };
+  }, [font, text, letter, depth, ringR]);
   useEffect(() => () => geometry.dispose(), [geometry]);
 
-  const ringR = 0.06 * sizeFactor;
-  const ends: [number, number][] = [
-    [-width / 2 - ringR * 0.6, height * 0.12],
-    [width / 2 + ringR * 0.6, height * 0.12],
-  ];
-  const chain = useMemo(
-    () =>
-      ends.map(([x, y]) => {
-        const top = new THREE.Vector3(Math.sign(x) * width * 0.18, y + width * 0.55, -0.05);
-        const curve = new THREE.CatmullRomCurve3([new THREE.Vector3(x, y + ringR, 0), new THREE.Vector3(x * 0.85, y + width * 0.25, -0.02), top]);
-        return new THREE.TubeGeometry(curve, 48, 0.012 * Math.max(1, sizeFactor), 6, false);
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [width, height, ringR, sizeFactor],
-  );
+  // The chain starts at the top of each ring and rises to the wearer's neck.
+  const chain = useMemo(() => {
+    const topY = Math.max(rings[0][1], rings[1][1]) + width * 0.55;
+    return rings.map(([x, y]) => {
+      const start = new THREE.Vector3(x, y + ringR, 0);
+      const mid = new THREE.Vector3(x + Math.sign(x) * width * 0.04, y + width * 0.25, -0.02);
+      const top = new THREE.Vector3(Math.sign(x) * width * 0.18, topY, -0.05);
+      return new THREE.TubeGeometry(new THREE.CatmullRomCurve3([start, mid, top]), 48, 0.012 * Math.max(1, sizeFactor), 6, false);
+    });
+  }, [rings, width, ringR, sizeFactor]);
   useEffect(() => () => chain.forEach((c) => c.dispose()), [chain]);
 
   return (
@@ -382,9 +407,9 @@ export function NamePendantModel({ finish, sizeFactor, nameText, fontFile, scrip
           <MetalMaterial finish={finish} />
         </mesh>
       )}
-      {ends.map(([x, y]) => (
-        <mesh key={x} position={[x, y, 0]} rotation={[0, Math.PI / 2, 0]} name="metal">
-          <torusGeometry args={[ringR, ringR * 0.25, 10, 24]} />
+      {rings.map(([x, y]) => (
+        <mesh key={x} position={[x, y, 0]} name="metal">
+          <torusGeometry args={[ringR, ringR * 0.28, 12, 28]} />
           <MetalMaterial finish={finish} />
         </mesh>
       ))}
