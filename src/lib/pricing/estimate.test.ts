@@ -125,9 +125,11 @@ describe("estimate() — required and coverage cases", () => {
     };
     expect(used.materials.size).toBe(options.materials.length);
     expect(used.finishes.size).toBe(options.finishes.length);
-    expect(used.gemstones.size).toBe(options.gemstones.length);
-    expect(used.cuts.size).toBe(options.cuts.length);
-    expect(used.sizes.size).toBe(options.sizes.length);
+    // Birthstones, the newer cuts, anklet and toe-ring sizes are covered in design.test.ts (D-25).
+    const newer = new Set(["anklet", "toe_ring"]);
+    expect(used.gemstones.size).toBe(6);
+    expect(used.cuts.size).toBe(4);
+    expect(used.sizes.size).toBe(options.sizes.filter((x) => !newer.has(x.productType)).length);
     expect(new Set(cases.map(([, c]) => c.claspId).filter(Boolean)).size).toBe(options.clasps.length);
     expect(cases.length).toBeGreaterThanOrEqual(20);
   });
@@ -148,7 +150,7 @@ describe("estimate() — rounding and breakdown", () => {
 
   it("returns a breakdown that adds up to the unrounded total", () => {
     const r = estimate(cases[0][1], options);
-    expect(r.breakdown).toEqual({ metal: 19026, stones: 3500, labor: 1500, finish: 0, clasp: 0 });
+    expect(r.breakdown).toEqual({ metal: 19026, stones: 3500, labor: 1500, finish: 0, clasp: 0, design: 0 });
     const r2 = estimate(cases[1][1], options);
     expect(r2.breakdown.metal + r2.breakdown.stones + r2.breakdown.labor + r2.breakdown.finish).toBeCloseTo(2263.5, 6);
   });

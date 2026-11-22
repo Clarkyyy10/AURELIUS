@@ -10,7 +10,10 @@ import { Center, ContactShadows, Environment, Lightformer, OrbitControls, Perspe
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import type { CustomizationOptions, DesignConfig, ProductType } from "@/types";
-import { BraceletModel, EarringsModel, NamePendantModel, PendantModel, RingModel, type ModelProps } from "./models";
+import { BraceletModel, EarringsModel, NamePendantModel, PendantModel, type ModelProps } from "./models";
+import { RingModel, ToeRingModel } from "./rings";
+import { TextureContext } from "./stones";
+import { chosenOption } from "@/lib/pricing/design";
 import { NecklaceModel } from "./chains";
 
 const MODELS: Record<ProductType, React.ComponentType<ModelProps>> = {
@@ -20,6 +23,8 @@ const MODELS: Record<ProductType, React.ComponentType<ModelProps>> = {
   necklace: NecklaceModel,
   bracelet: BraceletModel,
   earrings: EarringsModel,
+  anklet: NecklaceModel,
+  toe_ring: ToeRingModel,
 };
 
 const CAMERA: Record<ProductType, [number, number, number]> = {
@@ -29,6 +34,8 @@ const CAMERA: Record<ProductType, [number, number, number]> = {
   necklace: [0, 0, 6.2],
   bracelet: [0, 0.6, 5.6],
   earrings: [0, 0.3, 3.8],
+  anklet: [0, 0.6, 5.6],
+  toe_ring: [0, 0.7, 5],
 };
 
 /** Resolve the config into what the models need. Unknown IDs fall back safely. */
@@ -41,6 +48,8 @@ export function useResolved(config: DesignConfig, options: CustomizationOptions)
     const size = options.sizes.find((s) => s.id === config.sizeId);
     const type = options.productTypes.find((p) => p.type === config.productType);
     const font = config.productType === "name_pendant" ? ((options.fonts ?? []).find((x) => x.id === config.fontId) ?? options.fonts?.[0]) : undefined;
+    const key = (g: "style" | "setting" | "profile" | "shank" | "texture") => chosenOption(config, options, g)?.key;
+    const textFont = (options.fonts ?? []).find((x) => x.id === config.fontId);
     return {
       finish,
       gem,
@@ -53,6 +62,8 @@ export function useResolved(config: DesignConfig, options: CustomizationOptions)
       scriptFont: font ? font.cssFamily.includes("cursive") : undefined,
       chainPattern: (options.chainStyles ?? []).find((c) => c.id === config.chainStyleId)?.pattern,
       claspKind: (options.clasps ?? []).find((c) => c.id === config.claspId)?.kind,
+      design: { style: key("style"), setting: key("setting"), profile: key("profile"), shank: key("shank"), texture: key("texture"), text: config.styleText },
+      textFontFile: textFont?.file,
     };
   }, [config, options]);
 }
@@ -144,7 +155,7 @@ export interface JewelrySceneProps {
 export function JewelryScene({ config, options, autoRotate, enableRotate = true, enableZoom = true, onInteract, fitRef, background = "#F6F1E9" }: JewelrySceneProps) {
   const resolved = useResolved(config, options);
   const [shadowY, setShadowY] = useState(-1.2);
-  const fitKey = `${config.productType}|${config.sizeId}|${config.gemstoneId === "gem-none" ? 0 : config.stoneQuantity}|${config.nameText ?? ""}|${config.fontId ?? ""}|${config.chainStyleId ?? ""}|${config.claspId ?? ""}`;
+  const fitKey = `${config.productType}|${config.sizeId}|${config.gemstoneId === "gem-none" ? 0 : config.stoneQuantity}|${config.nameText ?? ""}|${config.fontId ?? ""}|${config.chainStyleId ?? ""}|${config.claspId ?? ""}|${JSON.stringify(config.choices ?? {})}|${config.styleText ?? ""}`;
   const Model = MODELS[config.productType];
   const piece = useRef<THREE.Group>(null);
 
@@ -156,7 +167,9 @@ export function JewelryScene({ config, options, autoRotate, enableRotate = true,
       <directionalLight position={[3, 5, 4]} intensity={1.2} />
       <Suspense fallback={null}>
         <group ref={piece}>
-          <Center onCentered={({ height }) => setShadowY(-height / 2 - 0.02)}>{resolved.modelUrl ? <GlbModel url={resolved.modelUrl} {...resolved} /> : <Model {...resolved} />}</Center>
+          <TextureContext.Provider value={resolved.design.texture}>
+            <Center onCentered={({ height }) => setShadowY(-height / 2 - 0.02)}>{resolved.modelUrl ? <GlbModel url={resolved.modelUrl} {...resolved} /> : <Model {...resolved} />}</Center>
+          </TextureContext.Provider>
         </group>
       </Suspense>
       <AutoFit target={piece} fitRef={fitRef} shapeKey={fitKey} />

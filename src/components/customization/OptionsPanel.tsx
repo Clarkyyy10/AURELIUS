@@ -8,7 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import type { ChainFamily, CustomizationOptions, DesignConfig, ProductType } from "@/types";
+import type { ChainFamily, CustomizationOptions, DesignConfig, DesignOption, OptionGroup, ProductType } from "@/types";
+import { GROUP_LABEL, optionsFor, stoneRule, styleOf, styleTextProblem, usesChain } from "@/lib/pricing/design";
+import { ZODIAC_SIGNS } from "@/lib/data/seed/designs";
 import { NAME_MAX, nameProblem } from "@/lib/pricing/name";
 
 const CHAIN_GROUPS: [ChainFamily, string][] = [
@@ -54,6 +56,18 @@ export function PieceIcon({ type, className }: { type: ProductType; className?: 
           <path d="M4 18h16" />
         </g>
       )}
+      {type === "anklet" && (
+        <g {...common}>
+          <path d="M9 3v8c0 2 1 3 3 4l5 2c2 1 2 3 1 4H8" />
+          <path d="M6.5 12.5c2 2 6 3 9 2" strokeDasharray="1.4 1.4" />
+        </g>
+      )}
+      {type === "toe_ring" && (
+        <g {...common}>
+          <path d="M8 21v-8a4 4 0 0 1 8 0v8" />
+          <ellipse cx="12" cy="15" rx="5" ry="1.8" />
+        </g>
+      )}
       {type === "earrings" && (
         <g {...common}>
           <circle cx="7" cy="7" r="1.2" />
@@ -72,6 +86,8 @@ const MEASURE: Partial<Record<ProductType, string>> = {
   bracelet: "Measure around your wrist bone with a soft tape and add about 0.5 in (1.3 cm) for comfort.",
   pendant: "Small is about 1.5 cm tall, Medium about 2 cm, Large about 2.5 cm.",
   earrings: "Small is about 6 mm across, Medium about 8 mm, Large about 10 mm.",
+  anklet: "Measure around your ankle just above the ankle bone and add about 0.5 in (1.3 cm) so it hangs loosely.",
+  toe_ring: "Small fits most second toes; choose Large for a looser fit. An open toe ring can be adjusted.",
   name_pendant: "The size is the height of the capital letters. Longer names make a wider pendant; the owner confirms the final size and price.",
 };
 
@@ -94,6 +110,31 @@ function Choice({ selected, onClick, children, className, label }: { selected: b
   );
 }
 
+/** Cards for one design-option group, grouped by family when there is more than one. */
+function GroupPicker({ group, list, value, onPick }: { group: OptionGroup; list: DesignOption[]; value?: string; onPick: (id: string) => void }) {
+  const families = [...new Set(list.map((o) => o.family ?? ""))];
+  const grouped = families.length > 1;
+  return (
+    <div role="radiogroup" aria-label={GROUP_LABEL[group]} className="space-y-3">
+      {families.map((fam) => (
+        <div key={fam}>
+          {grouped && fam && <p className="mb-1.5 text-xs font-medium text-muted-foreground">{fam}</p>}
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] gap-2">
+            {list
+              .filter((o) => (o.family ?? "") === fam)
+              .map((o) => (
+                <Choice key={o.id} selected={o.id === value} onClick={() => onPick(o.id)} className="min-w-0 px-3 py-2 text-left break-words hyphens-auto" label={o.label}>
+                  <span className="block font-medium">{o.label}</span>
+                  <span className="block text-xs leading-snug text-muted-foreground">{o.description}</span>
+                </Choice>
+              ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** Options panel for FR-01 to FR-04 (only active, owner-set options are shown — FR-47). */
 export function OptionsPanel({
   config,
@@ -112,8 +153,22 @@ export function OptionsPanel({
   const gem = options.gemstones.find((g) => g.id === config.gemstoneId);
   const hasStone = Boolean(gem && !gem.isNone);
   const sizes = options.sizes.filter((s) => s.productType === config.productType).sort((a, b) => a.sortOrder - b.sortOrder);
-  const sections = ["type", "material", "finish", "name", "chain", "gem", "size", "extras"];
-  const isNecklace = config.productType === "necklace";
+  const sections = ["type", "style", "material", "finish", "name", "text", "chain", "gem", "details", "size", "extras"];
+  const chain = usesChain(config, options);
+  const style = styleOf(config, options);
+  const rule = stoneRule(config, options);
+  const styles = optionsFor(options, config.productType, "style");
+  const pick = (group: OptionGroup) => (id: string) => onChange({ choices: { ...config.choices, [group]: id } });
+  const detailGroups = (["setting", "profile", "shank", "texture"] as const).filter((g) => optionsFor(options, config.productType, g).length > 0 && (g !== "setting" || hasStone));
+  const textProblem = config.styleText ? styleTextProblem(style, config.styleText) : null;
+  const textFonts = style?.textMax && style.key !== "zodiac";
+  const pearlOnly = style?.requiresSurface === "pearl";
+  const gemList = [...options.gemstones]
+    .filter((g) => (pearlOnly ? g.surface === "pearl" : !(g.isNone && rule.min > 0)))
+    .sort((a, b) => Number(Boolean(b.isNone)) - Number(Boolean(a.isNone)));
+  const qtyMin = Math.max(1, rule.min);
+  let step = 0;
+  const n = () => ++step;
   const isName = config.productType === "name_pendant";
   const fonts = options.fonts ?? [];
   const problem = config.nameText ? nameProblem(config.nameText) : null;
@@ -121,7 +176,7 @@ export function OptionsPanel({
   return (
     <Accordion type="multiple" defaultValue={sections} className="w-full">
       <AccordionItem value="type">
-        <AccordionTrigger className="text-base font-semibold">1. Piece type</AccordionTrigger>
+        <AccordionTrigger className="text-base font-semibold">{n()}. Piece type</AccordionTrigger>
         <AccordionContent>
           <div role="radiogroup" aria-label="Piece type" className="grid grid-cols-[repeat(auto-fill,minmax(5.75rem,1fr))] gap-2">
             {options.productTypes.map((p) => (
@@ -135,8 +190,17 @@ export function OptionsPanel({
         </AccordionContent>
       </AccordionItem>
 
+      {styles.length > 0 && (
+        <AccordionItem value="style">
+          <AccordionTrigger className="text-base font-semibold">{n()}. Style</AccordionTrigger>
+          <AccordionContent>
+            <GroupPicker group="style" list={styles} value={config.choices?.style} onPick={pick("style")} />
+          </AccordionContent>
+        </AccordionItem>
+      )}
+
       <AccordionItem value="material">
-        <AccordionTrigger className="text-base font-semibold">2. Material</AccordionTrigger>
+        <AccordionTrigger className="text-base font-semibold">{n()}. Material</AccordionTrigger>
         <AccordionContent>
           <div role="radiogroup" aria-label="Material" className="grid grid-cols-2 gap-2">
             {options.materials.map((m) => (
@@ -149,7 +213,7 @@ export function OptionsPanel({
       </AccordionItem>
 
       <AccordionItem value="finish">
-        <AccordionTrigger className="text-base font-semibold">3. Color or finish</AccordionTrigger>
+        <AccordionTrigger className="text-base font-semibold">{n()}. Color or finish</AccordionTrigger>
         <AccordionContent>
           <div role="radiogroup" aria-label="Color or finish" className="flex flex-wrap gap-3">
             {finishes.map((f) => (
@@ -165,7 +229,7 @@ export function OptionsPanel({
 
       {isName && (
         <AccordionItem value="name">
-          <AccordionTrigger className="text-base font-semibold">4. Name and font</AccordionTrigger>
+          <AccordionTrigger className="text-base font-semibold">{n()}. Name and font</AccordionTrigger>
           <AccordionContent className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="pendant-name">Name on the pendant</Label>
@@ -216,9 +280,60 @@ export function OptionsPanel({
         </AccordionItem>
       )}
 
-      {isNecklace && (
+      {style?.textMax ? (
+        <AccordionItem value="text">
+          <AccordionTrigger className="text-base font-semibold">{n()}. {style.key === "zodiac" ? "Zodiac sign" : "Letters or text"}</AccordionTrigger>
+          <AccordionContent className="space-y-4">
+            {style.key === "zodiac" ? (
+              <div role="radiogroup" aria-label="Zodiac sign" className="grid grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-2">
+                {ZODIAC_SIGNS.map((z) => (
+                  <Choice key={z} selected={config.styleText === z} onClick={() => onChange({ styleText: z })} className="px-2 py-2">
+                    {z}
+                  </Choice>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                <Label htmlFor="style-text">{style.textMax <= 3 ? "Initials" : "Text"} for the {style.label.toLowerCase()}</Label>
+                <Input
+                  id="style-text"
+                  maxLength={style.textMax}
+                  value={config.styleText ?? ""}
+                  onChange={(e) => onChange({ styleText: e.target.value })}
+                  placeholder={style.textMax <= 3 ? "For example: JA" : "For example: Maria 2026"}
+                  autoComplete="off"
+                  aria-describedby="style-text-hint"
+                  aria-invalid={Boolean(textProblem)}
+                />
+                <p id="style-text-hint" className={cn("text-xs", textProblem ? "text-danger" : "text-muted-foreground")}>
+                  {textProblem ?? `Up to ${style.textMax} characters (${style.textMax - (config.styleText?.length ?? 0)} left).`}
+                </p>
+              </div>
+            )}
+            {textFonts && fonts.length > 0 && (
+              <div>
+                <p className="mb-2 text-sm font-medium" id="text-font-label">
+                  Font
+                </p>
+                <div role="radiogroup" aria-labelledby="text-font-label" className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2">
+                  {fonts.map((f) => (
+                    <Choice key={f.id} selected={f.id === (config.fontId ?? fonts[0].id)} onClick={() => onChange({ fontId: f.id })} className="flex flex-col items-start gap-0.5 px-3 py-2 text-left" label={f.label}>
+                      <span className="block w-full truncate text-xl leading-tight text-ink" style={{ fontFamily: f.cssFamily }} aria-hidden>
+                        {(config.styleText ?? "").trim() || "AB"}
+                      </span>
+                      <span className="text-xs text-muted-foreground">{f.label}</span>
+                    </Choice>
+                  ))}
+                </div>
+              </div>
+            )}
+          </AccordionContent>
+        </AccordionItem>
+      ) : null}
+
+      {chain && (
         <AccordionItem value="chain">
-          <AccordionTrigger className="text-base font-semibold">4. Chain style and clasp</AccordionTrigger>
+          <AccordionTrigger className="text-base font-semibold">{n()}. Chain style and clasp</AccordionTrigger>
           <AccordionContent className="space-y-4">
             <div role="radiogroup" aria-label="Chain style" className="space-y-3">
               {CHAIN_GROUPS.map(([family, title]) => {
@@ -256,16 +371,19 @@ export function OptionsPanel({
         </AccordionItem>
       )}
 
-      {!isName && !isNecklace && (
+      {!isName && (rule.max > 0 || styles.length === 0 || type.maxStones > 0) && (
       <AccordionItem value="gem">
-        <AccordionTrigger className="text-base font-semibold">4. Gemstone</AccordionTrigger>
+        <AccordionTrigger className="text-base font-semibold">{n()}. {pearlOnly ? "Pearls" : "Gemstone"}</AccordionTrigger>
         <AccordionContent>
-          {type.maxStones === 0 ? (
-            <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">Gemstones are not available for this piece.</p>
-          ) : (
+          {rule.max === 0 ? (
+            <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
+              {style ? `The ${style.label} style has no stones. Choosing a stone switches to a style that holds one.` : "Gemstones are not available for this piece."}
+            </p>
+          ) : null}
+          {rule.max === 0 && styles.length === 0 ? null : (
             <div className="space-y-4">
               <div role="radiogroup" aria-label="Gemstone type" className="flex flex-wrap gap-2">
-                {[...options.gemstones].sort((a, b) => Number(Boolean(b.isNone)) - Number(Boolean(a.isNone))).map((g) => (
+                {gemList.map((g) => (
                   <Choice key={g.id} selected={g.id === config.gemstoneId} onClick={() => onChange({ gemstoneId: g.id })} className="flex items-center gap-2 py-1.5 pr-3 pl-1.5">
                     <span
                       className={cn("size-7 rotate-45 rounded-[4px] border border-black/10", g.isNone && "rotate-0 rounded-full border-dashed border-muted-foreground bg-transparent")}
@@ -276,9 +394,10 @@ export function OptionsPanel({
                   </Choice>
                 ))}
               </div>
+              {style?.key === "birthstone" && <p className="text-xs text-muted-foreground">Each birthstone shows its month in brackets, for example Garnet (January).</p>}
               {hasStone && (
                 <>
-                  <div>
+                  {!pearlOnly && <div>
                     <p className="mb-2 text-sm font-medium" id="cut-label">
                       Cut
                     </p>
@@ -289,25 +408,25 @@ export function OptionsPanel({
                         </Choice>
                       ))}
                     </div>
-                  </div>
-                  <div>
+                  </div>}
+                  {rule.max > 1 && <div>
                     <p className="mb-2 text-sm font-medium" id="qty-label">
                       Number of stones {config.productType === "earrings" && <span className="font-normal text-muted-foreground">(for the pair)</span>}
                     </p>
                     <div className="inline-flex items-center gap-2" role="group" aria-labelledby="qty-label">
-                      <Button type="button" variant="outline" size="icon" onClick={() => onChange({ stoneQuantity: config.stoneQuantity - 1 })} disabled={config.stoneQuantity <= 1} aria-label="Fewer stones">
+                      <Button type="button" variant="outline" size="icon" onClick={() => onChange({ stoneQuantity: config.stoneQuantity - 1 })} disabled={config.stoneQuantity <= qtyMin} aria-label="Fewer stones">
                         <Minus className="size-4" />
                       </Button>
                       <span className="tabular w-8 text-center text-lg font-semibold" aria-live="polite">
                         {config.stoneQuantity}
                       </span>
-                      <Button type="button" variant="outline" size="icon" onClick={() => onChange({ stoneQuantity: config.stoneQuantity + 1 })} disabled={config.stoneQuantity >= type.maxStones} aria-label="More stones">
+                      <Button type="button" variant="outline" size="icon" onClick={() => onChange({ stoneQuantity: config.stoneQuantity + 1 })} disabled={config.stoneQuantity >= rule.max} aria-label="More stones">
                         <Plus className="size-4" />
                       </Button>
-                      <span className="text-xs text-muted-foreground">up to {type.maxStones}</span>
+                      <span className="text-xs text-muted-foreground">{qtyMin === rule.max ? `exactly ${rule.max}` : qtyMin > 1 ? `${qtyMin} to ${rule.max}` : `up to ${rule.max}`}</span>
                     </div>
-                    {config.productType === "earrings" && <p className="mt-1 text-xs text-muted-foreground">Choose 2 for a matching pair (one stone in each earring).</p>}
-                  </div>
+                    {config.productType === "earrings" && rule.max === 2 && <p className="mt-1 text-xs text-muted-foreground">Choose 2 for a matching pair (one stone in each earring).</p>}
+                  </div>}
                 </>
               )}
             </div>
@@ -317,8 +436,22 @@ export function OptionsPanel({
 
       )}
 
+      {detailGroups.length > 0 && (
+        <AccordionItem value="details">
+          <AccordionTrigger className="text-base font-semibold">{n()}. {detailGroups.length === 1 ? GROUP_LABEL[detailGroups[0]] : "Design details"}</AccordionTrigger>
+          <AccordionContent className="space-y-4">
+            {detailGroups.map((g) => (
+              <div key={g}>
+                {detailGroups.length > 1 && <p className="mb-2 text-sm font-medium">{GROUP_LABEL[g]}</p>}
+                <GroupPicker group={g} list={optionsFor(options, config.productType, g)} value={config.choices?.[g]} onPick={pick(g)} />
+              </div>
+            ))}
+          </AccordionContent>
+        </AccordionItem>
+      )}
+
       <AccordionItem value="size">
-        <AccordionTrigger className="text-base font-semibold">5. Size</AccordionTrigger>
+        <AccordionTrigger className="text-base font-semibold">{n()}. Size</AccordionTrigger>
         <AccordionContent>
           <div className="flex flex-wrap items-center gap-2">
             <div role="radiogroup" aria-label="Size" className="flex flex-wrap gap-2">
@@ -343,7 +476,7 @@ export function OptionsPanel({
       </AccordionItem>
 
       <AccordionItem value="extras">
-        <AccordionTrigger className="text-base font-semibold">6. Engraving and notes (optional)</AccordionTrigger>
+        <AccordionTrigger className="text-base font-semibold">{n()}. Engraving and notes (optional)</AccordionTrigger>
         <AccordionContent className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="engraving">Engraving text</Label>

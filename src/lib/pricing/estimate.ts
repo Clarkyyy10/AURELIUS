@@ -2,7 +2,8 @@
 //
 //   est_weight_g = round2( baseWeightG × size_factor × density_ratio × chain_factor )  (0.01 g, half-up)
 //   stone_price  = gemstone.basePrice × cut.multiplier × stoneQuantity                 (0 when "None")
-//   est_price    = round0( est_weight_g × ratePerGram + stone_price + laborFee + finish.fee + clasp.fee )  (nearest peso, half-up)
+//   est_price    = round0( est_weight_g × ratePerGram + stone_price + laborFee + finish.fee + clasp.fee + Σ design fees )  (nearest peso, half-up)
+//   est_weight_g also multiplies the weight factors of the chosen style, setting, band shape, shank and texture (D-25).
 //
 // chain_factor and clasp.fee apply to necklaces only (chain_factor = 1, clasp fee = 0 for other pieces).
 // They were added after Phase 1 review (decisions D-23); cable chain = 1.00 and lobster clasp = ₱0,
@@ -23,6 +24,8 @@ import type {
   SizeOption,
 } from "@/types";
 import { nameProblem } from "./name";
+import { GROUP_LABEL, optionsFor, stoneRule, styleTextProblem, usesChain } from "./design";
+import { OPTION_GROUPS, type DesignOption } from "@/types";
 
 /** Factors and ratios are stored with up to 4 decimals. */
 const FACTOR_SCALE = 10_000;
@@ -57,6 +60,9 @@ export interface ResolvedSelection {
   stoneQuantity: number;
   chainFactor: number;
   claspFee: number;
+  /** Weight factors and fees of the chosen design options (style, setting, band shape, shank, texture). */
+  designFactors: number[];
+  designFee: number;
 }
 
 /** Look up every option the config refers to. Throws a plain-English error if one is missing. */
@@ -81,11 +87,24 @@ export function resolveSelection(config: DesignConfig, options: CustomizationOpt
     if (!(options.fonts ?? []).some((x) => x.id === config.fontId)) throw new EstimateError("Choose a font for the name.");
   }
 
-  // Necklaces: chain style and clasp. Designs submitted before chain styles existed have neither,
-  // and keep the plain-chain estimate they were submitted with (factor 1, no clasp fee).
+  // Design options (D-25). Designs saved before options existed have no choices and keep their estimate.
+  const picked: DesignOption[] = [];
+  for (const group of OPTION_GROUPS) {
+    const id = config.choices?.[group];
+    if (!id) continue;
+    const opt = optionsFor(options, productType.type, group).find((o) => o.id === id);
+    if (!opt) throw new EstimateError(`Choose a ${GROUP_LABEL[group].toLowerCase()} to see an estimate.`);
+    picked.push(opt);
+  }
+  const style = picked.find((o) => o.group === "style");
+  const textProblem = styleTextProblem(style, config.styleText);
+  if (textProblem) throw new EstimateError(textProblem);
+
+  // Chain style and clasp (necklaces, chain bracelets, anklets…). Designs saved before chain styles
+  // existed have neither, and keep the plain-chain estimate they were submitted with.
   let chainFactor = 1;
   let claspFee = 0;
-  if (productType.type === "necklace") {
+  if (usesChain(config, options)) {
     if (config.chainStyleId) {
       const chain = (options.chainStyles ?? []).find((c) => c.id === config.chainStyleId);
       if (!chain) throw new EstimateError("Choose a chain style to see an estimate.");
@@ -101,32 +120,41 @@ export function resolveSelection(config: DesignConfig, options: CustomizationOpt
   const hasStone = !gemstone.isNone && gemstone.basePrice > 0;
   if (hasStone && !cut) throw new EstimateError("Choose a gemstone cut to see an estimate.");
 
+  const rule = stoneRule(config, options);
   const stoneQuantity = hasStone ? config.stoneQuantity : 0;
-  if (hasStone && (stoneQuantity < 1 || stoneQuantity > productType.maxStones)) {
+  if (hasStone && (stoneQuantity < Math.max(1, rule.min) || stoneQuantity > rule.max)) {
     throw new EstimateError(
-      productType.maxStones === 0
-        ? "Gemstones are not available for this piece."
-        : `Choose between 1 and ${productType.maxStones} stones.`,
+      rule.max === 0
+        ? style ? `The ${style.label} style has no stones.` : "Gemstones are not available for this piece."
+        : rule.min === rule.max ? `This style takes exactly ${rule.max} stones.` : `Choose between ${Math.max(1, rule.min)} and ${rule.max} stones.`,
     );
   }
+  if (!hasStone && rule.min > 0) throw new EstimateError(`The ${style?.label ?? "chosen"} style needs a gemstone. Choose one to see an estimate.`);
+  if (style?.requiresSurface && gemstone.surface !== style.requiresSurface) throw new EstimateError(`The ${style.label} style needs pearls. Choose Pearl as the stone.`);
 
-  return { productType, material, finish, gemstone, cut: hasStone ? cut : null, size, stoneQuantity, chainFactor, claspFee };
+  // A setting only applies when there are stones to hold.
+  const counted = picked.filter((o) => o.group !== "setting" || stoneQuantity > 0);
+  const designFactors = counted.map((o) => o.weightFactor);
+  const designFee = counted.reduce((sum, o) => sum + o.fee, 0);
+
+  return { productType, material, finish, gemstone, cut: hasStone ? cut : null, size, stoneQuantity, chainFactor, claspFee, designFactors, designFee };
 }
 
 /** Estimated weight in grams, rounded half-up to 0.01 g. */
-export function estimateWeightG(baseWeightG: number, sizeFactor: number, densityRatio: number, chainFactor = 1): number {
-  // Four scaled factors can exceed 2^53, so this product uses exact BigInt arithmetic.
+export function estimateWeightG(baseWeightG: number, sizeFactor: number, densityRatio: number, ...factors: number[]): number {
+  // Many scaled factors exceed 2^53, so this product uses exact BigInt arithmetic.
   const s = (v: number) => BigInt(toScaled(v, FACTOR_SCALE));
-  const product = s(baseWeightG) * s(sizeFactor) * s(densityRatio) * s(chainFactor);
-  // product is grams × 10^16; we want centigrams (grams × 10^2), rounded half-up.
-  const denominator = BigInt(FACTOR_SCALE) ** BigInt(4) / BigInt(100);
+  const all = [baseWeightG, sizeFactor, densityRatio, ...factors];
+  const product = all.reduce((acc, v) => acc * s(v), BigInt(1));
+  // product is grams × 10^(4n); we want centigrams (grams × 10^2), rounded half-up.
+  const denominator = BigInt(FACTOR_SCALE) ** BigInt(all.length) / BigInt(100);
   const centigrams = (product + denominator / BigInt(2)) / denominator;
   return Number(centigrams) / 100;
 }
 
 /** Pure estimate from resolved options. */
 export function estimateFromSelection(sel: ResolvedSelection): Estimate {
-  const weightG = estimateWeightG(sel.productType.baseWeightG, sel.size.factor, sel.material.densityRatio, sel.chainFactor);
+  const weightG = estimateWeightG(sel.productType.baseWeightG, sel.size.factor, sel.material.densityRatio, sel.chainFactor, ...sel.designFactors);
   const centigrams = Math.round(weightG * 100);
 
   // Everything below is in micro-pesos (peso × 10^6) so we can sum exactly.
@@ -138,8 +166,9 @@ export function estimateFromSelection(sel: ResolvedSelection): Estimate {
   const laborMicro = toScaled(sel.productType.laborFee, MONEY_SCALE) * FACTOR_SCALE;
   const finishMicro = toScaled(sel.finish.fee, MONEY_SCALE) * FACTOR_SCALE;
   const claspMicro = toScaled(sel.claspFee, MONEY_SCALE) * FACTOR_SCALE;
+  const designMicro = toScaled(sel.designFee, MONEY_SCALE) * FACTOR_SCALE;
 
-  const totalMicro = metalMicro + stonesMicro + laborMicro + finishMicro + claspMicro;
+  const totalMicro = metalMicro + stonesMicro + laborMicro + finishMicro + claspMicro + designMicro;
   const price = divRoundHalfUp(totalMicro, 1_000_000);
 
   const toPesos = (micro: number) => divRoundHalfUp(micro, 10_000) / 100; // centavo precision for display
@@ -153,6 +182,7 @@ export function estimateFromSelection(sel: ResolvedSelection): Estimate {
       labor: toPesos(laborMicro),
       finish: toPesos(finishMicro),
       clasp: toPesos(claspMicro),
+      design: toPesos(designMicro),
     },
   };
 }

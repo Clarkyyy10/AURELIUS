@@ -47,6 +47,12 @@ export function EstimateBar({ estimate, error, className, action }: { estimate: 
               <dd className="tabular text-right">{formatPesoExact(estimate.breakdown.labor)}</dd>
               <dt>Finish</dt>
               <dd className="tabular text-right">{formatPesoExact(estimate.breakdown.finish)}</dd>
+              {(estimate.breakdown.design ?? 0) > 0 && (
+                <>
+                  <dt>Design options</dt>
+                  <dd className="tabular text-right">{formatPesoExact(estimate.breakdown.design ?? 0)}</dd>
+                </>
+              )}
               {estimate.breakdown.clasp > 0 && (
                 <>
                   <dt>Clasp</dt>

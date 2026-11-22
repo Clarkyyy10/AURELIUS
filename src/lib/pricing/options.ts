@@ -1,7 +1,8 @@
 // Helpers for owner-configured options (FR-47).
 
 import { UserFacingError } from "@/lib/data/repositories";
-import type { CustomizationOptions } from "@/types";
+import { OPTION_GROUPS, type CustomizationOptions } from "@/types";
+import { GROUP_LABEL } from "./design";
 
 export function activeOptions(o: CustomizationOptions): CustomizationOptions {
   return {
@@ -14,6 +15,7 @@ export function activeOptions(o: CustomizationOptions): CustomizationOptions {
     fonts: (o.fonts ?? []).filter((x) => x.active),
     chainStyles: (o.chainStyles ?? []).filter((x) => x.active),
     clasps: (o.clasps ?? []).filter((x) => x.active),
+    designOptions: (o.designOptions ?? []).filter((x) => x.active),
   };
 }
 
@@ -34,6 +36,16 @@ export function validateOptions(o: CustomizationOptions): void {
   }
   for (const c of o.chainStyles ?? []) if (!(c.weightFactor > 0) || c.weightFactor > 10) throw new UserFacingError(`${c.label} weight factor must be greater than 0.`);
   for (const c of o.clasps ?? []) if (!(c.fee >= 0) || !Number.isFinite(c.fee)) throw new UserFacingError(`${c.label} fee must be 0 or more.`);
+  for (const d of o.designOptions ?? []) {
+    if (!(d.weightFactor > 0) || d.weightFactor > 10) throw new UserFacingError(`${d.label} weight factor must be greater than 0.`);
+    if (!(d.fee >= 0) || !Number.isFinite(d.fee)) throw new UserFacingError(`${d.label} fee must be 0 or more.`);
+  }
+  // Every active piece type keeps at least one active option in each group it uses.
+  for (const p of o.productTypes.filter((x) => x.active))
+    for (const group of OPTION_GROUPS) {
+      const list = (o.designOptions ?? []).filter((d) => d.group === group && d.productTypes.includes(p.type));
+      if (list.length && !list.some((d) => d.active)) throw new UserFacingError(`Keep at least one active ${GROUP_LABEL[group].toLowerCase()} for ${p.label}.`);
+    }
   const nums: [number, string][] = [
     ...o.productTypes.flatMap((p): [number, string][] => [[p.baseWeightG, `${p.label} base weight`], [p.laborFee, `${p.label} labor fee`], [p.maxStones, `${p.label} max stones`]]),
     ...o.materials.flatMap((m): [number, string][] => [[m.ratePerGram, `${m.label} rate per gram`], [m.densityRatio, `${m.label} density ratio`]]),

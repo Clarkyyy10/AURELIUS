@@ -269,6 +269,12 @@ function OwnerDesign({ tx }: { tx: CustomOrderRequest }) {
             <dd className="tabular text-right">{formatPesoExact(current.breakdown.labor)}</dd>
             <dt>Finish</dt>
             <dd className="tabular text-right">{formatPesoExact(current.breakdown.finish)}</dd>
+            {(current.breakdown.design ?? 0) > 0 && (
+              <>
+                <dt>Design options</dt>
+                <dd className="tabular text-right">{formatPesoExact(current.breakdown.design ?? 0)}</dd>
+              </>
+            )}
             {current.breakdown.clasp > 0 && (
               <>
                 <dt>Clasp</dt>

@@ -3,6 +3,8 @@
 // history always gives the same answer. Phase 2 replaces respond() with a call to POST /api/chat.
 
 import { repos } from "@/lib/data";
+import { optionsFor, stoneRule, styleOf, styleTextProblem, TEXT_REQUIRED, usesChain } from "@/lib/pricing/design";
+import { ZODIAC_SIGNS } from "@/lib/data/seed/designs";
 import type { DesignConfig, ProductType } from "@/types";
 import { nameProblem } from "@/lib/pricing/name";
 import type { ChatContext, ChatDraft, ChatResult, ChatTurn, KnowledgeBase } from "./types";
@@ -20,7 +22,7 @@ export const PRICE_GUARDRAIL =
 
 type State =
   | { flow: "idle" }
-  | { flow: "custom"; step: "type" | "material" | "finish" | "chain" | "gem" | "cut" | "qty" | "size" | "clasp" | "name" | "font" | "notes"; config: Partial<DesignConfig> }
+  | { flow: "custom"; step: "type" | "style" | "styleText" | "material" | "finish" | "chain" | "gem" | "cut" | "qty" | "size" | "clasp" | "name" | "font" | "notes"; config: Partial<DesignConfig> }
   | { flow: "service"; step: "itemType" | "item" | "services" | "details"; fields: NonNullable<Extract<ChatDraft, { kind: "service_request" }>["fields"]> };
 
 const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
@@ -64,6 +66,8 @@ const TYPE_WORDS: Record<ProductType, string[]> = {
   ring: ["ring", "rings", "band", "singsing"],
   pendant: ["pendant", "locket"],
   name_pendant: ["nameplate", "name-pendant"],
+  anklet: ["anklet", "ankle"],
+  toe_ring: ["toe"],
   necklace: ["necklace", "chain", "kwintas"],
   bracelet: ["bracelet", "bangle", "pulseras"],
   earrings: ["earring", "earrings", "studs", "hikaw"],
@@ -77,6 +81,10 @@ function detectType(text: string, kb: KnowledgeBase): ProductType | undefined {
 
 // ---------------------------------------------------------------- custom order flow (FR-36)
 
+const stylesOf = (kb: KnowledgeBase, type?: ProductType) => (type ? optionsFor(kb.options, type, "style") : []);
+const asConfig = (c: Partial<DesignConfig>) => c as Pick<DesignConfig, "choices" | "productType">;
+const firstStep = (kb: KnowledgeBase, type?: ProductType) => (stylesOf(kb, type).length ? "style" : "material") as "style" | "material";
+
 function askCustom(state: Extract<State, { flow: "custom" }>, kb: KnowledgeBase, prefix = ""): ChatResult {
   const o = kb.options;
   const c = state.config;
@@ -85,6 +93,15 @@ function askCustom(state: Extract<State, { flow: "custom" }>, kb: KnowledgeBase,
   switch (state.step) {
     case "type":
       return { reply: `${p}What kind of piece would you like?`, quickReplies: o.productTypes.map((x) => x.label) };
+    case "style": {
+      const styles = stylesOf(kb, c.productType);
+      return { reply: `${p}Which style would you like? For example: ${styles.slice(0, 3).map((x) => `${x.label} (${x.description.charAt(0).toLowerCase()}${x.description.slice(1).replace(/\.$/, "")})`).join("; ")}.`, quickReplies: styles.map((x) => x.label) };
+    }
+    case "styleText": {
+      const style = styleOf(asConfig(c), o);
+      if (style?.key === "zodiac") return { reply: `${p}Which zodiac sign?`, quickReplies: ZODIAC_SIGNS };
+      return { reply: `${p}What letters or text should it have? Up to ${style?.textMax} characters.${TEXT_REQUIRED.has(style?.key ?? "") ? "" : " Or type “None”."}` };
+    }
     case "material":
       return { reply: `${p}Which material would you like for your ${pt?.label.toLowerCase()}?`, quickReplies: o.materials.map((m) => m.label) };
     case "finish": {
@@ -92,12 +109,18 @@ function askCustom(state: Extract<State, { flow: "custom" }>, kb: KnowledgeBase,
       const fins = o.finishes.filter((f) => m?.finishIds.includes(f.id));
       return { reply: `${p}Which color or finish? For ${m?.label} we have ${fins.map((f) => f.label).join(", ")}.`, quickReplies: fins.map((f) => f.label) };
     }
-    case "gem":
-      return { reply: `${p}Would you like a gemstone? You can choose up to ${pt?.maxStones}.`, quickReplies: o.gemstones.map((g) => g.label) };
+    case "gem": {
+      const rule = stoneRule(asConfig(c), o);
+      const gems = o.gemstones.filter((g) => !(g.isNone && rule.min > 0) && g.surface !== "pearl");
+      return { reply: rule.min > 0 ? `${p}Which stone would you like?` : `${p}Would you like a gemstone? You can choose up to ${rule.max}.`, quickReplies: gems.map((g) => g.label) };
+    }
     case "cut":
       return { reply: `${p}Which cut for the stone?`, quickReplies: o.cuts.map((x) => x.label) };
-    case "qty":
-      return { reply: `${p}How many stones? (1 to ${pt?.maxStones})`, quickReplies: Array.from({ length: pt?.maxStones ?? 1 }, (_, i) => String(i + 1)) };
+    case "qty": {
+      const rule = stoneRule(asConfig(c), o);
+      const lo = Math.max(1, rule.min);
+      return { reply: `${p}How many stones? (${lo} to ${rule.max})`, quickReplies: rule.max - lo < 8 ? Array.from({ length: rule.max - lo + 1 }, (_, i) => String(lo + i)) : [String(lo), String(rule.default), String(rule.max)] };
+    }
     case "size": {
       const sizes = o.sizes.filter((s) => s.productType === c.productType).sort((a, b) => a.sortOrder - b.sortOrder);
       return { reply: `${p}What size? If you're not sure, choose the middle size — you can change it later.`, quickReplies: sizes.map((s) => s.label) };
@@ -130,7 +153,22 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       const t = matchOne(text, o.productTypes)?.type ?? detectType(text, kb);
       if (!t) return again("Sorry, I didn't catch that.");
       c.productType = t;
-      return next("material", `A ${pt().label.toLowerCase()} — lovely.`);
+      delete c.choices;
+      return next(firstStep(kb, t), `A ${pt().label.toLowerCase()} — lovely.`);
+    }
+    case "style": {
+      const style = matchOne(text, stylesOf(kb, c.productType));
+      if (!style) return again("Please choose one of these styles.");
+      c.choices = { style: style.id };
+      return next(style.textMax ? "styleText" : "material", `${style.label} — good choice.`);
+    }
+    case "styleText": {
+      const style = styleOf(asConfig(c), o);
+      const value = /^(none|no|wala)$/i.test(text.trim()) && !TEXT_REQUIRED.has(style?.key ?? "") ? "" : style?.key === "zodiac" ? (ZODIAC_SIGNS.find((z) => z.toLowerCase() === text.trim().toLowerCase()) ?? text.trim()) : text.trim();
+      const problem = styleTextProblem(style, value);
+      if (problem) return again(problem);
+      c.styleText = value || undefined;
+      return next("material");
     }
     case "material": {
       const m = matchOne(text, o.materials);
@@ -143,17 +181,28 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       const f = matchOne(text, o.finishes.filter((x) => m.finishIds.includes(x.id)));
       if (!f) return again(`That finish isn't available for ${m.label}.`);
       c.finishId = f.id;
-      if (pt().maxStones === 0) {
+      const rule = stoneRule(asConfig(c), o);
+      const style = styleOf(asConfig(c), o);
+      if (rule.max === 0) {
         c.gemstoneId = o.gemstones.find((g) => g.isNone)?.id;
         c.cutId = null;
         c.stoneQuantity = 0;
       }
-      if (pt().type === "necklace") return next("chain");
-      return pt().maxStones > 0 ? next("gem") : pt().type === "name_pendant" ? next("size") : next("size", `Gemstones aren't available for a ${pt().label.toLowerCase()}, so we'll skip that.`);
+      if (style?.requiresSurface === "pearl") {
+        c.gemstoneId = o.gemstones.find((g) => g.surface === "pearl")?.id;
+        c.cutId = o.cuts[0]?.id ?? null;
+        c.stoneQuantity = rule.default;
+        return next("size", `A ${style.label.toLowerCase()} uses about ${rule.default} pearls — the owner will confirm.`);
+      }
+      if (usesChain(asConfig(c), o)) return next("chain");
+      if (rule.max > 0) return next("gem");
+      return pt().type === "name_pendant" ? next("size") : next("size", style ? `The ${style.label} style has no stones, so we'll skip that.` : `Gemstones aren't available for a ${pt().label.toLowerCase()}, so we'll skip that.`);
     }
     case "gem": {
+      const rule = stoneRule(asConfig(c), o);
       const g = /^(no|none|wala|no stone|no gemstone)\b/i.test(text.trim()) ? o.gemstones.find((x) => x.isNone) : matchOne(text, o.gemstones);
       if (!g) return again("Please choose a gemstone, or “None”.");
+      if (g.isNone && rule.min > 0) return again("This style needs a stone. Please choose one.");
       c.gemstoneId = g.id;
       if (g.isNone) {
         c.cutId = null;
@@ -166,15 +215,18 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       const cut = matchOne(text, o.cuts);
       if (!cut) return again("Please choose a cut.");
       c.cutId = cut.id;
-      if (pt().maxStones === 1) {
-        c.stoneQuantity = 1;
+      const rule = stoneRule(asConfig(c), o);
+      if (Math.max(1, rule.min) === rule.max) {
+        c.stoneQuantity = rule.max;
         return next("size");
       }
       return next("qty");
     }
     case "qty": {
       const n = Number.parseInt(text.match(/\d+/)?.[0] ?? (/\b(one|isa)\b/i.test(text) ? "1" : /\b(two|dalawa)\b/i.test(text) ? "2" : /\b(three|tatlo)\b/i.test(text) ? "3" : ""), 10);
-      if (!(n >= 1 && n <= pt().maxStones)) return again(`Please choose a number from 1 to ${pt().maxStones}.`);
+      const rule = stoneRule(asConfig(c), o);
+      const lo = Math.max(1, rule.min);
+      if (!(n >= lo && n <= rule.max)) return again(`Please choose a number from ${lo} to ${rule.max}.`);
       c.stoneQuantity = n;
       return next("size");
     }
@@ -182,13 +234,14 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       const s = matchOne(text, o.sizes.filter((x) => x.productType === c.productType));
       if (!s) return again("Please choose one of these sizes.");
       c.sizeId = s.id;
-      return c.productType === "name_pendant" ? next("name") : c.productType === "necklace" ? next("clasp") : next("notes");
+      return c.productType === "name_pendant" ? next("name") : usesChain(asConfig(c), o) ? next("clasp") : next("notes");
     }
     case "chain": {
       const chain = matchOne(text, o.chainStyles ?? []);
       if (!chain) return again("Please choose one of these chain styles.");
       c.chainStyleId = chain.id;
-      return next("size", `${chain.label} — ${chain.description.charAt(0).toLowerCase()}${chain.description.slice(1)}`);
+      const ack = `${chain.label} — ${chain.description.charAt(0).toLowerCase()}${chain.description.slice(1)}`;
+      return next(stoneRule(asConfig(c), o).max > 0 ? "gem" : "size", ack);
     }
     case "clasp": {
       const clasp = matchOne(text, o.clasps ?? []);
@@ -215,9 +268,11 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       const g = o.gemstones.find((x) => x.id === c.gemstoneId);
       const cut = o.cuts.find((x) => x.id === c.cutId);
       const s = o.sizes.find((x) => x.id === c.sizeId);
-      const chained = c.productType === "necklace" ? ` · ${(o.chainStyles ?? []).find((x) => x.id === c.chainStyleId)?.label} chain with ${(o.clasps ?? []).find((x) => x.id === c.claspId)?.label.toLowerCase()} clasp` : "";
+      const chained = usesChain(asConfig(c), o) ? ` · ${(o.chainStyles ?? []).find((x) => x.id === c.chainStyleId)?.label} chain with ${(o.clasps ?? []).find((x) => x.id === c.claspId)?.label.toLowerCase()} clasp` : "";
       const named = c.productType === "name_pendant" ? ` “${c.nameText}” in ${(o.fonts ?? []).find((x) => x.id === c.fontId)?.label.toLowerCase()}` : "";
-      const summary = [`${f?.label} ${m?.label} ${pt().label.toLowerCase()}${named}`, g && !g.isNone ? `${g.label}, ${cut?.label} cut × ${c.stoneQuantity}` : "no gemstone", `size ${s?.label}`].join(" · ") + chained;
+      const style = styleOf(asConfig(c), o);
+      const styled = style ? ` (${style.label.toLowerCase()}${c.styleText ? ` “${c.styleText}”` : ""})` : "";
+      const summary = [`${f?.label} ${m?.label} ${pt().label.toLowerCase()}${styled}${named}`, g && !g.isNone ? `${g.label}, ${cut?.label} cut × ${c.stoneQuantity}` : "no gemstone", `size ${s?.label}`].join(" · ") + chained;
       return {
         state: { flow: "idle" },
         result: {
@@ -292,7 +347,7 @@ function idleStep(text: string, kb: KnowledgeBase): { state: State; result: Chat
     const config: Partial<DesignConfig> = {};
     const type = detectType(text, kb);
     if (type) config.productType = type;
-    const s: Extract<State, { flow: "custom" }> = { flow: "custom", step: type ? "material" : "type", config };
+    const s: Extract<State, { flow: "custom" }> = { flow: "custom", step: type ? firstStep(kb, type) : "type", config };
     const ack = type ? `Let's design your ${kb.options.productTypes.find((p) => p.type === type)!.label.toLowerCase()}.` : "Let's design your piece together.";
     const r = askCustom(s, kb, ack);
     if (PRICE_WORDS.test(text) || DATE_WORDS.test(text)) r.reply = `${PRICE_GUARDRAIL} ${r.reply}`;

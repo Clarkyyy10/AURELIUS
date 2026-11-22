@@ -1,5 +1,6 @@
 import type { CustomizationOptions, DesignConfig, DesignLabels, Product } from "@/types";
 import { normalizeConfig } from "./normalize";
+import { chosenOption, usesChain } from "./design";
 
 /** Human-readable labels for a design, captured when it is submitted. */
 export function designLabels(config: DesignConfig, options: CustomizationOptions): DesignLabels {
@@ -13,9 +14,15 @@ export function designLabels(config: DesignConfig, options: CustomizationOptions
     cut: hasStone ? (options.cuts.find((c) => c.id === config.cutId)?.label ?? null) : null,
     size: options.sizes.find((s) => s.id === config.sizeId)?.label ?? "—",
     name: config.productType === "name_pendant" ? (config.nameText ?? "").trim() || null : null,
-    font: config.productType === "name_pendant" ? ((options.fonts ?? []).find((x) => x.id === config.fontId)?.label ?? null) : null,
-    chain: config.productType === "necklace" ? ((options.chainStyles ?? []).find((x) => x.id === config.chainStyleId)?.label ?? null) : null,
-    clasp: config.productType === "necklace" ? ((options.clasps ?? []).find((x) => x.id === config.claspId)?.label ?? null) : null,
+    font: config.productType === "name_pendant" || (config.styleText?.trim() && chosenOption(config, options, "style")?.key !== "zodiac") ? ((options.fonts ?? []).find((x) => x.id === config.fontId)?.label ?? null) : null,
+    chain: usesChain(config, options) ? ((options.chainStyles ?? []).find((x) => x.id === config.chainStyleId)?.label ?? null) : null,
+    clasp: usesChain(config, options) ? ((options.clasps ?? []).find((x) => x.id === config.claspId)?.label ?? null) : null,
+    style: chosenOption(config, options, "style")?.label ?? null,
+    setting: config.stoneQuantity > 0 ? (chosenOption(config, options, "setting")?.label ?? null) : null,
+    profile: chosenOption(config, options, "profile")?.label ?? null,
+    shank: chosenOption(config, options, "shank")?.label ?? null,
+    texture: chosenOption(config, options, "texture")?.label ?? null,
+    styleText: config.styleText?.trim() || null,
   };
 }
 

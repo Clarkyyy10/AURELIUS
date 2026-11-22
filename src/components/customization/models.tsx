@@ -9,6 +9,8 @@ import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import type { ChainPattern, ClaspKind, CutOption, FinishOption, GemstoneOption } from "@/types";
+import { MetalMaterial } from "./metal";
+import { Stone } from "./stones";
 
 export interface ModelProps {
   finish: FinishOption;
@@ -24,99 +26,28 @@ export interface ModelProps {
   /** Necklaces only */
   chainPattern?: ChainPattern;
   claspKind?: ClaspKind;
+  /** Chosen design options (D-25), by key: e.g. style "halo", setting "bezel", profile "d_shape". */
+  design?: DesignKeys;
+  /** Font for style text (initial, signet, bar, ID plate). */
+  textFontFile?: string;
 }
 
-// ---------------------------------------------------------------- materials
-
-export function MetalMaterial({ finish }: { finish: FinishOption }) {
-  return <meshPhysicalMaterial color={finish.colorHex} metalness={1} roughness={finish.roughness} clearcoat={0.3} clearcoatRoughness={0.2} envMapIntensity={1.2} />;
+export interface DesignKeys {
+  style?: string;
+  setting?: string;
+  profile?: string;
+  shank?: string;
+  texture?: string;
+  /** Short text for initial, signet, bar, medallion, zodiac and ID styles. */
+  text?: string;
 }
 
-export function GemMaterial({ gem }: { gem: GemstoneOption }) {
-  // Partly transparent with strong reflections and flat facets, so stones read as cut gems
-  // (fully transparent glass looks empty against a light background).
-  const clear = gem.colorHex.toLowerCase() === "#ffffff" || gem.colorHex.toLowerCase() === "#f4f6fa";
-  return (
-    <meshPhysicalMaterial
-      color={gem.colorHex}
-      metalness={clear ? 0.25 : 0.1}
-      roughness={0}
-      transmission={clear ? 0.55 : 0.4}
-      thickness={0.6}
-      ior={gem.ior}
-      attenuationColor={gem.colorHex}
-      attenuationDistance={0.4}
-      specularIntensity={1}
-      clearcoat={1}
-      clearcoatRoughness={0}
-      envMapIntensity={clear ? 3.5 : 2.5}
-      iridescence={clear ? 0.35 : 0}
-      flatShading
-    />
-  );
-}
+// ---------------------------------------------------------------- materials (shared)
 
-// ---------------------------------------------------------------- stones per cut
+export { MetalMaterial } from "./metal";
+export { GemMaterial, Stone } from "./stones";
 
-/** A single stone with its table facing +Y. `r` is the girdle radius. */
-export function Stone({ gem, cut, r }: { gem: GemstoneOption; cut: CutOption | null; r: number }) {
-  const label = cut?.label.toLowerCase() ?? "round";
-  const mat = <GemMaterial gem={gem} />;
-
-  if (label === "princess") {
-    // square pyramid shape
-    return (
-      <group rotation={[0, Math.PI / 4, 0]} name="stone">
-        <mesh position={[0, r * 0.12, 0]}>
-          <cylinderGeometry args={[r * 0.72, r, r * 0.25, 4, 1]} />
-          {mat}
-        </mesh>
-        <mesh position={[0, -r * 0.4, 0]} rotation={[Math.PI, 0, 0]}>
-          <coneGeometry args={[r, r * 0.8, 4, 1]} />
-          {mat}
-        </mesh>
-      </group>
-    );
-  }
-
-  const brilliant = (
-    <>
-      <mesh position={[0, r * 0.12, 0]}>
-        <cylinderGeometry args={[r * 0.58, r, r * 0.28, 8, 1]} />
-        {mat}
-      </mesh>
-      <mesh position={[0, -r * 0.4, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[r, r * 0.85, 8, 1]} />
-        {mat}
-      </mesh>
-    </>
-  );
-
-  if (label === "oval") {
-    return (
-      <group scale={[1.35, 1, 0.9]} name="stone">
-        {brilliant}
-      </group>
-    );
-  }
-
-  if (label === "pear") {
-    // round body + a tapered side
-    return (
-      <group name="stone">
-        {brilliant}
-        <mesh position={[r * 0.8, r * 0.05, 0]} rotation={[0, 0, -Math.PI / 2]} scale={[0.4, 1, 1]}>
-          <coneGeometry args={[r * 0.88, r * 0.85, 8, 1]} />
-          {mat}
-        </mesh>
-      </group>
-    );
-  }
-
-  return <group name="stone">{brilliant}</group>;
-}
-
-function Prongs({ r, finish, count = 4, height }: { r: number; finish: FinishOption; count?: number; height: number }) {
+export function Prongs({ r, finish, count = 4, height }: { r: number; finish: FinishOption; count?: number; height: number }) {
   return (
     <>
       {Array.from({ length: count }, (_, i) => {
@@ -129,39 +60,6 @@ function Prongs({ r, finish, count = 4, height }: { r: number; finish: FinishOpt
         );
       })}
     </>
-  );
-}
-
-// ---------------------------------------------------------------- ring
-
-export function RingModel({ finish, gem, cut, stones, sizeFactor }: ModelProps) {
-  const R = 0.9 + 0.1 * sizeFactor;
-  const tube = 0.09 * sizeFactor;
-  // One stone is a solitaire; more stones get smaller and sit side by side along the top of the band.
-  const r = stones <= 1 ? 0.26 : stones <= 3 ? 0.19 : 0.15;
-  const step = (2.25 * r) / R;
-  const angles = stones > 0 ? Array.from({ length: stones }, (_, i) => (i - (stones - 1) / 2) * step) : [];
-  return (
-    <group name="ring" rotation={[-0.45, 0.55, 0]}>
-      <mesh name="metal" castShadow scale={[1, 1, 1.7]}>
-        <torusGeometry args={[R, tube, 48, 160]} />
-        <MetalMaterial finish={finish} />
-      </mesh>
-      {gem &&
-        angles.map((t, i) => (
-          <group key={i} position={[Math.sin(t) * (R + tube + r * 0.45), Math.cos(t) * (R + tube + r * 0.45), 0]} rotation={[0, 0, -t]}>
-            {/* head / basket */}
-            <mesh position={[0, -r * 0.35, 0]}>
-              <cylinderGeometry args={[r * 0.75, r * 0.45, r * 0.5, 16, 1, true]} />
-              <MetalMaterial finish={finish} />
-            </mesh>
-            <Prongs r={r} finish={finish} height={r * 0.8} />
-            <group position={[0, r * 0.3, 0]}>
-              <Stone gem={gem} cut={cut} r={r} />
-            </group>
-          </group>
-        ))}
-    </group>
   );
 }
 

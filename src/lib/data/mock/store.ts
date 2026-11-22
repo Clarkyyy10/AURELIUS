@@ -122,7 +122,7 @@ export const useDemoStore = create<DemoState>()(
     }),
     {
       name: STORAGE_KEY,
-      version: 5,
+      version: 6,
       // v2: products gained a 3D "design". Copy it from the seed for products saved before that.
       migrate: (persisted, from) => {
         const state = persisted as DemoState;
@@ -160,6 +160,26 @@ export const useDemoStore = create<DemoState>()(
           for (const p of state.products ?? []) {
             const sp = seedProductsNow.find((x) => x.id === p.id);
             if (p.category === "necklace" && sp?.design?.chainStyleId && !p.design?.chainStyleId) p.design = { ...p.design, chainStyleId: sp.design.chainStyleId, claspId: sp.design.claspId };
+          }
+        }
+        // v6: design options (styles, settings, band shapes, shanks, textures), more cuts and
+        // birthstones, anklets and toe rings, and the matching styles on the sample products (D-25).
+        if (from < 6 && state?.options) {
+          const seed = seedOptions();
+          const o = state.options;
+          const addMissing = <T extends { id: string }>(list: T[], extra: T[]) => {
+            for (const x of extra) if (!list.some((y) => y.id === x.id)) list.push(x);
+          };
+          addMissing((o.designOptions ??= []), seed.designOptions);
+          addMissing(o.cuts, seed.cuts);
+          addMissing(o.gemstones, seed.gemstones);
+          addMissing(o.productTypes, seed.productTypes);
+          addMissing(o.sizes, seed.sizes);
+          for (const g of o.gemstones) g.surface ??= seed.gemstones.find((x) => x.id === g.id)?.surface;
+          const seedProductsNow = seedProducts(new Date());
+          for (const p of state.products ?? []) {
+            const sp = seedProductsNow.find((x) => x.id === p.id && x.name === p.name);
+            if (sp?.design?.choices && !p.design?.choices) p.design = { ...p.design, ...sp.design };
           }
         }
         return state;

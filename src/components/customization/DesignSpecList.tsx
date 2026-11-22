@@ -3,7 +3,9 @@ import type { DesignConfig, DesignLabels } from "@/types";
 
 const ROWS: [keyof DesignLabels, string][] = [
   ["productType", "Piece"],
+  ["style", "Style"],
   ["name", "Name"],
+  ["styleText", "Letters / text"],
   ["font", "Font"],
   ["material", "Material"],
   ["finish", "Color / finish"],
@@ -12,6 +14,10 @@ const ROWS: [keyof DesignLabels, string][] = [
   ["size", "Size"],
   ["chain", "Chain style"],
   ["clasp", "Clasp"],
+  ["setting", "Setting"],
+  ["profile", "Band shape"],
+  ["shank", "Shank"],
+  ["texture", "Texture"],
 ];
 
 /** Read-only list of a design's specifications. `highlight` marks changed fields (version compare). */

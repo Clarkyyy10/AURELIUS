@@ -29,7 +29,7 @@ export interface StoreSettings {
 }
 
 // ---------- Customization options and rates (FR-01 to FR-04, FR-47) ----------
-export const PRODUCT_TYPES = ["ring", "pendant", "name_pendant", "necklace", "bracelet", "earrings"] as const;
+export const PRODUCT_TYPES = ["ring", "pendant", "name_pendant", "necklace", "bracelet", "earrings", "anklet", "toe_ring"] as const;
 export type ProductType = (typeof PRODUCT_TYPES)[number];
 
 export interface ProductTypeOption {
@@ -70,6 +70,8 @@ export interface GemstoneOption {
   active: boolean;
   /** true for the "None" option */
   isNone?: boolean;
+  /** How the stone is drawn: faceted (default), pearl (smooth, lustrous) or opal (milky). */
+  surface?: "faceted" | "pearl" | "opal";
 }
 
 export interface CutOption {
@@ -80,6 +82,46 @@ export interface CutOption {
 }
 
 /** How the 3D model builds a chain. Fixed list — each one has its own geometry. */
+/**
+ * Design option groups. Each option belongs to one group and applies to some piece types.
+ * style = overall design (solitaire, halo, hoop, locket, cuff…), setting = how stones are held,
+ * profile = ring band cross-section, shank = ring band shape, texture = metal surface.
+ */
+export const OPTION_GROUPS = ["style", "setting", "profile", "shank", "texture"] as const;
+export type OptionGroup = (typeof OPTION_GROUPS)[number];
+
+export interface StoneRule {
+  min: number;
+  max: number;
+  default: number;
+}
+
+/** Owner-configurable design option (FR-47). The 3D shape for each `key` is fixed in code. */
+export interface DesignOption {
+  id: ID;
+  group: OptionGroup;
+  productTypes: ProductType[];
+  /** 3D pattern key, e.g. "halo", "bezel", "knife_edge", "hammered" */
+  key: string;
+  label: string;
+  description: string;
+  /** Sub-heading in the picker, e.g. "Classic", "Statement" */
+  family?: string;
+  /** Multiplies the estimated weight (1.00 = no change). */
+  weightFactor: number;
+  /** Added to the estimated price (₱). */
+  fee: number;
+  active: boolean;
+  /** Styles only: how many stones this design takes (overrides the piece type's max). */
+  stones?: StoneRule;
+  /** Styles only: the design needs short text (initial, zodiac sign, ID plate). Max characters. */
+  textMax?: number;
+  /** Styles only: uses the chain style and clasp choices (chain bracelets, anklets…). */
+  usesChain?: boolean;
+  /** Styles only: needs a particular kind of stone (pearl strands need pearls). */
+  requiresSurface?: "pearl";
+}
+
 export const CHAIN_PATTERNS = [
   "cable", "rolo", "paperclip", "mariner", "figaro", "satellite", "bead",
   "curb", "cuban", "herringbone", "omega",
@@ -144,6 +186,7 @@ export interface CustomizationOptions {
   fonts: FontOption[];
   chainStyles: ChainStyleOption[];
   clasps: ClaspOption[];
+  designOptions: DesignOption[];
 }
 
 // ---------- Catalog (FR-12, FR-13, FR-24, FR-25, FR-34) ----------
@@ -246,6 +289,10 @@ export interface DesignConfig {
   /** Necklaces only: chain style and clasp. */
   chainStyleId?: ID | null;
   claspId?: ID | null;
+  /** Chosen design option per group (style, setting, band shape, shank, texture). */
+  choices?: Partial<Record<OptionGroup, ID>>;
+  /** Short text for styles that need it (initial pendant, zodiac sign, ID plate). */
+  styleText?: string;
 }
 
 export interface EstimateBreakdown {
@@ -254,6 +301,8 @@ export interface EstimateBreakdown {
   labor: number;
   finish: number;
   clasp: number;
+  /** Fees of the chosen style, setting, band shape, shank and texture. */
+  design: number;
 }
 
 export interface Estimate {
@@ -283,6 +332,12 @@ export interface DesignLabels {
   font?: string | null;
   chain?: string | null;
   clasp?: string | null;
+  style?: string | null;
+  setting?: string | null;
+  profile?: string | null;
+  shank?: string | null;
+  texture?: string | null;
+  styleText?: string | null;
 }
 
 export interface Quotation {

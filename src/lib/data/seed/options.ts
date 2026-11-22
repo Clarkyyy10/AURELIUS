@@ -1,6 +1,7 @@
 // Seed customization options and rates — docs/data-model.md §3.
 // DEMO VALUES ONLY. The owner replaces them in Admin → Customization & Rates (FR-47).
 
+import { seedDesignOptions } from "./designs";
 import type {
   CustomizationOptions,
   ChainStyleOption,
@@ -23,6 +24,8 @@ export const seedProductTypes: ProductTypeOption[] = [
   { id: "pt-necklace", type: "necklace", label: "Necklace", baseWeightG: 6.0, laborFee: 2000, maxStones: 0, active: true },
   { id: "pt-bracelet", type: "bracelet", label: "Bracelet", baseWeightG: 8.0, laborFee: 1200, maxStones: 0, active: true },
   { id: "pt-earrings", type: "earrings", label: "Earrings (pair)", baseWeightG: 2.4, laborFee: 800, maxStones: 2, active: true },
+  { id: "pt-anklet", type: "anklet", label: "Anklet", baseWeightG: 3.0, laborFee: 900, maxStones: 0, active: true },
+  { id: "pt-toe-ring", type: "toe_ring", label: "Toe ring", baseWeightG: 1.2, laborFee: 600, maxStones: 1, active: true },
 ];
 
 export const seedFinishes: FinishOption[] = [
@@ -51,6 +54,15 @@ export const seedGemstones: GemstoneOption[] = [
   { id: "gem-sapphire", label: "Sapphire (lab)", basePrice: 900, colorHex: "#1F3FA8", ior: 1.77, active: true },
   { id: "gem-emerald", label: "Emerald (lab)", basePrice: 1000, colorHex: "#1E8A57", ior: 1.58, active: true },
   { id: "gem-diamond", label: "Diamond (lab-grown)", basePrice: 3500, colorHex: "#FFFFFF", ior: 2.42, active: true },
+  // Birthstones (with their months) — demo prices
+  { id: "gem-garnet", label: "Garnet (January)", basePrice: 400, colorHex: "#7B1020", ior: 1.79, active: true },
+  { id: "gem-amethyst", label: "Amethyst (February)", basePrice: 350, colorHex: "#8E5BC4", ior: 1.54, active: true },
+  { id: "gem-aquamarine", label: "Aquamarine (March)", basePrice: 600, colorHex: "#7FD3E8", ior: 1.57, active: true },
+  { id: "gem-pearl", label: "Pearl (June)", basePrice: 450, colorHex: "#F5EFE6", ior: 1.53, active: true, surface: "pearl" },
+  { id: "gem-peridot", label: "Peridot (August)", basePrice: 450, colorHex: "#8BBF2A", ior: 1.65, active: true },
+  { id: "gem-opal", label: "Opal (October)", basePrice: 900, colorHex: "#E8EEF2", ior: 1.45, active: true, surface: "opal" },
+  { id: "gem-citrine", label: "Citrine (November)", basePrice: 350, colorHex: "#E8A320", ior: 1.55, active: true },
+  { id: "gem-blue-topaz", label: "Blue Topaz (December)", basePrice: 400, colorHex: "#4FA8D8", ior: 1.62, active: true },
 ];
 
 export const seedCuts: CutOption[] = [
@@ -58,6 +70,13 @@ export const seedCuts: CutOption[] = [
   { id: "cut-oval", label: "Oval", multiplier: 1.1, active: true },
   { id: "cut-princess", label: "Princess", multiplier: 1.15, active: true },
   { id: "cut-pear", label: "Pear", multiplier: 1.2, active: true },
+  { id: "cut-cushion", label: "Cushion", multiplier: 1.1, active: true },
+  { id: "cut-emerald", label: "Emerald", multiplier: 1.15, active: true },
+  { id: "cut-asscher", label: "Asscher", multiplier: 1.2, active: true },
+  { id: "cut-radiant", label: "Radiant", multiplier: 1.2, active: true },
+  { id: "cut-marquise", label: "Marquise", multiplier: 1.25, active: true },
+  { id: "cut-heart", label: "Heart", multiplier: 1.3, active: true },
+  { id: "cut-baguette", label: "Baguette", multiplier: 0.9, active: true },
 ];
 
 function sizes(type: ProductType, list: [label: string, factor: number, isDefault?: boolean][]): SizeOption[] {
@@ -88,6 +107,8 @@ export const seedSizes: SizeOption[] = [
   ...sizes("pendant", [["Small", 0.8], ["Medium", 1.0, true], ["Large", 1.25]]),
   ...sizes("name_pendant", [["Small (10 mm letters)", 0.8], ["Medium (13 mm letters)", 1.0, true], ["Large (16 mm letters)", 1.3]]),
   ...sizes("earrings", [["Small", 0.8], ["Medium", 1.0, true], ["Large", 1.25]]),
+  ...sizes("anklet", [["9 in", 0.9], ["10 in", 1.0, true], ["11 in", 1.1]]),
+  ...sizes("toe_ring", [["Small", 0.9], ["Medium", 1.0, true], ["Large", 1.1]]),
 ];
 
 type C = [pattern: ChainStyleOption["pattern"], family: ChainStyleOption["family"], label: string, weightFactor: number, description: string];
@@ -164,5 +185,6 @@ export function seedOptions(): CustomizationOptions {
     fonts: seedFonts,
     chainStyles: seedChainStyles,
     clasps: seedClasps,
+    designOptions: seedDesignOptions,
   });
 }

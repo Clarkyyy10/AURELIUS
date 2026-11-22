@@ -20,6 +20,7 @@ import { useDemoStore } from "@/lib/data/mock/store";
 import { EstimateError, estimate as computeEstimate } from "@/lib/pricing/estimate";
 import { designLabels, placeholderFor, productDesign } from "@/lib/pricing/labels";
 import { normalizeConfig } from "@/lib/pricing/normalize";
+import { applyChange } from "@/lib/pricing/design";
 import { PRODUCT_TYPES, type CustomizationOptions, type CustomOrderRequest, type DesignConfig, type Draft, type Product, type ProductType } from "@/types";
 
 /** FR-01 to FR-07, FR-10 — the 3D design customizer. */
@@ -108,10 +109,8 @@ function Customizer({
   const labels = useMemo(() => designLabels(config, options), [config, options]);
 
   const change = (patch: Partial<DesignConfig>) => {
-    // Switching piece type resets size and stones for the new type.
-    const next = patch.productType && patch.productType !== config.productType ? { ...config, ...patch, sizeId: "", stoneQuantity: config.stoneQuantity } : { ...config, ...patch };
-    if (patch.gemstoneId && !config.cutId) next.stoneQuantity = 1;
-    const r = normalizeConfig(next, options);
+    // Related choices follow along (new piece type, new style, a stone on a plain style) — D-25.
+    const r = normalizeConfig(applyChange(config, patch, options), options);
     setConfig(r.config);
     setNotice(r.notices[0] ?? null);
   };
@@ -207,11 +206,11 @@ function Customizer({
       </div>
 
       <div className="mt-4 grid gap-6 lg:grid-cols-[3fr_2fr]">
-        <div className="lg:sticky lg:top-20 lg:self-start">
+        <div className="min-w-0 lg:sticky lg:top-20 lg:self-start">
           <LazyJewelryViewer config={config} options={options} captureRef={captureRef} className="h-[45vh] min-h-72 w-full rounded-none sm:rounded-2xl lg:h-[calc(100vh-8rem)] lg:max-h-[720px]" label={`3D preview: ${labels.finish} ${labels.material} ${labels.productType.toLowerCase()}, ${labels.gemstone}, size ${labels.size}`} />
         </div>
 
-        <div className="px-4 sm:px-0">
+        <div className="min-w-0 px-4 sm:px-0">
           {notice && (
             <p className="mb-3 rounded-lg border border-info/30 bg-info/10 px-3 py-2 text-sm" role="status">
               {notice}

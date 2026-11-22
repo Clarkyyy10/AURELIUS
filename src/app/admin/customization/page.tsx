@@ -18,8 +18,9 @@ import { activeOptions } from "@/lib/pricing/options";
 import { errorMessage, useQuery } from "@/lib/data/hooks";
 import { tryEstimate } from "@/lib/pricing/estimate";
 import { normalizeConfig } from "@/lib/pricing/normalize";
+import { GROUP_LABEL, applyChange, stoneRule, chosenOption, optionsFor, usesChain } from "@/lib/pricing/design";
 import { formatPeso, formatPesoExact } from "@/lib/utils/format";
-import { PRODUCT_TYPES, type CustomizationOptions, type DesignConfig, type ID, type ProductType } from "@/types";
+import { OPTION_GROUPS, PRODUCT_TYPES, type CustomizationOptions, type DesignConfig, type ID, type ProductType } from "@/types";
 
 type Key = keyof CustomizationOptions;
 const uid = (p: string) => `${p}-${crypto.randomUUID().slice(0, 6)}`;
@@ -39,6 +40,7 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
   const [busy, setBusy] = useState(false);
   const dirty = JSON.stringify(draft) !== JSON.stringify(saved);
 
+  const [designType, setDesignType] = useState<ProductType>("ring");
   function update<K extends Key>(key: K, id: ID, patch: Partial<CustomizationOptions[K][number]>) {
     setDraft((d) => ({ ...d, [key]: (d[key] as { id: ID }[]).map((x) => (x.id === id ? { ...x, ...patch } : x)) }));
   }
@@ -110,6 +112,7 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                 ["fonts", "Fonts"],
                 ["chains", "Chain styles"],
                 ["clasps", "Clasps"],
+                ["designs", "Designs"],
                 ["sizes", "Sizes"],
               ].map(([v, l]) => (
                 <TabsTrigger key={v} value={v} className="min-h-9 px-3">
@@ -231,6 +234,52 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
               ))}
             </OptionTable>
             <p className="mt-2 text-xs text-muted-foreground">The clasp fee is added to necklace estimates.</p>
+          </TabsContent>
+
+          <TabsContent value="designs" className="mt-4 space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <Label htmlFor="design-type">Piece type</Label>
+              <Select value={designType} onValueChange={(v) => setDesignType(v as ProductType)}>
+                <SelectTrigger id="design-type" className="h-9 w-48">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {draft.productTypes.map((p) => (
+                    <SelectItem key={p.id} value={p.type}>
+                      {p.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {OPTION_GROUPS.map((group) => {
+              const list = (draft.designOptions ?? []).filter((d) => d.group === group && d.productTypes.includes(designType));
+              if (list.length === 0) return null;
+              return (
+                <section key={group}>
+                  <h3 className="mb-2 font-semibold">{GROUP_LABEL[group]}</h3>
+                  <OptionTable headers={["Name", "Weight factor", "Fee (₱)", "Description customers see", "Active"]}>
+                    {list.map((d) => (
+                      <tr key={d.id} className="border-t border-line align-top">
+                        <td className="p-2">
+                          {text(d.label, (v) => update("designOptions", d.id, { label: v }), `${GROUP_LABEL[group]} name`)}
+                          {d.productTypes.length > 1 && <p className="mt-1 text-xs text-muted-foreground">Shared by {d.productTypes.length} piece types</p>}
+                        </td>
+                        <td className="p-2">{num(d.weightFactor, (v) => update("designOptions", d.id, { weightFactor: v }), `${d.label} weight factor`)}</td>
+                        <td className="p-2">{num(d.fee, (v) => update("designOptions", d.id, { fee: v }), `${d.label} fee`, "1")}</td>
+                        <td className="p-2">
+                          <Input value={d.description} onChange={(e) => update("designOptions", d.id, { description: e.target.value })} aria-label={`${d.label} description`} className="h-9 min-w-64" />
+                        </td>
+                        <td className="p-2">{active(d.active, (v) => update("designOptions", d.id, { active: v }), `${d.label} active`)}</td>
+                      </tr>
+                    ))}
+                  </OptionTable>
+                </section>
+              );
+            })}
+            <p className="text-xs text-muted-foreground">
+              Weight factor = metal used compared with the simplest version (1.00); it multiplies the estimated weight. The fee is added to the estimate for the extra work (settings only when the design has stones). Each option is tied to its 3D model, so options can be renamed, re-rated or turned off but not added. Keep at least one option active in each group.
+            </p>
           </TabsContent>
 
           <TabsContent value="fonts" className="mt-4">
@@ -361,10 +410,17 @@ function FormulaPreview({ options }: { options: CustomizationOptions }) {
       </Select>
     </div>
   );
-  const chain = cfg.productType === "necklace" ? activeOpts.chainStyles.find((x) => x.id === cfg.chainStyleId) : undefined;
-  const clasp = cfg.productType === "necklace" ? activeOpts.clasps.find((x) => x.id === cfg.claspId) : undefined;
-  const rawWeight = pt.baseWeightG * (s?.factor ?? 0) * (m?.densityRatio ?? 0) * (chain?.weightFactor ?? 1);
+  const hasChain = usesChain(cfg, activeOpts);
+  const chain = hasChain ? activeOpts.chainStyles.find((x) => x.id === cfg.chainStyleId) : undefined;
+  const clasp = hasChain ? activeOpts.clasps.find((x) => x.id === cfg.claspId) : undefined;
   const hasStone = Boolean(g && !g.isNone);
+  const picked = OPTION_GROUPS.map((grp) => chosenOption(cfg, activeOpts, grp)).filter((o): o is NonNullable<typeof o> => Boolean(o) && (o!.group !== "setting" || hasStone));
+  const rawWeight = picked.reduce((w, o) => w * o.weightFactor, pt.baseWeightG * (s?.factor ?? 0) * (m?.densityRatio ?? 0) * (chain?.weightFactor ?? 1));
+  const groupPick = (grp: (typeof OPTION_GROUPS)[number]) => {
+    const list = optionsFor(activeOpts, cfg.productType, grp);
+    if (!list.length || (grp === "setting" && !hasStone)) return null;
+    return <div key={grp}>{pick(GROUP_LABEL[grp], cfg.choices?.[grp] ?? "", list, (v) => setSample(applyChange(cfg, { choices: { ...cfg.choices, [grp]: v } }, activeOpts)))}</div>;
+  };
 
   return (
     <aside className="h-fit space-y-4 rounded-2xl border border-gold/40 bg-paper p-5 xl:sticky xl:top-20" aria-labelledby="preview-title">
@@ -375,26 +431,27 @@ function FormulaPreview({ options }: { options: CustomizationOptions }) {
         <p className="text-xs text-muted-foreground">Uses the rates on this page, including unsaved changes.</p>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        {pick("Piece", pt.type, activeOpts.productTypes.map((p) => ({ id: p.type, label: p.label })), (v) => setSample({ ...cfg, productType: v as ProductType, sizeId: "" }))}
+        {pick("Piece", pt.type, activeOpts.productTypes.map((p) => ({ id: p.type, label: p.label })), (v) => setSample(applyChange(cfg, { productType: v as ProductType }, activeOpts)))}
         {pick("Material", cfg.materialId, activeOpts.materials, (v) => set({ materialId: v }))}
         {pick("Finish", cfg.finishId, activeOpts.finishes.filter((x) => m?.finishIds.includes(x.id)), (v) => set({ finishId: v }))}
         {pick("Size", cfg.sizeId, activeOpts.sizes.filter((x) => x.productType === cfg.productType), (v) => set({ sizeId: v }))}
-        {pt.maxStones > 0 && pick("Gemstone", cfg.gemstoneId, activeOpts.gemstones, (v) => set({ gemstoneId: v, stoneQuantity: Math.max(1, cfg.stoneQuantity) }))}
+        {OPTION_GROUPS.map(groupPick)}
+        {(pt.maxStones > 0 || optionsFor(activeOpts, cfg.productType, "style").some((o) => (o.stones?.max ?? 0) > 0)) && pick("Gemstone", cfg.gemstoneId, activeOpts.gemstones, (v) => setSample(applyChange(cfg, { gemstoneId: v }, activeOpts)))}
         {hasStone && pick("Cut", cfg.cutId ?? "", activeOpts.cuts, (v) => set({ cutId: v }))}
-        {cfg.productType === "necklace" && pick("Chain", cfg.chainStyleId ?? "", activeOpts.chainStyles, (v) => set({ chainStyleId: v }))}
-        {cfg.productType === "necklace" && pick("Clasp", cfg.claspId ?? "", activeOpts.clasps, (v) => set({ claspId: v }))}
+        {hasChain && pick("Chain", cfg.chainStyleId ?? "", activeOpts.chainStyles, (v) => set({ chainStyleId: v }))}
+        {hasChain && pick("Clasp", cfg.claspId ?? "", activeOpts.clasps, (v) => set({ claspId: v }))}
         {hasStone && (
           <div className="space-y-1">
             <Label className="text-xs" htmlFor="pv-qty">
               Stones
             </Label>
-            <Input id="pv-qty" type="number" min={1} max={pt.maxStones} value={cfg.stoneQuantity} onChange={(e) => set({ stoneQuantity: Number(e.target.value) })} className="h-9" />
+            <Input id="pv-qty" type="number" min={1} max={stoneRule(cfg, activeOpts).max} value={cfg.stoneQuantity} onChange={(e) => set({ stoneQuantity: Number(e.target.value) })} className="h-9" />
           </div>
         )}
       </div>
       <ol className="space-y-2 rounded-xl bg-muted/50 p-3 font-mono text-xs leading-relaxed">
         <li>
-          weight = {pt.baseWeightG} g × {s?.factor} × {m?.densityRatio}{chain ? ` × ${chain.weightFactor} (${chain.label})` : ""} = {rawWeight.toFixed(4)} → <strong>{est?.weightG.toFixed(2)} g</strong>
+          weight = {pt.baseWeightG} g × {s?.factor} × {m?.densityRatio}{chain ? ` × ${chain.weightFactor} (${chain.label})` : ""}{picked.map((o) => ` × ${o.weightFactor} (${o.label})`).join("")} = {rawWeight.toFixed(4)} → <strong>{est?.weightG.toFixed(2)} g</strong>
         </li>
         <li>
           metal = {est?.weightG.toFixed(2)} × {formatPesoExact(m?.ratePerGram ?? 0)} = <strong>{formatPesoExact(est?.breakdown.metal ?? 0)}</strong>
@@ -404,9 +461,10 @@ function FormulaPreview({ options }: { options: CustomizationOptions }) {
         </li>
         <li>
           labor = <strong>{formatPesoExact(pt.laborFee)}</strong> · finish fee = <strong>{formatPesoExact(f?.fee ?? 0)}</strong>{clasp ? <> · clasp ({clasp.label}) = <strong>{formatPesoExact(clasp.fee)}</strong></> : null}
+          {picked.some((o) => o.fee > 0) ? <> · design ({picked.filter((o) => o.fee > 0).map((o) => o.label).join(" + ")}) = <strong>{formatPesoExact(est?.breakdown.design ?? 0)}</strong></> : null}
         </li>
         <li>
-          price = {formatPesoExact((est?.breakdown.metal ?? 0) + (est?.breakdown.stones ?? 0) + (est?.breakdown.labor ?? 0) + (est?.breakdown.finish ?? 0) + (est?.breakdown.clasp ?? 0))} → rounded to the nearest peso
+          price = {formatPesoExact((est?.breakdown.metal ?? 0) + (est?.breakdown.stones ?? 0) + (est?.breakdown.labor ?? 0) + (est?.breakdown.finish ?? 0) + (est?.breakdown.clasp ?? 0) + (est?.breakdown.design ?? 0))} → rounded to the nearest peso
         </li>
       </ol>
       <p className="text-center">

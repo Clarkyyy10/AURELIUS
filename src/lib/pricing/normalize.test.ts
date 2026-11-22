@@ -19,11 +19,21 @@ describe("normalizeConfig", () => {
     expect(notices[0]).toMatch(/picked Polished/);
   });
 
-  it("removes stones from pieces that can't hold them", () => {
-    const { config, notices } = normalizeConfig({ productType: "necklace", gemstoneId: "gem-ruby", cutId: "cut-round", stoneQuantity: 1 }, options);
+  it("removes stones from styles that can't hold them (D-25)", () => {
+    const { config, notices } = normalizeConfig({ productType: "necklace", gemstoneId: "gem-ruby", cutId: "cut-round", stoneQuantity: 1, choices: { style: "style-necklace-chain" } }, options);
     expect(config.gemstoneId).toBe("gem-none");
     expect(config.stoneQuantity).toBe(0);
-    expect(notices[0]).toMatch(/not available for a necklace/);
+    expect(notices[0]).toMatch(/The Chain style has no stones/);
+    const ring = normalizeConfig({ productType: "ring", gemstoneId: "gem-ruby", choices: { style: "style-ring-band" } }, options);
+    expect(ring.config.gemstoneId).toBe("gem-none");
+  });
+
+  it("keeps a stone by starting from a style that holds one when no style was chosen", () => {
+    const { config } = normalizeConfig({ productType: "necklace", gemstoneId: "gem-ruby", cutId: "cut-round", stoneQuantity: 1 }, options);
+    expect(config.choices?.style).toBe("style-necklace-lariat");
+    expect(config.gemstoneId).toBe("gem-ruby");
+    expect(normalizeConfig({ productType: "ring", gemstoneId: "gem-ruby" }, options).config.choices?.style).toBe("style-ring-solitaire");
+    expect(normalizeConfig({ productType: "ring" }, options).config.choices?.style).toBe("style-ring-band");
   });
 
   it("clamps the stone quantity to the piece's maximum", () => {
