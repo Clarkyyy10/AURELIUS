@@ -317,11 +317,16 @@ export function Beads({ spots, r, finish }: { spots: Spot[]; r: number; finish: 
 
 // ---------------------------------------------------------------- text
 
+/** Drops characters the font has no shape for (a missing glyph would crash the 3D text). */
+export function safeText(font: { data: { glyphs: Record<string, unknown> } }, text: string): string {
+  return [...text].filter((ch) => ch === " " || ch in font.data.glyphs).join("");
+}
+
 /** Raised metal letters, centred on the origin, facing +Z. */
 export function RaisedText({ text, size, depth, fontFile, finish, maxWidth }: { text: string; size: number; depth: number; fontFile?: string; finish: FinishOption; maxWidth?: number }) {
   const font = useLoader(FontLoader, fontFile ?? DEFAULT_TEXT_FONT);
   const geometry = useMemo(() => {
-    const g = new TextGeometry(text, { font, size, depth, curveSegments: 6, bevelEnabled: true, bevelThickness: depth * 0.2, bevelSize: size * 0.015, bevelSegments: 1 });
+    const g = new TextGeometry(safeText(font, text) || " ", { font, size, depth, curveSegments: 6, bevelEnabled: true, bevelThickness: depth * 0.2, bevelSize: size * 0.015, bevelSegments: 1 });
     g.center();
     if (maxWidth) {
       g.computeBoundingBox();

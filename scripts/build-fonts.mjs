@@ -1,11 +1,11 @@
 // Converts the name-pendant fonts (open licenses: SIL OFL 1.1 or Apache 2.0, from @fontsource) into three.js
-// "typeface" JSON for 3D text, keeping only the characters a name needs.
+// "typeface" JSON for 3D text, keeping only the characters names, initials and dates need.
 // Run: node scripts/build-fonts.mjs   (output: public/fonts/*.typeface.json)
 import { mkdirSync, readFileSync, writeFileSync, copyFileSync } from "node:fs";
 import { join } from "node:path";
 import opentype from "opentype.js";
 
-const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÑñÁÉÍÓÚáéíóú '&-.";
+const CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÑñÁÉÍÓÚáéíóú0123456789 '&-./";
 
 const FONTS = [
   ["great-vibes", "@fontsource/great-vibes/files/great-vibes-latin-400-normal.woff"],

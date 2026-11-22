@@ -10,7 +10,7 @@ import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import type { ChainPattern, ClaspKind, CutOption, FinishOption, GemstoneOption } from "@/types";
 import { MetalMaterial } from "./metal";
-import { Stone } from "./stones";
+import { safeText } from "./parts";
 
 export interface ModelProps {
   finish: FinishOption;
@@ -63,44 +63,6 @@ export function Prongs({ r, finish, count = 4, height }: { r: number; finish: Fi
   );
 }
 
-// ---------------------------------------------------------------- pendant
-
-export function PendantModel({ finish, gem, cut, stones, sizeFactor }: ModelProps) {
-  const s = 0.75 * sizeFactor;
-  const r = 0.28 * s;
-  const n = Math.max(stones, 0);
-  return (
-    <group name="pendant" scale={[1.6, 1.6, 1.6]}>
-      {/* bail */}
-      <mesh position={[0, 0.62 * s + 0.1, 0]} rotation={[0, Math.PI / 2, 0]} name="metal">
-        <torusGeometry args={[0.1, 0.028, 16, 48]} />
-        <MetalMaterial finish={finish} />
-      </mesh>
-      {/* drop-shaped body */}
-      <mesh position={[0, 0, -0.03]} scale={[s * 0.78, s, 0.12]} name="metal">
-        <sphereGeometry args={[0.62, 48, 32]} />
-        <MetalMaterial finish={finish} />
-      </mesh>
-      {gem &&
-        Array.from({ length: n }, (_, i) => {
-          const y = n === 1 ? 0 : (0.5 - i / (n - 1)) * s * 0.7;
-          const rr = n === 1 ? r : r * 0.62;
-          return (
-            <group key={i} position={[0, y, 0.06]} rotation={[Math.PI / 2, 0, 0]}>
-              <mesh position={[0, -rr * 0.05, 0]} rotation={[Math.PI / 2, 0, 0]}>
-                <torusGeometry args={[rr * 1.04, rr * 0.13, 12, 48]} />
-                <MetalMaterial finish={finish} />
-              </mesh>
-              <group rotation={[0, 0, 0]}>
-                <Stone gem={gem} cut={cut} r={rr} />
-              </group>
-            </group>
-          );
-        })}
-    </group>
-  );
-}
-
 // ---------------------------------------------------------------- bracelet (flat band)
 
 export function BraceletModel({ finish, sizeFactor }: ModelProps) {
@@ -143,7 +105,7 @@ export function NamePendantModel({ finish, sizeFactor, nameText, fontFile, scrip
   const ringR = 0.06 * sizeFactor;
 
   const { geometry, width, height, rings } = useMemo(() => {
-    const g = new TextGeometry(text, { font, size: letter, depth, curveSegments: 10, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.01, bevelSegments: 2 });
+    const g = new TextGeometry(safeText(font, text) || "?", { font, size: letter, depth, curveSegments: 10, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.01, bevelSegments: 2 });
     g.center();
     g.computeBoundingBox();
     const b = g.boundingBox!;
