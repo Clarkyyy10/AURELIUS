@@ -122,7 +122,7 @@ export const useDemoStore = create<DemoState>()(
     }),
     {
       name: STORAGE_KEY,
-      version: 3,
+      version: 4,
       // v2: products gained a 3D "design". Copy it from the seed for products saved before that.
       migrate: (persisted, from) => {
         const state = persisted as DemoState;
@@ -138,6 +138,11 @@ export const useDemoStore = create<DemoState>()(
           for (const sz of seed.sizes) if (!state.options.sizes.some((x) => x.id === sz.id)) state.options.sizes.push(sz);
           const product = seedProducts(new Date()).find((p) => p.category === "name_pendant");
           if (product && state.products && !state.products.some((p) => p.id === product.id)) state.products.push(product);
+        }
+        // v4: more fonts for name pendants (keeps any the owner renamed or turned off).
+        if (from < 4 && state?.options) {
+          const fonts = (state.options.fonts ??= []);
+          for (const font of seedOptions().fonts) if (!fonts.some((x) => x.id === font.id)) fonts.push(font);
         }
         return state;
       },

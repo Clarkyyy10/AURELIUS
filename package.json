@@ -11,6 +11,14 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@fontsource/alex-brush": "^5.3.0",
+    "@fontsource/allura": "^5.3.0",
+    "@fontsource/cinzel": "^5.3.0",
+    "@fontsource/cormorant-garamond": "^5.3.0",
+    "@fontsource/lobster": "^5.3.0",
+    "@fontsource/pacifico": "^5.3.0",
+    "@fontsource/parisienne": "^5.3.0",
+    "@fontsource/satisfy": "^5.3.0",
     "@hookform/resolvers": "^7.0.8",
     "@react-three/drei": "^10.7.9",
     "@react-three/fiber": "^9.8.2",

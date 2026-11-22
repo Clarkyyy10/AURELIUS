@@ -79,10 +79,19 @@ export const seedSizes: SizeOption[] = [
   ...sizes("earrings", [["Small", 0.8], ["Medium", 1.0, true], ["Large", 1.25]]),
 ];
 
+// Script fonts first (their letters join), then classic fonts (joined by a bar under the letters).
 export const seedFonts: FontOption[] = [
   { id: "font-great-vibes", label: "Elegant script", file: "/fonts/great-vibes.typeface.json", cssFamily: "'Great Vibes', cursive", active: true },
   { id: "font-dancing-script", label: "Casual script", file: "/fonts/dancing-script.typeface.json", cssFamily: "'Dancing Script', cursive", active: true },
+  { id: "font-pacifico", label: "Bold script", file: "/fonts/pacifico.typeface.json", cssFamily: "'Pacifico', cursive", active: true },
+  { id: "font-allura", label: "Graceful script", file: "/fonts/allura.typeface.json", cssFamily: "'Allura', cursive", active: true },
+  { id: "font-alex-brush", label: "Brush script", file: "/fonts/alex-brush.typeface.json", cssFamily: "'Alex Brush', cursive", active: true },
+  { id: "font-parisienne", label: "Parisian script", file: "/fonts/parisienne.typeface.json", cssFamily: "'Parisienne', cursive", active: true },
+  { id: "font-lobster", label: "Retro script", file: "/fonts/lobster.typeface.json", cssFamily: "'Lobster', cursive", active: true },
+  { id: "font-satisfy", label: "Handwritten", file: "/fonts/satisfy.typeface.json", cssFamily: "'Satisfy', cursive", active: true },
   { id: "font-playfair", label: "Classic serif", file: "/fonts/playfair-display.typeface.json", cssFamily: "'Playfair Display', serif", active: true },
+  { id: "font-cormorant", label: "Fine serif", file: "/fonts/cormorant-garamond.typeface.json", cssFamily: "'Cormorant Garamond', serif", active: true },
+  { id: "font-cinzel", label: "Roman capitals", file: "/fonts/cinzel.typeface.json", cssFamily: "'Cinzel', serif", active: true },
   { id: "font-montserrat", label: "Modern block", file: "/fonts/montserrat.typeface.json", cssFamily: "'Montserrat', sans-serif", active: true },
 ];
 

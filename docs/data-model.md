@@ -338,7 +338,8 @@ interface FontOption { id: string; label: string; file: string /* /fonts/*.typef
 | Labor fee | ₱1,800 |
 | Max stones | 0 |
 | Sizes | Small (10 mm letters) 0.80 · **Medium (13 mm letters) 1.00** · Large (16 mm letters) 1.30 |
-| Fonts | Elegant script · Casual script · Classic serif · Modern block |
+| Fonts (script) | Elegant · Casual · Bold · Graceful · Brush · Parisian · Retro script · Handwritten |
+| Fonts (classic, joined by a bar) | Classic serif · Fine serif · Roman capitals · Modern block |
 
 Test cases: 14K Gold, Yellow, Medium → 3.15 g, ₱12,195 · 18K Gold, Yellow, Small → 3.02 g, ₱14,484 ·
 Silver 925, Polished, Medium → 2.50 g, ₱2,038 · Stainless Steel, Gold tone, Large → 2.50 g, ₱2,200.

@@ -179,15 +179,29 @@ export function OptionsPanel({
               <p className="mb-2 text-sm font-medium" id="font-label">
                 Font
               </p>
-              <div role="radiogroup" aria-labelledby="font-label" className="grid grid-cols-2 gap-2">
-                {fonts.map((f) => (
-                  <Choice key={f.id} selected={f.id === config.fontId} onClick={() => onChange({ fontId: f.id })} className="flex flex-col items-start gap-0.5 px-3 py-2 text-left" label={f.label}>
-                    <span className="block w-full truncate text-2xl leading-tight text-ink" style={{ fontFamily: f.cssFamily }} aria-hidden>
-                      {(config.nameText ?? "").trim() || "Maria"}
-                    </span>
-                    <span className="text-xs text-muted-foreground">{f.label}</span>
-                  </Choice>
-                ))}
+              <div role="radiogroup" aria-labelledby="font-label" className="space-y-3">
+                {(
+                  [
+                    ["Script — letters join", fonts.filter((f) => f.cssFamily.includes("cursive"))],
+                    ["Classic — joined by a bar", fonts.filter((f) => !f.cssFamily.includes("cursive"))],
+                  ] as const
+                )
+                  .filter(([, list]) => list.length > 0)
+                  .map(([group, list]) => (
+                    <div key={group}>
+                      <p className="mb-1.5 text-xs font-medium text-muted-foreground">{group}</p>
+                      <div className="grid grid-cols-2 gap-2">
+                        {list.map((f) => (
+                          <Choice key={f.id} selected={f.id === config.fontId} onClick={() => onChange({ fontId: f.id })} className="flex flex-col items-start gap-0.5 px-3 py-2 text-left" label={f.label}>
+                            <span className="block w-full truncate text-2xl leading-tight text-ink" style={{ fontFamily: f.cssFamily }} aria-hidden>
+                              {(config.nameText ?? "").trim() || "Maria"}
+                            </span>
+                            <span className="text-xs text-muted-foreground">{f.label}</span>
+                          </Choice>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
               </div>
             </div>
           </AccordionContent>
