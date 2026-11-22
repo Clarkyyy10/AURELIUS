@@ -123,11 +123,11 @@ export function OptionsPanel({
       <AccordionItem value="type">
         <AccordionTrigger className="text-base font-semibold">1. Piece type</AccordionTrigger>
         <AccordionContent>
-          <div role="radiogroup" aria-label="Piece type" className="grid grid-cols-3 gap-2 sm:grid-cols-6 lg:grid-cols-3 xl:grid-cols-6">
+          <div role="radiogroup" aria-label="Piece type" className="grid grid-cols-[repeat(auto-fill,minmax(5.75rem,1fr))] gap-2">
             {options.productTypes.map((p) => (
               <Choice key={p.id} selected={p.type === config.productType} onClick={() => onChange({ productType: p.type })} className={cn("flex flex-col items-center gap-1 px-2 py-3", disabledTypes && p.type !== config.productType && "pointer-events-none opacity-40")}>
                 <PieceIcon type={p.type} className="text-gold-dark" />
-                <span className="text-xs font-medium">{p.label}</span>
+                <span className="text-center text-xs leading-tight font-medium">{p.label}</span>
               </Choice>
             ))}
           </div>
@@ -227,9 +227,9 @@ export function OptionsPanel({
                 return (
                   <div key={family}>
                     <p className="mb-1.5 text-xs font-medium text-muted-foreground">{title}</p>
-                    <div className="grid gap-2 sm:grid-cols-2">
+                    <div className="grid grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] gap-2">
                       {list.map((c) => (
-                        <Choice key={c.id} selected={c.id === config.chainStyleId} onClick={() => onChange({ chainStyleId: c.id })} className="px-3 py-2 text-left" label={c.label}>
+                        <Choice key={c.id} selected={c.id === config.chainStyleId} onClick={() => onChange({ chainStyleId: c.id })} className="min-w-0 px-3 py-2 text-left break-words hyphens-auto" label={c.label}>
                           <span className="block font-medium">{c.label}</span>
                           <span className="block text-xs leading-snug text-muted-foreground">{c.description}</span>
                         </Choice>
@@ -243,9 +243,9 @@ export function OptionsPanel({
               <p className="mb-2 text-sm font-medium" id="clasp-label">
                 Clasp
               </p>
-              <div role="radiogroup" aria-labelledby="clasp-label" className="grid gap-2 sm:grid-cols-2">
+              <div role="radiogroup" aria-labelledby="clasp-label" className="grid grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] gap-2">
                 {(options.clasps ?? []).map((c) => (
-                  <Choice key={c.id} selected={c.id === config.claspId} onClick={() => onChange({ claspId: c.id })} className="px-3 py-2 text-left" label={c.label}>
+                  <Choice key={c.id} selected={c.id === config.claspId} onClick={() => onChange({ claspId: c.id })} className="min-w-0 px-3 py-2 text-left break-words hyphens-auto" label={c.label}>
                     <span className="block font-medium">{c.label}</span>
                     <span className="block text-xs leading-snug text-muted-foreground">{c.description}</span>
                   </Choice>
@@ -354,7 +354,7 @@ export function OptionsPanel({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="notes">Notes for the owner</Label>
-            <Textarea id="notes" maxLength={500} rows={3} value={config.notes ?? ""} onChange={(e) => onChange({ notes: e.target.value })} aria-describedby="notes-hint" placeholder="For example: I want the stone a little higher." />
+            <Textarea id="notes" maxLength={500} rows={3} value={config.notes ?? ""} onChange={(e) => onChange({ notes: e.target.value })} aria-describedby="notes-hint" placeholder="Anything the owner should know about your design." />
             <p id="notes-hint" className="text-xs text-muted-foreground">
               Up to 500 characters ({500 - (config.notes?.length ?? 0)} left).
             </p>

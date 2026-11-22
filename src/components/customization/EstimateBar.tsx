@@ -11,24 +11,26 @@ import type { Estimate } from "@/types";
 export function EstimateBar({ estimate, error, className, action }: { estimate: Estimate | null; error?: string | null; className?: string; action?: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className={cn("rounded-2xl border border-line bg-paper p-4 shadow-[0_-6px_20px_-12px_rgba(28,27,25,0.25)]", className)}>
-      <div className="flex flex-col gap-3">
-        <div aria-live="polite" aria-atomic="true" className="min-w-0">
+    <div className={cn("@container rounded-2xl border border-line bg-paper p-3 shadow-[0_-6px_20px_-12px_rgba(28,27,25,0.25)] sm:p-4", className)}>
+      <div className="flex flex-col gap-2.5 @sm:flex-row @sm:items-center @sm:gap-4">
+        <div aria-live="polite" aria-atomic="true" className="min-w-0 flex-1">
           {estimate ? (
-            <p className="text-sm">
-              <span className="text-muted-foreground">Estimated weight</span> <strong className="tabular">{formatWeight(estimate.weightG)}</strong>
-              <span className="mx-2 text-line" aria-hidden>
-                ·
-              </span>
-              <span className="text-muted-foreground">Estimated price</span>{" "}
-              <strong className="tabular font-heading text-2xl leading-none text-ink">{formatPeso(estimate.price)}</strong>
-            </p>
+            <dl className="flex flex-wrap items-end gap-x-5 gap-y-1">
+              <div>
+                <dt className="text-xs text-muted-foreground">Estimated weight</dt>
+                <dd className="tabular font-semibold whitespace-nowrap">{formatWeight(estimate.weightG)}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">Estimated price</dt>
+                <dd className="tabular font-heading text-2xl leading-none font-semibold whitespace-nowrap text-ink">{formatPeso(estimate.price)}</dd>
+              </div>
+            </dl>
           ) : (
             <p className="text-sm text-danger">{error ?? "Finish choosing your options to see an estimate."}</p>
           )}
-          <EstimateNotice className="mt-0.5" />
+          <EstimateNotice className="mt-1 text-[11px] leading-tight" />
         </div>
-        {action && <div className="[&>*]:w-full">{action}</div>}
+        {action && <div className="shrink-0 [&>*]:w-full @sm:[&>*]:w-auto">{action}</div>}
       </div>
       {estimate && (
         <div className="mt-2">
