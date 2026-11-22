@@ -10,7 +10,8 @@ import { Center, ContactShadows, Environment, Lightformer, OrbitControls, Perspe
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import type { CustomizationOptions, DesignConfig, ProductType } from "@/types";
-import { BraceletModel, NamePendantModel, type ModelProps } from "./models";
+import { NamePendantModel, type ModelProps } from "./models";
+import { AnkletModel, BraceletModel } from "./bracelets";
 import { PendantModel } from "./pendants";
 import { EarringsModel } from "./earrings";
 import { RingModel, ToeRingModel } from "./rings";
@@ -25,7 +26,7 @@ const MODELS: Record<ProductType, React.ComponentType<ModelProps>> = {
   necklace: NecklaceModel,
   bracelet: BraceletModel,
   earrings: EarringsModel,
-  anklet: NecklaceModel,
+  anklet: AnkletModel,
   toe_ring: ToeRingModel,
 };
 

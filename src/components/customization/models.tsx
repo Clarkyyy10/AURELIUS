@@ -63,32 +63,6 @@ export function Prongs({ r, finish, count = 4, height }: { r: number; finish: Fi
   );
 }
 
-// ---------------------------------------------------------------- bracelet (flat band)
-
-export function BraceletModel({ finish, sizeFactor }: ModelProps) {
-  const geometry = useMemo(() => {
-    const rIn = 1.0 * sizeFactor;
-    const rOut = rIn + 0.09;
-    const h = 0.32;
-    const pts = [
-      new THREE.Vector2(rIn, -h / 2),
-      new THREE.Vector2(rOut, -h / 2 + 0.02),
-      new THREE.Vector2(rOut + 0.015, 0),
-      new THREE.Vector2(rOut, h / 2 - 0.02),
-      new THREE.Vector2(rIn, h / 2),
-      new THREE.Vector2(rIn, -h / 2),
-    ];
-    return new THREE.LatheGeometry(pts, 128);
-  }, [sizeFactor]);
-  return (
-    <group name="bracelet" rotation={[1.1, 0, 0.15]}>
-      <mesh geometry={geometry} name="metal" castShadow>
-        <MetalMaterial finish={finish} />
-      </mesh>
-    </group>
-  );
-}
-
 // ---------------------------------------------------------------- name pendant
 
 /**

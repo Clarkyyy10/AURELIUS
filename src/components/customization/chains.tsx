@@ -260,7 +260,7 @@ function buildChain(pattern: ChainPattern, curve: THREE.Curve<THREE.Vector3>, le
 }
 
 /** The clasp at the two open ends of the necklace. */
-function Clasp({ kind, start, end, finish }: { kind: ClaspKind; start: THREE.Vector3; end: THREE.Vector3; finish: FinishOption }) {
+export function Clasp({ kind, start, end, finish }: { kind: ClaspKind; start: THREE.Vector3; end: THREE.Vector3; finish: FinishOption }) {
   const jump = (p: THREE.Vector3) => (
     <mesh position={p} name="metal">
       <torusGeometry args={[1.3 * G, 0.3 * G, 10, 24]} />
@@ -336,11 +336,20 @@ export function ChainNecklace({ pattern, claspKind, finish, sizeFactor }: { patt
     return { curve: c, length: c.getLength() };
   }, [sizeFactor]);
 
-  const parts = useMemo(() => buildChain(pattern, curve, length), [pattern, curve, length]);
-  useLayoutEffect(() => () => parts.forEach((p) => p.geometry.dispose()), [parts]);
-
   return (
     <group name="necklace" position={[0, 0.3, 0]}>
+      <ChainAlong pattern={pattern} curve={curve} length={length} finish={finish} />
+      <Clasp kind={claspKind} start={curve.getPointAt(0)} end={curve.getPointAt(1)} finish={finish} />
+    </group>
+  );
+}
+
+/** Any chain style laid along a curve that lies in the x–y plane (necklaces, bracelets, anklets). */
+export function ChainAlong({ pattern, curve, length, finish }: { pattern: ChainPattern; curve: THREE.Curve<THREE.Vector3>; length: number; finish: FinishOption }) {
+  const parts = useMemo(() => buildChain(pattern, curve, length), [pattern, curve, length]);
+  useLayoutEffect(() => () => parts.forEach((p) => p.geometry.dispose()), [parts]);
+  return (
+    <>
       {parts.map((part, i) =>
         part.matrices ? (
           <Instances key={`${pattern}-${i}`} geometry={part.geometry} matrices={part.matrices} finish={finish} />
@@ -350,7 +359,6 @@ export function ChainNecklace({ pattern, claspKind, finish, sizeFactor }: { patt
           </mesh>
         ),
       )}
-      <Clasp kind={claspKind} start={curve.getPointAt(0)} end={curve.getPointAt(1)} finish={finish} />
-    </group>
+    </>
   );
 }
