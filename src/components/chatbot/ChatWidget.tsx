@@ -148,7 +148,7 @@ export function ChatWidget() {
           onClick={() => setOpen(true)}
           className={cn(
             "fixed right-4 z-40 flex h-14 items-center gap-2 rounded-full bg-emerald px-5 text-ivory shadow-lg transition-transform hover:scale-105 focus-visible:outline-gold",
-            raised ? "bottom-48 lg:bottom-6" : "bottom-5",
+            raised ? "bottom-48 lg:right-auto lg:bottom-6 lg:left-4" : "bottom-5",
           )}
           aria-label="Open the AURELIUS Assistant"
         >
