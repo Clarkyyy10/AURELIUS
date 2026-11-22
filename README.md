@@ -4,6 +4,10 @@ Capstone web platform for **Afable's Jewelry Store** (Montalban Public Market, R
 customization, e-commerce, service management, and an AI assistant. Phase 1 runs entirely in the
 browser on mock data; Phase 2 connects Supabase and the Claude API (see `docs/backend-plan.md`).
 
+The 3D customizer covers 8 piece types (rings, pendants, name pendants, necklaces, bracelets, earrings,
+anklets, toe rings) with 60+ styles, 7 settings, 5 band shapes, 4 shanks, 6 metal textures, 21 chain
+styles and 11 stone cuts — see decisions D-21 to D-25 in `docs/decisions.md`.
+
 ## Run it
 
 ```bash
@@ -14,7 +18,7 @@ npm run dev
 Open http://localhost:3000. Other commands:
 
 ```bash
-npm test          # 170+ unit and flow tests (pricing, status machines, validation, data layer, chatbot)
+npm test          # 370+ unit and flow tests (pricing, status machines, validation, data layer, chatbot)
 npm run lint
 npm run build && npm start
 ```

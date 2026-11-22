@@ -367,3 +367,27 @@ Bismarck 1.85 · Box 1.20 · Venetian 1.25 · Snake 1.50 · Popcorn 1.30. Clasp 
 
 Test cases: 14K Yellow 14 in Cuban + box clasp → 10.61 g, ₱37,663 · Silver Polished 22 in Rope + toggle → 12.44 g, ₱3,632 ·
 18K White 24 in Paperclip + spring ring → 10.24 g, ₱45,008 · Steel Black 30 in Byzantine + lobster → 14.66 g, ₱2,886.
+
+## 10. Design options (added after Phase 1 review — see decision D-25)
+
+`DesignOption { id, group, productTypes[], key, label, description, family?, weightFactor, fee, active, stones?, textMax?, usesChain?, requiresSurface? }`
+
+- `group` is one of `style`, `setting`, `profile` (band shape), `shank`, `texture`. A design stores its picks in
+  `DesignConfig.choices` (one ID per group) and the short text for initial, signet, bar, medallion, zodiac, charm
+  and ID styles in `DesignConfig.styleText`.
+- `stones` = `{ min, max, default }` for the style (otherwise the piece type's `maxStones`). `usesChain` = the
+  chain style and clasp apply (necklace chains, chain bracelets, anklets). `requiresSurface: "pearl"` = pearls only.
+- The owner edits labels, weight factors, fees, descriptions and on/off in **Customization & Rates → Designs**.
+  At least one option stays active in each group for each active piece type.
+
+**Updated formula** (all pieces; options not chosen count as factor 1 and fee 0):
+```
+est_weight_g = round2( baseWeightG × size_factor × density_ratio × chain_factor × Π option.weightFactor )
+est_price    = round0( est_weight_g × ratePerGram + stone_price + laborFee + finish.fee + clasp.fee + Σ option.fee )
+```
+A setting's factor and fee count only when the piece has stones. The weight product is computed with exact integer
+(BigInt) arithmetic and rounded half-up, like before.
+
+Test case: 18K Yellow ring, US 7, lab diamond, round, halo + prong + knife edge + split shank + hammered →
+3 × 1.00 × 1.51 × 1.15 × 1.15 × 0.90 = 5.39 g → 5.39 × ₱4,200 + ₱3,500 + ₱1,500 + ₱1,800 + ₱200 + ₱700 + ₱400 = **₱30,738**.
+Every option is also checked against an independent hand calculation in `src/lib/pricing/design.test.ts`.

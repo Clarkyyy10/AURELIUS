@@ -20,10 +20,10 @@ interface TextureLook {
 const LOOKS: Record<string, TextureLook> = {
   polished: { roughness: 0, clearcoat: 0.3, normal: 0, repeat: [1, 1] },
   satin: { roughness: 0.38, clearcoat: 0, normal: 0, repeat: [1, 1] },
-  brushed: { roughness: 0.3, clearcoat: 0, normal: 0.35, map: "brushed", repeat: [6, 2] },
+  brushed: { roughness: 0.22, clearcoat: 0, normal: 0.8, map: "brushed", repeat: [3, 1] },
   hammered: { roughness: 0.08, clearcoat: 0.2, normal: 0.9, map: "hammered", repeat: [5, 2] },
   sandblasted: { roughness: 0.6, clearcoat: 0, normal: 0.25, map: "sand", repeat: [6, 3] },
-  florentine: { roughness: 0.25, clearcoat: 0, normal: 0.55, map: "florentine", repeat: [8, 3] },
+  florentine: { roughness: 0.18, clearcoat: 0, normal: 1.1, map: "florentine", repeat: [5, 1.5] },
 };
 
 const SIZE = 256;
