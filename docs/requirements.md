@@ -1,8 +1,8 @@
 # AURELIUS — System Requirements
 
-Taken from Chapter 3 (3.9) of the AURELIUS manuscript. Users: **Customer** and **Owner** (the owner is
+Taken from Chapter 3 (3.9) of the AURELIUS manuscript, **version 2** (`docs/manuscript-v2.md`, the source of truth). Users: **Customer** and **Owner** (the owner is
 also the system administrator). Phase column: **P1** = built in the front-end phase with mock data;
-**P2** = needs the backend (Supabase / Claude API / email) to be fully real. P1 items marked "UI" are
+**P2** = needs the backend (Supabase / Gemini API / email) to be fully real. P1 items marked "UI" are
 built as working screens in Phase 1 and wired to real services in Phase 2.
 
 ## 1. Functional Requirements
@@ -56,9 +56,9 @@ built as working screens in Phase 1 and wired to real services in Phase 2.
 ### Module 4 – AI-Powered Chatbot
 | ID | Requirement | Priority | Phase |
 |---|---|---|---|
-| FR-35 | The system shall provide an AI-powered chatbot accessible to customers within the platform. | Must | P1 UI + mock, P2 Claude API |
-| FR-36 | The chatbot shall guide customers in preparing a custom order request by asking about design preferences, materials, gemstones, and size, and shall pre-fill a draft request that the customer reviews, edits, and confirms. The chatbot shall not submit a request without the customer's confirmation. | Must | P1 mock, P2 |
-| FR-37 | The chatbot shall guide customers in preparing a service request by asking about the item, the type of service needed, and relevant details, and shall pre-fill a draft request that the customer reviews, edits, and confirms. The chatbot shall not submit a request without the customer's confirmation. | Must | P1 mock, P2 |
+| FR-35 | The system shall provide an AI-powered chatbot accessible to customers within the platform. | Must | P1 UI + mock, P2 Gemini API |
+| FR-36 | The chatbot shall guide customers in preparing a custom order request within the chat interface by asking about design preferences, materials, gemstones, and size, and shall present a pre-filled text draft summary in the chat that the customer reviews, edits, and confirms. The chatbot shall not automatically generate or modify 3D designs, nor shall it submit a request without the customer's explicit confirmation in chat. | Must | P1 mock, P2 |
+| FR-37 | The chatbot shall guide customers in preparing a service request by asking about the item, the type of service needed, relevant details and the chatbot shall not submit a request without the customer's confirmation. | Must | P1 mock, P2 |
 | FR-38 | The chatbot shall answer customer inquiries about the store's available products, services, and service catalog. | Should | P1 mock, P2 |
 | FR-39 | The chatbot shall recognize when an inquiry falls outside its defined scope and shall refer the customer to the store owner. | Must | P1 mock, P2 |
 | FR-40 | The chatbot shall not provide binding quotations, final prices, or production commitments on behalf of the owner. | Must | P1 mock, P2 |

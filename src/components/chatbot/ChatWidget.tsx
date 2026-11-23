@@ -61,7 +61,7 @@ function RichText({ text, onNavigate }: { text: string; onNavigate: () => void }
   );
 }
 
-/** FR-35 to FR-40 — AURELIUS Assistant (mock engine in Phase 1, Claude API in Phase 2). */
+/** FR-35 to FR-40 — AURELIUS Assistant (mock engine in Phase 1, Gemini API in Phase 2). */
 export function ChatWidget() {
   const pathname = usePathname();
   const router = useRouter();

@@ -2,7 +2,7 @@
 
 Capstone web platform for **Afable's Jewelry Store** (Montalban Public Market, Rizal): 3D design
 customization, e-commerce, service management, and an AI assistant. Phase 1 runs entirely in the
-browser on mock data; Phase 2 connects Supabase and the Claude API (see `docs/backend-plan.md`).
+browser on mock data; Phase 2 connects Supabase and the Gemini API (see `docs/backend-plan.md`).
 
 The 3D customizer covers 8 piece types (rings, pendants, name pendants, necklaces, bracelets, earrings,
 anklets, toe rings) with 60+ styles, 7 settings, 5 band shapes, 4 shanks, 6 metal textures, 21 chain
@@ -45,7 +45,7 @@ src/lib/data/       repository interfaces, mock implementation (zustand store), 
 src/lib/pricing/    estimate engine (FR-06/FR-47) + tests
 src/lib/status/     status machines for orders, custom orders, services + tests
 src/lib/validation/ zod schemas for every form (re-used by Phase 2 server code)
-src/lib/chatbot/    mock assistant engine (same interface as the Phase 2 Claude API route)
+src/lib/chatbot/    mock assistant engine (same interface as the Phase 2 Gemini API route)
 docs/               requirements, specs, data model, decisions log
 ```
 

@@ -348,7 +348,7 @@ quotations, payments) in one timeline with filters.
 
 ### 5.19 Owner — Chatbot knowledge `/admin/chatbot`
 CRUD of FAQ entries (question, answer, keywords, active) + store policies text. Used by the mock bot
-now and as the grounding knowledge for the Claude API in Phase 2. Seed 12 FAQs: store hours,
+now and as the grounding knowledge for the Gemini API in Phase 2. Seed 12 FAQs: store hours,
 location, payment methods, down payment policy, claiming policy, how custom orders work, how long
 custom orders take (answer: "the owner gives the expected date in the quotation"), services offered,
 watch battery replacement, cleaning frequency, gemstone options, cancellation policy.

@@ -17,7 +17,7 @@ import { errorMessage, useQuery } from "@/lib/data/hooks";
 import { faqSchema } from "@/lib/validation/schemas";
 import type { FaqEntry } from "@/types";
 
-/** Chatbot knowledge base (FR-38 content) — used by the mock bot now and to ground the Claude API in Phase 2. */
+/** Chatbot knowledge base (FR-38 content) — used by the mock bot now and to ground the Gemini API in Phase 2. */
 export default function ChatbotKnowledgePage() {
   const q = useQuery("owner:faqs", () => repos.knowledge.list({ includeInactive: true }));
   const pq = useQuery("owner:policies", () => repos.knowledge.getPolicies());

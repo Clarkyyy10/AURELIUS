@@ -1,4 +1,4 @@
-// Chatbot interface — frontend-spec §5.9. Phase 2's Claude API route returns the same ChatResult.
+// Chatbot interface — frontend-spec §5.9. Phase 2's Gemini API route returns the same ChatResult.
 
 import type { CustomizationOptions, DesignConfig, FaqEntry, Product, ServiceCatalogItem, ServiceRequest, StoreSettings } from "@/types";
 
