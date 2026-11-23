@@ -31,7 +31,18 @@ export async function flushOutbox(limit = 20): Promise<{ sent: number; failed: n
   const from = optionalEnv("EMAIL_FROM");
   if (!key || !from) return { sent: 0, failed: 0 }; // not configured (development): emails stay queued
   const pending = await asSystem((tx) =>
-    tx.emailOutbox.findMany({ where: { status: { in: ["pending", "failed"] }, attempts: { lt: MAX_ATTEMPTS } }, orderBy: { createdAt: "asc" }, take: limit }),
+    tx.emailOutbox.findMany({
+      where: {
+        attempts: { lt: MAX_ATTEMPTS },
+        OR: [
+          { status: { in: ["pending", "failed"] } },
+          // a send that was cut off (e.g. the server stopped) is retried after 10 minutes
+          { status: "sending", createdAt: { lt: new Date(Date.now() - 10 * 60_000) } },
+        ],
+      },
+      orderBy: { createdAt: "asc" },
+      take: limit,
+    }),
   );
   let sent = 0;
   let failed = 0;
