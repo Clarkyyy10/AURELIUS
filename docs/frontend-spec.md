@@ -197,8 +197,9 @@ remarks in a highlighted panel at the top, button **Resubmit for review** create
 moves status back to `under_review`. Show "Version 2 of your design" and a link to compare with the
 previous version (side-by-side snapshots + changed fields).
 
-**Draft mode** (`?draft=<id>`): config pre-filled from a chatbot draft with a notice "Your assistant
-filled this in. Review and change anything before submitting." (FR-36)
+**Draft mode** (`?draft=<id>`): config pre-filled from a saved draft with a notice "Your assistant
+filled this in. Review and change anything before submitting." The chatbot no longer opens drafts here
+(manuscript V2 FR-36: it never generates or changes 3D designs — see D-27).
 
 ### 5.5 Services `/services` and `/services/request` (FR-25, FR-26)
 - Catalog: cards for each non-hidden service with icon, name, description, "For jewelry / watches"
@@ -260,9 +261,14 @@ change password form (current, new ≥ 8 chars with strength hint, confirm). Suc
 - Welcome message + quick-reply chips: **Design a custom piece** · **Request a repair or service** ·
   **Ask about products** · **Store hours and location**.
 - Messages: bubbles, typing indicator, timestamps, links rendered as buttons, quick replies.
-- **Draft card** (FR-36/37): when a draft is ready, show a card summarizing the collected details with
-  **Review and edit draft** (opens `/customize?draft=` or `/services/request?draft=`) and **Start over**.
-  The bot never submits; the customer submits on the page.
+- **Draft card** (FR-36/37, manuscript V2): when a draft is ready, the chat shows a text summary of the
+  collected details with **Confirm and send**, **Edit** (an inline form inside the chat, with the same
+  rules as the customizer and the service form) and **Start over**. Nothing is sent until the customer
+  presses **Confirm and send**; guests are asked to log in first and keep the draft. Once sent, the card
+  shows the request code and a **View** link, and the assistant confirms in a message. The chatbot never
+  generates or changes a 3D design.
+- **Data notice** (manuscript §3.15): above the message box — chat text is processed by Google Gemini
+  in the live system; do not type passwords, bank or card details, or government ID numbers.
 - **Mock engine** (`lib/chatbot/mockEngine.ts`) implementing the same interface Phase 2 uses:
   ```ts
   interface ChatTurn { role: "user" | "assistant"; content: string }
@@ -426,7 +432,7 @@ shows the latest 8 with "Mark all as read" and "View all".
 - [ ] Owner can add/edit/hide/remove products and services, and edit options/rates; the customizer
       and estimates reflect changes immediately.
 - [ ] Notifications appear for every event in §7, for the right user.
-- [ ] Chatbot: both guided flows produce drafts that open pre-filled pages; out-of-scope questions are
+- [ ] Chatbot: both guided flows produce in-chat drafts the customer edits and confirms; out-of-scope questions are
       referred to the owner; it never states a final price or date.
 - [ ] Customer cannot open `/admin/*`; guests are redirected to login on protected pages.
 - [ ] Every page works at 360 px wide; no horizontal scrolling.

@@ -2,21 +2,23 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { Bot, FileText, MessageCircle, RotateCcw, Send, X } from "lucide-react";
+import { usePathname } from "next/navigation";
+import { Bot, MessageCircle, RotateCcw, Send, ShieldAlert, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { repos } from "@/lib/data";
 import { errorMessage, useCurrentUser } from "@/lib/data/hooks";
 import { QUICK_START, sendMessage, WELCOME } from "@/lib/chatbot/mockEngine";
 import type { ChatDraft, ChatTurn } from "@/lib/chatbot/types";
 import { cn } from "@/lib/utils";
 import { formatDateTime } from "@/lib/utils/format";
+import { DraftCard, type SentInfo } from "./DraftCard";
 
 interface Message extends ChatTurn {
   at: string;
   quickReplies?: string[];
   draft?: ChatDraft;
+  /** Set once the customer confirmed the draft in the chat and it was sent (FR-36, FR-37). */
+  sent?: SentInfo;
   referToOwner?: boolean;
 }
 
@@ -64,14 +66,12 @@ function RichText({ text, onNavigate }: { text: string; onNavigate: () => void }
 /** FR-35 to FR-40 — AURELIUS Assistant (mock engine in Phase 1, Gemini API in Phase 2). */
 export function ChatWidget() {
   const pathname = usePathname();
-  const router = useRouter();
   const { user } = useCurrentUser();
   const [open, setOpen] = useState(false);
   const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
   const [messages, setMessages] = useState<Message[] | null>(null);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
-  const [openingDraft, setOpeningDraft] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const list = messages ?? (mounted ? loadMessages() : []);
@@ -119,18 +119,18 @@ export function ChatWidget() {
     }
   }
 
-  async function openDraft(draft: ChatDraft) {
-    setOpeningDraft(true);
-    try {
-      const saved = await repos.drafts.save(draft.kind === "custom_order" ? { kind: "custom_order", config: draft.config, notes: draft.notes } : { kind: "service_request", fields: draft.fields });
-      setOpen(false);
-      router.push(draft.kind === "custom_order" ? `/customize?draft=${saved.id}` : `/services/request?draft=${saved.id}`);
-    } catch (e) {
-      setMessages([...list, { role: "assistant", content: errorMessage(e), at: new Date().toISOString() }]);
-    } finally {
-      setOpeningDraft(false);
-    }
-  }
+  const updateDraft = (index: number, draft: ChatDraft) => setMessages(list.map((m, i) => (i === index ? { ...m, draft } : m)));
+
+  const markSent = (index: number, sent: SentInfo) =>
+    setMessages([
+      ...list.map((m, i) => (i === index ? { ...m, sent } : m)),
+      {
+        role: "assistant",
+        content: `Done — I sent your request to the owner as ${sent.code}. The owner reviews it and confirms the final price and dates. You'll get a notification when there's an update.`,
+        quickReplies: ["Design a custom piece", "Request a repair or service"],
+        at: new Date().toISOString(),
+      },
+    ]);
 
   const reset = () => {
     setMessages(welcome());
@@ -197,20 +197,15 @@ export function ChatWidget() {
                   <RichText text={m.content} onNavigate={() => setOpen(false)} />
                 </div>
                 {m.draft && (
-                  <div className="mt-2 w-[85%] rounded-2xl border border-gold/50 bg-paper p-3 text-sm shadow-sm">
-                    <p className="flex items-center gap-2 font-semibold">
-                      <FileText className="size-4 text-gold-dark" aria-hidden /> {m.draft.kind === "custom_order" ? "Custom order draft" : "Service request draft"}
-                    </p>
-                    <p className="mt-1 text-muted-foreground">Not sent yet. Review it, change anything, then submit it yourself.</p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      <Button size="sm" onClick={() => void openDraft(m.draft!)} disabled={openingDraft}>
-                        Review and edit draft
-                      </Button>
-                      <Button size="sm" variant="outline" onClick={reset}>
-                        Start over
-                      </Button>
-                    </div>
-                  </div>
+                  <DraftCard
+                    draft={m.draft}
+                    sent={m.sent}
+                    uid={`draft-${i}`}
+                    onDraftChange={(d) => updateDraft(i, d)}
+                    onSent={(info) => markSent(i, info)}
+                    onStartOver={reset}
+                    onNavigate={() => setOpen(false)}
+                  />
                 )}
                 <time className="mt-0.5 px-1 text-[10px] text-muted-foreground" dateTime={m.at}>
                   {formatDateTime(m.at).split("·")[1]?.trim()}
@@ -236,8 +231,15 @@ export function ChatWidget() {
             </div>
           )}
 
+          {/* Manuscript V2 §3.15: say who processes the chat text and what not to type. */}
+          <p className="flex items-start gap-1.5 border-t border-line bg-paper px-3 pt-2 text-[11px] leading-snug text-muted-foreground">
+            <ShieldAlert className="mt-px size-3.5 shrink-0" aria-hidden />
+            <span>
+              In the live system, chat text is processed by Google Gemini. Please don&apos;t type passwords, bank or card details, or government ID numbers.
+            </span>
+          </p>
           <form
-            className="flex gap-2 border-t border-line p-3"
+            className="flex gap-2 p-3"
             onSubmit={(e) => {
               e.preventDefault();
               void send(input);

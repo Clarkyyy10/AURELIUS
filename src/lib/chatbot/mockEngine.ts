@@ -276,7 +276,7 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       return {
         state: { flow: "idle" },
         result: {
-          reply: `Your draft is ready: ${summary}. Open it in the 3D customizer to review and change anything — I won't submit it for you. ${PRICE_GUARDRAIL}`,
+          reply: `Your draft is ready: ${summary}. Check it below and tap Edit to change anything. Nothing is sent until you tap Confirm and send — I won't submit it for you. ${PRICE_GUARDRAIL}`,
           draft: { kind: "custom_order", config: { ...c, notes }, notes },
           quickReplies: ["Start over"],
         },
@@ -317,7 +317,7 @@ function serviceStep(state: Extract<State, { flow: "service" }>, text: string, k
         state: { flow: "idle" },
         result: {
           reply:
-            "Your service request draft is ready. Open it to review and send it — I won't submit it for you. I can't give prices or completion dates: the owner inspects your item and confirms the cost and date in a quotation.",
+            "Your service request draft is ready. Check it below and tap Edit to change anything. Nothing is sent until you tap Confirm and send — I won't submit it for you. I can't give prices or completion dates: the owner inspects your item and confirms the cost and date in a quotation.",
           draft: { kind: "service_request", fields: f },
           quickReplies: ["Start over"],
         },

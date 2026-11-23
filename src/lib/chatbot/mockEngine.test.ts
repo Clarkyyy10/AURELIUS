@@ -27,6 +27,7 @@ describe("custom order flow (FR-36)", () => {
     expect(cfg.notes).toBe("Engrave M&J inside");
     expect(() => estimate(cfg, kb.options)).not.toThrow();
     expect(r.reply).toContain("won't submit");
+    expect(r.reply).toContain("Confirm and send");
   });
 
   it("detects the piece type from free text and skips gemstones for necklaces", () => {
