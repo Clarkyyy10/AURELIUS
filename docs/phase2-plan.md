@@ -1,8 +1,7 @@
 # AURELIUS — Phase 2 plan (backend) — FOR APPROVAL
 
-Status: **draft, waiting for the team's approval.** Nothing has been created in any database or
-service yet. Source of truth: `docs/manuscript-v2.md` (§3.9–3.15). The draft schema is in
-`prisma/schema.prisma` (validated with `prisma validate`, not applied).
+Status: **approved 2026-11-24 (D-28); stages 0–8 built.** Setup steps: `docs/phase2-setup.md`. Test results: `docs/test-log.md`.
+Integration, Playwright and live chatbot tests run once the Supabase test project and keys exist.
 
 ---
 
