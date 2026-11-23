@@ -1,0 +1,11 @@
+node_modules
+.next
+out
+coverage
+playwright-report
+test-results
+pnpm-lock.yaml
+public/fonts
+docs/manuscript-v2.md
+docs/archive
+*.tsbuildinfo
