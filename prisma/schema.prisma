@@ -66,7 +66,7 @@ enum Availability {
 
 /// ERD: products (FR-12, FR-13, FR-24).
 model Product {
-  id           String       @id @default(uuid()) @db.Uuid
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   slug         String       @unique @db.VarChar(120)
   name         String       @db.VarChar(120)
   description  String       @db.VarChar(2000)
@@ -145,7 +145,7 @@ enum Actor {
 
 /// ERD: orders — product orders and custom-order requests (one record each, FR-07).
 model Order {
-  id                String    @id @default(uuid()) @db.Uuid
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   code              String    @unique @db.VarChar(20) // ORD-2026-0001 / CO-2026-0001
   kind              OrderKind
   customerId        String    @map("customer_id") @db.Uuid
@@ -173,7 +173,7 @@ model Order {
 
 /// ERD: order_items — the product, price and photo captured when the order was placed.
 model OrderItem {
-  id          String  @id @default(uuid()) @db.Uuid
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   orderId     String  @map("order_id") @db.Uuid
   productId   String  @map("product_id") @db.Uuid
   productName String  @map("product_name") @db.VarChar(120)
@@ -189,7 +189,7 @@ model OrderItem {
 
 /// ERD: custom_designs — each submitted version of a custom order's design (FR-07, FR-10).
 model CustomDesign {
-  id              String   @id @default(uuid()) @db.Uuid
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   orderId         String   @map("order_id") @db.Uuid
   customerId      String   @map("customer_id") @db.Uuid
   version         Int
@@ -209,7 +209,7 @@ model CustomDesign {
 
 /// Support: the owner's revision remarks (FR-09).
 model RevisionRemark {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   orderId   String   @map("order_id") @db.Uuid
   text      String   @db.VarChar(1000)
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
@@ -228,7 +228,7 @@ enum ItemType {
 
 /// ERD: service_requests (FR-26 to FR-33).
 model ServiceRequest {
-  id                   String    @id @default(uuid()) @db.Uuid
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   code                 String    @unique @db.VarChar(20) // SR-2026-0001
   customerId           String    @map("customer_id") @db.Uuid
   itemType             ItemType  @map("item_type")
@@ -273,7 +273,7 @@ model ServiceRequestService {
 /// ERD: quotations (FR-15, FR-16, FR-27, FR-28). Exactly one of orderId / serviceRequestId is set
 /// (check constraint in SQL). A re-issued quotation keeps the old one with isCurrent = false.
 model Quotation {
-  id                  String    @id @default(uuid()) @db.Uuid
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   orderId             String?   @map("order_id") @db.Uuid
   serviceRequestId    String?   @map("service_request_id") @db.Uuid
   finalPrice          Decimal   @map("final_price") @db.Decimal(12, 2)
@@ -313,7 +313,7 @@ enum PaymentMethod {
 
 /// ERD: payments (FR-17, FR-18, FR-30). Recording and verification only — no payment gateway.
 model Payment {
-  id               String        @id @default(uuid()) @db.Uuid
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   orderId          String?       @map("order_id") @db.Uuid
   serviceRequestId String?       @map("service_request_id") @db.Uuid
   kind             PaymentKind
@@ -341,7 +341,7 @@ model Payment {
 
 /// Support: every status change with who made it (FR-19, FR-29, FR-31 tracking timeline).
 model StatusHistory {
-  id               String   @id @default(uuid()) @db.Uuid
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   orderId          String?  @map("order_id") @db.Uuid
   serviceRequestId String?  @map("service_request_id") @db.Uuid
   status           String   @db.VarChar(30)
@@ -369,7 +369,7 @@ model CodeCounter {
 
 /// ERD: notifications (FR-49, FR-50). Published to Supabase Realtime for the bell.
 model Notification {
-  id        String   @id @default(uuid()) @db.Uuid
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId    String   @map("user_id") @db.Uuid
   type      String   @db.VarChar(40)
   title     String   @db.VarChar(120)
@@ -388,7 +388,7 @@ model Notification {
 /// Support: emails are written here inside the same transaction as the change, then sent through
 /// Resend after it commits (retried by a daily job), so a failed email never undoes a saved record.
 model EmailOutbox {
-  id         String    @id @default(uuid()) @db.Uuid
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   toEmail    String    @map("to_email") @db.VarChar(254)
   template   String    @db.VarChar(40)
   subject    String    @db.VarChar(200)
@@ -410,7 +410,7 @@ model EmailOutbox {
 /// metadata (no message text): when, how many messages, which drafts were sent, whether the bot
 /// referred the customer to the owner. See docs/phase2-plan.md §6.
 model ChatSession {
-  id              String    @id @default(uuid()) @db.Uuid
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId          String?   @map("user_id") @db.Uuid // null for guests
   startedAt       DateTime  @default(now()) @map("started_at") @db.Timestamptz
   lastMessageAt   DateTime  @default(now()) @map("last_message_at") @db.Timestamptz
@@ -436,7 +436,7 @@ model RateLimit {
 
 /// Support: chatbot knowledge entries (FR-38), edited by the owner.
 model Faq {
-  id       String   @id @default(uuid()) @db.Uuid
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   question String   @db.VarChar(200)
   answer   String   @db.VarChar(1500)
   keywords String[]
