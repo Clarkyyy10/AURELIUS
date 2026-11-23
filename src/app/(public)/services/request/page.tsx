@@ -39,7 +39,15 @@ function RequestLoader() {
   return <RequestForm key={`${draftId}|${preselect}`} services={servicesQ.data} draft={draft} preselect={preselect} />;
 }
 
-function RequestForm({ services, draft, preselect }: { services: ServiceCatalogItem[]; draft: Extract<Draft, { kind: "service_request" }> | null; preselect: string | null }) {
+function RequestForm({
+  services,
+  draft,
+  preselect,
+}: {
+  services: ServiceCatalogItem[];
+  draft: Extract<Draft, { kind: "service_request" }> | null;
+  preselect: string | null;
+}) {
   const router = useRouter();
   const { user } = useCurrentUser();
   const [step, setStep] = useState<"form" | "review">("form");
@@ -51,7 +59,9 @@ function RequestForm({ services, draft, preselect }: { services: ServiceCatalogI
   const form = useForm<ServiceRequestInput>({
     resolver: zodResolver(serviceRequestSchema),
     defaultValues: {
-      itemType: draft?.fields.itemType ?? (services.find((s) => s.id === preselect)?.appliesTo.length === 1 ? services.find((s) => s.id === preselect)!.appliesTo[0] : "jewelry"),
+      itemType:
+        draft?.fields.itemType ??
+        (services.find((s) => s.id === preselect)?.appliesTo.length === 1 ? services.find((s) => s.id === preselect)!.appliesTo[0] : "jewelry"),
       itemDescription: draft?.fields.itemDescription ?? "",
       brandModel: draft?.fields.brandModel ?? "",
       material: draft?.fields.material ?? "",
@@ -123,7 +133,11 @@ function RequestForm({ services, draft, preselect }: { services: ServiceCatalogI
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Request a service" back={{ href: "/services", label: "Back to services" }} description="Tell us about your item. The owner will look at your request and send a quotation." />
+      <PageHeader
+        title="Request a service"
+        back={{ href: "/services", label: "Back to services" }}
+        description="Tell us about your item. The owner will look at your request and send a quotation."
+      />
       {user && <VerifyEmailBanner user={user} action="submit a service request" />}
       {!user && (
         <p className="rounded-xl border border-line bg-paper p-3 text-sm">
@@ -141,7 +155,14 @@ function RequestForm({ services, draft, preselect }: { services: ServiceCatalogI
       )}
       <ol className="flex gap-2 text-sm" aria-label="Steps">
         {["Your item", "Review and send"].map((s, i) => (
-          <li key={s} aria-current={(i === 0 && step === "form") || (i === 1 && step === "review") ? "step" : undefined} className={cn("rounded-full px-3 py-1", (i === 0 && step === "form") || (i === 1 && step === "review") ? "bg-emerald text-ivory" : "bg-muted text-muted-foreground")}>
+          <li
+            key={s}
+            aria-current={(i === 0 && step === "form") || (i === 1 && step === "review") ? "step" : undefined}
+            className={cn(
+              "rounded-full px-3 py-1",
+              (i === 0 && step === "form") || (i === 1 && step === "review") ? "bg-emerald text-ivory" : "bg-muted text-muted-foreground",
+            )}
+          >
             {i + 1}. {s}
           </li>
         ))}
@@ -167,7 +188,10 @@ function RequestForm({ services, draft, preselect }: { services: ServiceCatalogI
                         const keep = (form.getValues("serviceIds") ?? []).filter((id) => services.find((s) => s.id === id)?.appliesTo.includes(t));
                         form.setValue("serviceIds", keep);
                       }}
-                      className={cn("rounded-xl border px-4 py-3 text-left font-medium", field.value === t ? "border-gold-dark bg-gold/10 ring-2 ring-gold/40" : "border-line")}
+                      className={cn(
+                        "rounded-xl border px-4 py-3 text-left font-medium",
+                        field.value === t ? "border-gold-dark bg-gold/10 ring-2 ring-gold/40" : "border-line",
+                      )}
                     >
                       {t === "jewelry" ? "Jewelry" : "Watch"}
                     </button>
@@ -177,7 +201,11 @@ function RequestForm({ services, draft, preselect }: { services: ServiceCatalogI
             />
           </fieldset>
 
-          <Field label="Describe your item" error={errors.itemDescription?.message} hint="For example: “18K gold wedding ring, plain band”. 10 to 300 characters.">
+          <Field
+            label="Describe your item"
+            error={errors.itemDescription?.message}
+            hint="For example: “18K gold wedding ring, plain band”. 10 to 300 characters."
+          >
             <Input {...form.register("itemDescription")} />
           </Field>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -201,8 +229,17 @@ function RequestForm({ services, draft, preselect }: { services: ServiceCatalogI
                   {relevant.map((s) => {
                     const checked = field.value?.includes(s.id) ?? false;
                     return (
-                      <label key={s.id} className={cn("flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm", checked ? "border-gold-dark bg-gold/10" : "border-line")}>
-                        <Checkbox checked={checked} onCheckedChange={(v) => field.onChange(v ? [...(field.value ?? []), s.id] : (field.value ?? []).filter((x) => x !== s.id))} />
+                      <label
+                        key={s.id}
+                        className={cn(
+                          "flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm",
+                          checked ? "border-gold-dark bg-gold/10" : "border-line",
+                        )}
+                      >
+                        <Checkbox
+                          checked={checked}
+                          onCheckedChange={(v) => field.onChange(v ? [...(field.value ?? []), s.id] : (field.value ?? []).filter((x) => x !== s.id))}
+                        />
                         <ServiceIcon name={s.icon} className="size-4 text-gold-dark" />
                         {s.name}
                       </label>
@@ -218,11 +255,22 @@ function RequestForm({ services, draft, preselect }: { services: ServiceCatalogI
             )}
           </fieldset>
 
-          <Field label="What's wrong, or what would you like done?" error={errors.details?.message} hint="Describe the condition and what you want. 10 to 1,000 characters.">
+          <Field
+            label="What's wrong, or what would you like done?"
+            error={errors.details?.message}
+            hint="Describe the condition and what you want. 10 to 1,000 characters."
+          >
             <Textarea rows={4} {...form.register("details")} />
           </Field>
 
-          <FileDropzone label="Photos of your item (optional)" accept={PHOTO_TYPES} max={3} value={photos} onChange={setPhotos} hint="JPG or PNG, up to 5 MB each, up to 3 photos." />
+          <FileDropzone
+            label="Photos of your item (optional)"
+            accept={PHOTO_TYPES}
+            max={3}
+            value={photos}
+            onChange={setPhotos}
+            hint="JPG or PNG, up to 5 MB each, up to 3 photos."
+          />
 
           <Field label="Preferred drop-off date" optional error={errors.preferredDropOffDate?.message}>
             <Input type="date" min={todayISODate()} className="max-w-56" {...form.register("preferredDropOffDate")} />
@@ -268,13 +316,19 @@ function RequestForm({ services, draft, preselect }: { services: ServiceCatalogI
               ))}
             </ul>
           )}
-          <p className="rounded-lg bg-muted/60 p-3 text-sm">The owner reviews your request and sends a quotation with the cost and date. Nothing is charged until you accept.</p>
+          <p className="rounded-lg bg-muted/60 p-3 text-sm">
+            The owner reviews your request and sends a quotation with the cost and date. Nothing is charged until you accept.
+          </p>
           <FormError message={error} />
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setStep("form")}>
               Edit
             </Button>
-            <SubmitButton onClick={submit} disabled={Boolean(user && (!user.emailVerified || user.role !== "customer"))} label={user ? "Send request" : "Log in to send"} />
+            <SubmitButton
+              onClick={submit}
+              disabled={Boolean(user && (!user.emailVerified || user.role !== "customer"))}
+              label={user ? "Send request" : "Log in to send"}
+            />
           </div>
           {user?.role === "owner" && <p className="text-sm text-danger">Owner accounts can&apos;t submit requests. Switch to a customer in the Demo bar.</p>}
         </div>

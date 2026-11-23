@@ -36,7 +36,17 @@ export function SharedViewCanvas() {
  * - Touch: tap once to turn on rotate and pinch-zoom (so swiping still scrolls the page).
  * Moving away (or tapping elsewhere) turns zoom off again.
  */
-export function ProductModelView({ config, options, className, label }: { config: DesignConfig; options: CustomizationOptions; className?: string; label: string }) {
+export function ProductModelView({
+  config,
+  options,
+  className,
+  label,
+}: {
+  config: DesignConfig;
+  options: CustomizationOptions;
+  className?: string;
+  label: string;
+}) {
   const reduced = usePrefersReducedMotion();
   const wrap = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(false);
@@ -61,18 +71,21 @@ export function ProductModelView({ config, options, className, label }: { config
       onPointerLeave={(e) => e.pointerType === "mouse" && setActive(false)}
     >
       <View className={cn("absolute inset-0", active ? "touch-none" : "touch-pan-y")}>
-        <JewelryScene
-          config={config}
-          options={options}
-          autoRotate={!reduced && !touched}
-          enableZoom={active}
-          onInteract={() => setTouched(true)}
-        />
+        <JewelryScene config={config} options={options} autoRotate={!reduced && !touched} enableZoom={active} onInteract={() => setTouched(true)} />
       </View>
       {/* On touch screens a transparent cover keeps swipes scrolling the page until the model is tapped. */}
-      {!active && <button type="button" aria-label={`Rotate and zoom ${label}`} className="absolute inset-0 hidden cursor-grab pointer-coarse:block" onClick={() => setActive(true)} />}
+      {!active && (
+        <button
+          type="button"
+          aria-label={`Rotate and zoom ${label}`}
+          className="absolute inset-0 hidden cursor-grab pointer-coarse:block"
+          onClick={() => setActive(true)}
+        />
+      )}
       <p className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-paper/85 px-2.5 py-0.5 text-[11px] whitespace-nowrap text-muted-foreground">
-        {active ? "Drag to rotate · scroll or pinch to zoom" : (
+        {active ? (
+          "Drag to rotate · scroll or pinch to zoom"
+        ) : (
           <>
             <span className="pointer-coarse:hidden">Drag to rotate · click to zoom</span>
             <span className="hidden pointer-coarse:inline">Tap to rotate and zoom</span>

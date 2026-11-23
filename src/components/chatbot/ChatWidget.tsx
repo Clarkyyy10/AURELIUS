@@ -52,7 +52,12 @@ function RichText({ text, onNavigate }: { text: string; onNavigate: () => void }
       {parts.map((p, i) => {
         const m = p.match(/^\[([^\]]+)\]\((\/[^)]*)\)$/);
         return m ? (
-          <Link key={i} href={m[2]} onClick={onNavigate} className="mx-0.5 inline-flex items-center rounded-md border border-gold/50 bg-paper px-2 py-0.5 text-sm font-medium text-gold-dark hover:bg-gold/10">
+          <Link
+            key={i}
+            href={m[2]}
+            onClick={onNavigate}
+            className="mx-0.5 inline-flex items-center rounded-md border border-gold/50 bg-paper px-2 py-0.5 text-sm font-medium text-gold-dark hover:bg-gold/10"
+          >
             {m[1]}
           </Link>
         ) : (
@@ -68,7 +73,11 @@ export function ChatWidget() {
   const pathname = usePathname();
   const { user } = useCurrentUser();
   const [open, setOpen] = useState(false);
-  const mounted = useSyncExternalStore(() => () => {}, () => true, () => false);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
   const [messages, setMessages] = useState<Message[] | null>(null);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
@@ -110,8 +119,14 @@ export function ChatWidget() {
     setInput("");
     setTyping(true);
     try {
-      const r = await sendMessage(next.map(({ role, content }) => ({ role, content })), { isSignedIn: Boolean(user) });
-      setMessages([...next, { role: "assistant", content: r.reply, quickReplies: r.quickReplies, draft: r.draft, referToOwner: r.referToOwner, at: new Date().toISOString() }]);
+      const r = await sendMessage(
+        next.map(({ role, content }) => ({ role, content })),
+        { isSignedIn: Boolean(user) },
+      );
+      setMessages([
+        ...next,
+        { role: "assistant", content: r.reply, quickReplies: r.quickReplies, draft: r.draft, referToOwner: r.referToOwner, at: new Date().toISOString() },
+      ]);
     } catch (e) {
       setMessages([...next, { role: "assistant", content: `Sorry, I couldn't answer just now. ${errorMessage(e)}`, at: new Date().toISOString() }]);
     } finally {
@@ -178,7 +193,13 @@ export function ChatWidget() {
             <Button variant="ghost" size="icon-sm" className="text-ivory hover:bg-white/10 hover:text-ivory" onClick={reset} aria-label="Start over">
               <RotateCcw className="size-4" />
             </Button>
-            <Button variant="ghost" size="icon-sm" className="text-ivory hover:bg-white/10 hover:text-ivory" onClick={() => setOpen(false)} aria-label="Close the assistant">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="text-ivory hover:bg-white/10 hover:text-ivory"
+              onClick={() => setOpen(false)}
+              aria-label="Close the assistant"
+            >
               <X className="size-4" />
             </Button>
           </header>
@@ -213,7 +234,11 @@ export function ChatWidget() {
               </div>
             ))}
             {typing && (
-              <div className="flex items-center gap-1 rounded-2xl rounded-bl-sm border border-line bg-paper px-3 py-2.5" role="status" aria-label="The assistant is typing">
+              <div
+                className="flex items-center gap-1 rounded-2xl rounded-bl-sm border border-line bg-paper px-3 py-2.5"
+                role="status"
+                aria-label="The assistant is typing"
+              >
                 {[0, 1, 2].map((d) => (
                   <span key={d} className="size-1.5 animate-bounce rounded-full bg-muted-foreground" style={{ animationDelay: `${d * 150}ms` }} />
                 ))}
@@ -224,7 +249,12 @@ export function ChatWidget() {
           {lastAssistant?.quickReplies && !typing && (
             <div className="flex gap-2 overflow-x-auto border-t border-line bg-paper px-3 py-2" aria-label="Suggested replies">
               {lastAssistant.quickReplies.map((q) => (
-                <button key={q} type="button" onClick={() => void send(q)} className="min-h-9 shrink-0 rounded-full border border-gold/50 px-3 text-sm whitespace-nowrap text-gold-dark hover:bg-gold/10">
+                <button
+                  key={q}
+                  type="button"
+                  onClick={() => void send(q)}
+                  className="min-h-9 shrink-0 rounded-full border border-gold/50 px-3 text-sm whitespace-nowrap text-gold-dark hover:bg-gold/10"
+                >
                   {q}
                 </button>
               ))}
@@ -248,7 +278,15 @@ export function ChatWidget() {
             <label htmlFor="chat-input" className="sr-only">
               Type your message
             </label>
-            <Input id="chat-input" ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type your message…" maxLength={500} autoComplete="off" />
+            <Input
+              id="chat-input"
+              ref={inputRef}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              placeholder="Type your message…"
+              maxLength={500}
+              autoComplete="off"
+            />
             <Button type="submit" size="icon" disabled={!input.trim() || typing} aria-label="Send message">
               <Send className="size-4" />
             </Button>

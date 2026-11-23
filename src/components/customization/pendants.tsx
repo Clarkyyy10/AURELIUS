@@ -48,7 +48,21 @@ function Bail({ y, finish, r = 0.09 }: { y: number; finish: FinishOption; r?: nu
 }
 
 /** A stone set facing the viewer. */
-function FrontStone({ gem, cut, r, setting, finish, position }: { gem: GemstoneOption; cut: CutOption | null; r: number; setting?: string; finish: FinishOption; position?: [number, number, number] }) {
+function FrontStone({
+  gem,
+  cut,
+  r,
+  setting,
+  finish,
+  position,
+}: {
+  gem: GemstoneOption;
+  cut: CutOption | null;
+  r: number;
+  setting?: string;
+  finish: FinishOption;
+  position?: [number, number, number];
+}) {
   return (
     <group position={position} rotation={[Math.PI / 2, 0, 0]}>
       <Head setting={setting === "bezel" ? "bezel" : "prong"} r={r} gem={gem} cut={cut} finish={finish} />
@@ -150,14 +164,28 @@ function BirthstoneP({ finish, gem, cut, s }: P) {
   return (
     <group>
       <Bail y={0.2 * s} finish={finish} r={0.075} />
-      {gem ? <FrontStone gem={gem} cut={cut} r={r} setting="bezel" finish={finish} /> : <mesh name="metal"><sphereGeometry args={[r, 24, 16]} /><MetalMaterial finish={finish} /></mesh>}
+      {gem ? (
+        <FrontStone gem={gem} cut={cut} r={r} setting="bezel" finish={finish} />
+      ) : (
+        <mesh name="metal">
+          <sphereGeometry args={[r, 24, 16]} />
+          <MetalMaterial finish={finish} />
+        </mesh>
+      )}
     </group>
   );
 }
 
 function HeartP({ finish, gem, cut, s, setting }: P) {
   const g = useMemo(() => {
-    const geo = new THREE.ExtrudeGeometry(heartShape(0.85 * s), { depth: 0.08 * s, bevelEnabled: true, bevelThickness: 0.07 * s, bevelSize: 0.06 * s, bevelSegments: 6, curveSegments: 32 });
+    const geo = new THREE.ExtrudeGeometry(heartShape(0.85 * s), {
+      depth: 0.08 * s,
+      bevelEnabled: true,
+      bevelThickness: 0.07 * s,
+      bevelSize: 0.06 * s,
+      bevelSegments: 6,
+      curveSegments: 32,
+    });
     geo.center();
     return geo;
   }, [s]);
@@ -176,7 +204,14 @@ function HeartP({ finish, gem, cut, s, setting }: P) {
 function CrossP({ finish, gem, cut, stones, s, setting }: P) {
   const w = 0.16 * s;
   const d = 0.07 * s;
-  const spots: [number, number][] = [[0, 0.12], [0, -0.2], [-0.24, 0.12], [0.24, 0.12], [0, 0.42], [0, -0.48]];
+  const spots: [number, number][] = [
+    [0, 0.12],
+    [0, -0.2],
+    [-0.24, 0.12],
+    [0.24, 0.12],
+    [0, 0.42],
+    [0, -0.48],
+  ];
   return (
     <group>
       <Bail y={0.62 * s} finish={finish} />
@@ -188,7 +223,12 @@ function CrossP({ finish, gem, cut, stones, s, setting }: P) {
         <boxGeometry args={[0.72 * s, w, d]} />
         <MetalMaterial finish={finish} />
       </mesh>
-      {gem && spots.slice(0, stones).map(([x, y], i) => <FrontStone key={i} gem={gem} cut={cut} r={0.06 * s} setting={setting ?? "bezel"} finish={finish} position={[x * s, y * s, d / 2 + 0.01]} />)}
+      {gem &&
+        spots
+          .slice(0, stones)
+          .map(([x, y], i) => (
+            <FrontStone key={i} gem={gem} cut={cut} r={0.06 * s} setting={setting ?? "bezel"} finish={finish} position={[x * s, y * s, d / 2 + 0.01]} />
+          ))}
     </group>
   );
 }
@@ -253,7 +293,12 @@ function BarP({ finish, s, text, fontFile, gem, cut }: P) {
 function MedallionP({ finish, s, text, fontFile, zodiac }: P & { zodiac?: boolean }) {
   const R = 0.45 * s;
   const t = (text ?? "").trim();
-  const stars: Spot[] = zodiac ? Array.from({ length: 12 }, (_, i) => { const a = (i / 12) * TAU; return { position: V(Math.cos(a) * R * 0.82, Math.sin(a) * R * 0.82, 0.03 * s), normal: facing }; }) : [];
+  const stars: Spot[] = zodiac
+    ? Array.from({ length: 12 }, (_, i) => {
+        const a = (i / 12) * TAU;
+        return { position: V(Math.cos(a) * R * 0.82, Math.sin(a) * R * 0.82, 0.03 * s), normal: facing };
+      })
+    : [];
   return (
     <group>
       <Bail y={0.5 * s} finish={finish} />
@@ -269,7 +314,14 @@ function MedallionP({ finish, s, text, fontFile, zodiac }: P & { zodiac?: boolea
       {t && (
         <group position={[0, 0, 0.03 * s]}>
           <Suspense fallback={null}>
-            <RaisedText text={t} size={(zodiac ? 0.13 : t.length <= 3 ? 0.26 : 0.13) * s} depth={0.015 * s} fontFile={zodiac ? undefined : fontFile} finish={finish} maxWidth={R * 1.4} />
+            <RaisedText
+              text={t}
+              size={(zodiac ? 0.13 : t.length <= 3 ? 0.26 : 0.13) * s}
+              depth={0.015 * s}
+              fontFile={zodiac ? undefined : fontFile}
+              finish={finish}
+              maxWidth={R * 1.4}
+            />
           </Suspense>
         </group>
       )}
@@ -322,7 +374,17 @@ function CharmP({ finish, s, text, fontFile }: P) {
 }
 
 export function PendantModel({ finish, gem, cut, stones, sizeFactor, design, textFontFile }: ModelProps) {
-  const { node, ends } = Body({ style: design?.style, finish, gem, cut, stones, s: sizeFactor, setting: design?.setting, text: design?.text, fontFile: textFontFile });
+  const { node, ends } = Body({
+    style: design?.style,
+    finish,
+    gem,
+    cut,
+    stones,
+    s: sizeFactor,
+    setting: design?.setting,
+    text: design?.text,
+    fontFile: textFontFile,
+  });
   return (
     <group name="pendant" scale={[1.6, 1.6, 1.6]}>
       {node}

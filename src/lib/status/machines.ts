@@ -160,9 +160,7 @@ export function assertTransition(kind: MachineKind, from: AnyStatus, to: AnyStat
 /** Statuses the actor may move to from `from`. Excludes "cancelled" unless includeCancel is true. */
 export function nextStatuses(kind: MachineKind, from: AnyStatus, actor: Actor, includeCancel = false): AnyStatus[] {
   const rules = getMachine(kind).transitions[from] ?? [];
-  return rules
-    .filter((r) => r.by.includes(actor) && (includeCancel || r.to !== "cancelled"))
-    .map((r) => r.to as AnyStatus);
+  return rules.filter((r) => r.by.includes(actor) && (includeCancel || r.to !== "cancelled")).map((r) => r.to as AnyStatus);
 }
 
 export function isFinal(kind: MachineKind, status: AnyStatus): boolean {

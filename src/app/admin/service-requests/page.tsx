@@ -17,7 +17,18 @@ function List() {
     <>
       <PageHeader title="Service requests" description="Assess items, send quotations, record drop-offs, and update progress." />
       <QueryView query={q}>
-        {(rows) => <TransactionTable key={status} rows={rows} kind="service" role="owner" serviceNames={serviceNames} customers={map} initialStatus={status} empty={{ title: "No Service requests yet" }} />}
+        {(rows) => (
+          <TransactionTable
+            key={status}
+            rows={rows}
+            kind="service"
+            role="owner"
+            serviceNames={serviceNames}
+            customers={map}
+            initialStatus={status}
+            empty={{ title: "No Service requests yet" }}
+          />
+        )}
       </QueryView>
     </>
   );

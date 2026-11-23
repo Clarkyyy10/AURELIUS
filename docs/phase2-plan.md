@@ -28,6 +28,7 @@ application layer (role checks, estimate, transitions), keeps keys on the server
 every input on the server (NFR security).
 
 **The front end does not change**, except these shared pieces:
+
 - `src/lib/data/index.ts` chooses `api` or `mock` from `NEXT_PUBLIC_DATA_SOURCE`.
 - `FileDropzone` / `StoredImage` / proof thumbnails upload to `/api/uploads` and show files through
   short-lived signed links (today they use the browser's IndexedDB). `ProofFile` gains a `path`.
@@ -38,20 +39,20 @@ every input on the server (NFR security).
 
 ## 2. Database (ERD §3.11) — `prisma/schema.prisma`
 
-| ERD table | What it holds | Notes |
-|---|---|---|
-| users | role, name, email, contact number, consent time + notice version | `id` = Supabase Auth user id; passwords live in `auth.users` (bcrypt) |
-| products | catalog (FR-12, FR-13, FR-24) | photos are storage references |
-| services | service catalog (FR-25, FR-34) | |
-| design_options | all 3D options and rates: piece types, materials, finishes, gems, cuts, sizes, fonts, chain styles, clasps, styles/settings/band shapes/shanks/textures | one table with `kind` + validated `attributes`; read back as today's `CustomizationOptions`, so the formula is unchanged |
-| orders | product orders **and** custom-order requests (`kind`) | one record per request (FR-07); `client_request_id` unique → no duplicates |
-| order_items | product, price, photo at order time | |
-| custom_designs | every submitted design version | estimate recomputed on the server; snapshot in a private bucket |
-| quotations | order or service quotations | re-issued ones kept with `is_current = false` |
-| payments | submitted/recorded payments | proof in private bucket, signed links only |
-| service_requests | FR-26 to FR-33 | services in `service_request_services` |
-| notifications | in-app bell (FR-49, FR-50) | Realtime |
-| chat_sessions | **decision needed** (§6) | |
+| ERD table        | What it holds                                                                                                                                           | Notes                                                                                                                    |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| users            | role, name, email, contact number, consent time + notice version                                                                                        | `id` = Supabase Auth user id; passwords live in `auth.users` (bcrypt)                                                    |
+| products         | catalog (FR-12, FR-13, FR-24)                                                                                                                           | photos are storage references                                                                                            |
+| services         | service catalog (FR-25, FR-34)                                                                                                                          |                                                                                                                          |
+| design_options   | all 3D options and rates: piece types, materials, finishes, gems, cuts, sizes, fonts, chain styles, clasps, styles/settings/band shapes/shanks/textures | one table with `kind` + validated `attributes`; read back as today's `CustomizationOptions`, so the formula is unchanged |
+| orders           | product orders **and** custom-order requests (`kind`)                                                                                                   | one record per request (FR-07); `client_request_id` unique → no duplicates                                               |
+| order_items      | product, price, photo at order time                                                                                                                     |                                                                                                                          |
+| custom_designs   | every submitted design version                                                                                                                          | estimate recomputed on the server; snapshot in a private bucket                                                          |
+| quotations       | order or service quotations                                                                                                                             | re-issued ones kept with `is_current = false`                                                                            |
+| payments         | submitted/recorded payments                                                                                                                             | proof in private bucket, signed links only                                                                               |
+| service_requests | FR-26 to FR-33                                                                                                                                          | services in `service_request_services`                                                                                   |
+| notifications    | in-app bell (FR-49, FR-50)                                                                                                                              | Realtime                                                                                                                 |
+| chat_sessions    | **decision needed** (§6)                                                                                                                                |                                                                                                                          |
 
 Support tables (not drawn in the ERD, needed by existing features): `status_history`,
 `revision_remarks`, `service_request_services`, `code_counters`, `login_attempts`, `email_outbox`,
@@ -67,14 +68,14 @@ runs inside a transaction that sets `role authenticated` and the user's JWT clai
 policies also apply. Only the seed script, the email job and server-only tables use the privileged
 connection.
 
-| Tables | Customer | Owner | Guest |
-|---|---|---|---|
-| users | read/update own row (name, contact) | read all | — |
-| products, services, design_options, faqs, store_settings | read visible/active | full | read visible/active |
-| orders, order_items, custom_designs, revision_remarks, quotations, payments, service_requests, service_request_services, status_history | read own; insert own; no direct update (changes go through server rules) | full | — |
-| notifications | read/mark-read own | read/mark-read own | — |
-| chat_sessions | — (server writes) | read | — |
-| login_attempts, email_outbox, code_counters, rate_limits | — | — | — (server only) |
+| Tables                                                                                                                                  | Customer                                                                 | Owner              | Guest               |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------ | ------------------ | ------------------- |
+| users                                                                                                                                   | read/update own row (name, contact)                                      | read all           | —                   |
+| products, services, design_options, faqs, store_settings                                                                                | read visible/active                                                      | full               | read visible/active |
+| orders, order_items, custom_designs, revision_remarks, quotations, payments, service_requests, service_request_services, status_history | read own; insert own; no direct update (changes go through server rules) | full               | —                   |
+| notifications                                                                                                                           | read/mark-read own                                                       | read/mark-read own | —                   |
+| chat_sessions                                                                                                                           | — (server writes)                                                        | read               | —                   |
+| login_attempts, email_outbox, code_counters, rate_limits                                                                                | —                                                                        | —                  | — (server only)     |
 
 Storage buckets: `payment-proofs`, `service-photos`, `design-snapshots` private (owner + uploader,
 files under `<user id>/…`, signed links ≤ 5 min); `product-photos` public read, owner write. Server
@@ -184,14 +185,14 @@ evaluation period.
 
 ## 9. What you need to create (I can't create accounts or enter keys)
 
-| Account | What to create | Values I need (in `.env.local`, never committed) |
-|---|---|---|
-| Supabase (free) | **two** projects: `aurelius-test` (tests, may be wiped) and `aurelius-prod` | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL` (pooler, port 6543), `DIRECT_URL` (port 5432) — for each project |
-| Google AI Studio | Gemini API key (decision 2) | `GEMINI_API_KEY` |
-| Resend | account (+ verified domain, decision 3) and SMTP set up in Supabase Auth | `RESEND_API_KEY`, `EMAIL_FROM` |
-| Cloudflare | Turnstile widget for your domain + `localhost` | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` |
-| GitHub | a private repository to push to (Actions, Vercel) | — |
-| Vercel | project linked to the GitHub repo (later, before QA on the preview) | env vars copied in the Vercel dashboard |
-| Owner | sign up once on the test and live sites with the owner's email | `OWNER_EMAIL` |
+| Account          | What to create                                                              | Values I need (in `.env.local`, never committed)                                                                                                                          |
+| ---------------- | --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Supabase (free)  | **two** projects: `aurelius-test` (tests, may be wiped) and `aurelius-prod` | `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL` (pooler, port 6543), `DIRECT_URL` (port 5432) — for each project |
+| Google AI Studio | Gemini API key (decision 2)                                                 | `GEMINI_API_KEY`                                                                                                                                                          |
+| Resend           | account (+ verified domain, decision 3) and SMTP set up in Supabase Auth    | `RESEND_API_KEY`, `EMAIL_FROM`                                                                                                                                            |
+| Cloudflare       | Turnstile widget for your domain + `localhost`                              | `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`                                                                                                                  |
+| GitHub           | a private repository to push to (Actions, Vercel)                           | —                                                                                                                                                                         |
+| Vercel           | project linked to the GitHub repo (later, before QA on the preview)         | env vars copied in the Vercel dashboard                                                                                                                                   |
+| Owner            | sign up once on the test and live sites with the owner's email              | `OWNER_EMAIL`                                                                                                                                                             |
 
 Placeholders are in `.env.example`.

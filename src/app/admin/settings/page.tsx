@@ -66,7 +66,11 @@ function SettingsForm({ settings }: { settings: StoreSettings }) {
       </section>
       <section className="space-y-4 rounded-2xl border border-line bg-paper p-6">
         <h2 className="text-2xl">Payments and claiming</h2>
-        <Field label="Payment instructions" error={errors.paymentInstructions?.message} hint="Shown above the payment form: GCash name and number, bank details, and what to upload.">
+        <Field
+          label="Payment instructions"
+          error={errors.paymentInstructions?.message}
+          hint="Shown above the payment form: GCash name and number, bank details, and what to upload."
+        >
           <Textarea rows={5} {...form.register("paymentInstructions")} />
         </Field>
         <Field label="Claiming note" error={errors.claimingNote?.message}>

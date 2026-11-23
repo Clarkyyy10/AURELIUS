@@ -24,23 +24,11 @@ export const phPhone = z
     message: "Enter a Philippine mobile number like 09171234567 or +639171234567.",
   });
 
-export const email = z
-  .string()
-  .trim()
-  .min(1, "Enter your email address.")
-  .toLowerCase()
-  .pipe(z.email("Enter a valid email address, like name@example.com."));
+export const email = z.string().trim().min(1, "Enter your email address.").toLowerCase().pipe(z.email("Enter a valid email address, like name@example.com."));
 
-export const password = z
-  .string()
-  .min(8, "Use at least 8 characters for your password.")
-  .max(72, "Use 72 characters or fewer for your password.");
+export const password = z.string().min(8, "Use at least 8 characters for your password.").max(72, "Use 72 characters or fewer for your password.");
 
-const fullName = z
-  .string()
-  .trim()
-  .min(2, "Enter your full name.")
-  .max(80, "Use 80 characters or fewer for your name.");
+const fullName = z.string().trim().min(2, "Enter your full name.").max(80, "Use 80 characters or fewer for your name.");
 
 export const fileMeta = (allowed: readonly string[], label: string) =>
   z.object({
@@ -139,28 +127,27 @@ export const productOrderSchema = z.object({
 });
 
 // ---------- Service request (FR-26) ----------
-export const serviceRequestSchema = z
-  .object({
-    itemType: z.enum(["jewelry", "watch"], { error: "Choose whether this is jewelry or a watch." }),
-    itemDescription: z
-      .string()
-      .trim()
-      .min(10, "Describe your item in at least 10 characters, for example “18K gold wedding ring”.")
-      .max(300, "Keep the item description to 300 characters or fewer."),
-    brandModel: z.string().trim().max(80, "Keep the brand and model to 80 characters or fewer.").optional(),
-    material: z.string().trim().max(80, "Keep the material to 80 characters or fewer.").optional(),
-    serviceIds: z.array(z.string()).min(1, "Choose at least one service."),
-    details: z
-      .string()
-      .trim()
-      .min(10, "Tell us what's wrong or what you need, in at least 10 characters.")
-      .max(1000, "Keep the details to 1,000 characters or fewer."),
-    photos: z.array(fileMeta(PHOTO_TYPES, "Each photo")).max(3, "You can add up to 3 photos."),
-    preferredDropOffDate: z
-      .string()
-      .optional()
-      .refine((d) => !d || d >= todayISO(), { message: "Choose today or a later date." }),
-  });
+export const serviceRequestSchema = z.object({
+  itemType: z.enum(["jewelry", "watch"], { error: "Choose whether this is jewelry or a watch." }),
+  itemDescription: z
+    .string()
+    .trim()
+    .min(10, "Describe your item in at least 10 characters, for example “18K gold wedding ring”.")
+    .max(300, "Keep the item description to 300 characters or fewer."),
+  brandModel: z.string().trim().max(80, "Keep the brand and model to 80 characters or fewer.").optional(),
+  material: z.string().trim().max(80, "Keep the material to 80 characters or fewer.").optional(),
+  serviceIds: z.array(z.string()).min(1, "Choose at least one service."),
+  details: z
+    .string()
+    .trim()
+    .min(10, "Tell us what's wrong or what you need, in at least 10 characters.")
+    .max(1000, "Keep the details to 1,000 characters or fewer."),
+  photos: z.array(fileMeta(PHOTO_TYPES, "Each photo")).max(3, "You can add up to 3 photos."),
+  preferredDropOffDate: z
+    .string()
+    .optional()
+    .refine((d) => !d || d >= todayISO(), { message: "Choose today or a later date." }),
+});
 export type ServiceRequestInput = z.input<typeof serviceRequestSchema>;
 
 // ---------- Payments (FR-17, FR-18, FR-30) ----------
@@ -228,18 +215,20 @@ export const reasonSchema = z.object({
   reason: z.string().trim().min(5, "Give a short reason (at least 5 characters)."),
 });
 
-export const dropOffSchema = z.object({
-  receivedOn: z
-    .string()
-    .min(1, "Enter the date the item was received.")
-    .refine((d) => d <= todayISO(), { message: "The received date can't be in the future." }),
-  downPayment: peso("down payment"),
-  method: z.enum(["cash_in_store", "gcash", "bank_transfer"]),
-  referenceNumber: z.string().trim().max(40).optional(),
-}).refine((v) => v.method === "cash_in_store" || v.downPayment === 0 || (v.referenceNumber ?? "").length >= 4, {
-  path: ["referenceNumber"],
-  message: "Enter the GCash or bank reference number.",
-});
+export const dropOffSchema = z
+  .object({
+    receivedOn: z
+      .string()
+      .min(1, "Enter the date the item was received.")
+      .refine((d) => d <= todayISO(), { message: "The received date can't be in the future." }),
+    downPayment: peso("down payment"),
+    method: z.enum(["cash_in_store", "gcash", "bank_transfer"]),
+    referenceNumber: z.string().trim().max(40).optional(),
+  })
+  .refine((v) => v.method === "cash_in_store" || v.downPayment === 0 || (v.referenceNumber ?? "").length >= 4, {
+    path: ["referenceNumber"],
+    message: "Enter the GCash or bank reference number.",
+  });
 
 // ---------- Owner: catalog and settings (FR-24, FR-34, FR-46, FR-47) ----------
 export const productSchema = z.object({
@@ -285,5 +274,9 @@ export const faqSchema = z.object({
 
 /** Option tables (FR-47): rates and fees ≥ 0, factors > 0. */
 export const rateSchema = z.number({ error: "Enter a number." }).finite("Enter a number.").min(0, "This can't be negative.");
-export const factorSchema = z.number({ error: "Enter a number." }).finite("Enter a number.").gt(0, "This must be greater than 0.").max(10, "This looks too large.");
+export const factorSchema = z
+  .number({ error: "Enter a number." })
+  .finite("Enter a number.")
+  .gt(0, "This must be greater than 0.")
+  .max(10, "This looks too large.");
 export const optionLabelSchema = z.string().trim().min(1, "Enter a name.").max(40, "Keep names to 40 characters or fewer.");

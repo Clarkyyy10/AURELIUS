@@ -53,7 +53,10 @@ export function sweepBand(R: number, section: Section, opts: { from?: number; to
     // end caps: a fan from the section's centre
     const cdr = section.reduce((s, p) => s + p[0], 0) / m;
     const cdz = section.reduce((s, p) => s + p[1], 0) / m;
-    for (const [i, flip] of [[0, true], [segs, false]] as const) {
+    for (const [i, flip] of [
+      [0, true],
+      [segs, false],
+    ] as const) {
       const t = from + ((to - from) * i) / segs;
       const [odr, odz] = offset ? offset(t) : [0, 0];
       const base = pos.length / 3;
@@ -99,11 +102,27 @@ export function profileSection(key: string | undefined, T: number, W: number): S
     }
     case "flat": {
       const b = Math.min(T, W) * 0.12;
-      return [[b, -h], [T - b, -h], [T, -h + b], [T, h - b], [T - b, h], [b, h], [0, h - b], [0, -h + b]];
+      return [
+        [b, -h],
+        [T - b, -h],
+        [T, -h + b],
+        [T, h - b],
+        [T - b, h],
+        [b, h],
+        [0, h - b],
+        [0, -h + b],
+      ];
     }
     case "flat_court": {
       const b = Math.min(T, W) * 0.12;
-      const pts: Section = [[T * 0.3, -h], [T - b, -h], [T, -h + b], [T, h - b], [T - b, h], [T * 0.3, h]];
+      const pts: Section = [
+        [T * 0.3, -h],
+        [T - b, -h],
+        [T, -h + b],
+        [T, h - b],
+        [T - b, h],
+        [T * 0.3, h],
+      ];
       for (let i = 1; i < 12; i++) {
         const a = Math.PI / 2 + (i / 12) * Math.PI;
         pts.push([T * 0.3 + T * 0.3 * Math.cos(a), h * Math.sin(a)]);
@@ -111,7 +130,15 @@ export function profileSection(key: string | undefined, T: number, W: number): S
       return pts;
     }
     case "knife_edge":
-      return [[T * 0.12, -h * 0.9], [T * 0.5, -h], [T, 0], [T * 0.5, h], [T * 0.12, h * 0.9], [0, h * 0.4], [0, -h * 0.4]];
+      return [
+        [T * 0.12, -h * 0.9],
+        [T * 0.5, -h],
+        [T, 0],
+        [T * 0.5, h],
+        [T * 0.12, h * 0.9],
+        [0, h * 0.4],
+        [0, -h * 0.4],
+      ];
     default: {
       // comfort (court): rounded inside and out
       const pts: Section = [];
@@ -138,7 +165,12 @@ export function perimeterPoints(cutKey: string, n: number, s: number): THREE.Vec
     while (d > lens[i]) d -= lens[i++];
     const a = pts[i];
     const b = pts[(i + 1) % pts.length];
-    out.push(a.clone().lerp(b, d / lens[i]).multiplyScalar(s));
+    out.push(
+      a
+        .clone()
+        .lerp(b, d / lens[i])
+        .multiplyScalar(s),
+    );
   }
   return out;
 }
@@ -173,7 +205,14 @@ function shapeRing(cutKey: string, outer: number, inner: number, depth: number) 
   const pts = outline(cutKey);
   const shape = new THREE.Shape(pts.map((p) => p.clone().multiplyScalar(outer)));
   shape.holes.push(new THREE.Path(pts.map((p) => p.clone().multiplyScalar(inner)).reverse()));
-  const g = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: true, bevelThickness: depth * 0.15, bevelSize: (outer - inner) * 0.25, bevelSegments: 2, curveSegments: 4 });
+  const g = new THREE.ExtrudeGeometry(shape, {
+    depth,
+    bevelEnabled: true,
+    bevelThickness: depth * 0.15,
+    bevelSize: (outer - inner) * 0.25,
+    bevelSegments: 2,
+    curveSegments: 4,
+  });
   g.rotateX(-Math.PI / 2);
   return g;
 }
@@ -183,7 +222,21 @@ function shapeRing(cutKey: string, outer: number, inner: number, depth: number) 
  * prong: claws; bezel: a metal rim following the cut's outline; basket: claws joined by a rail;
  * channel: two metal walls along x; tension / pavé centre: claws (the band does the rest).
  */
-export function Head({ setting, r, gem, cut, finish, prongs = 4 }: { setting?: SettingKey; r: number; gem: GemstoneOption; cut: CutOption | null; finish: FinishOption; prongs?: number }) {
+export function Head({
+  setting,
+  r,
+  gem,
+  cut,
+  finish,
+  prongs = 4,
+}: {
+  setting?: SettingKey;
+  r: number;
+  gem: GemstoneOption;
+  cut: CutOption | null;
+  finish: FinishOption;
+  prongs?: number;
+}) {
   const key = gem.surface === "pearl" ? "round" : cutKeyOf(cut);
   const bezel = useMemo(() => (setting === "bezel" ? shapeRing(key, r * 1.13, r * 0.98, r * 0.32) : null), [setting, key, r]);
   const rail = useMemo(() => (setting === "basket" ? shapeRing(key, r * 0.86, r * 0.74, r * 0.08) : null), [setting, key, r]);
@@ -323,10 +376,33 @@ export function safeText(font: { data: { glyphs: Record<string, unknown> } }, te
 }
 
 /** Raised metal letters, centred on the origin, facing +Z. */
-export function RaisedText({ text, size, depth, fontFile, finish, maxWidth }: { text: string; size: number; depth: number; fontFile?: string; finish: FinishOption; maxWidth?: number }) {
+export function RaisedText({
+  text,
+  size,
+  depth,
+  fontFile,
+  finish,
+  maxWidth,
+}: {
+  text: string;
+  size: number;
+  depth: number;
+  fontFile?: string;
+  finish: FinishOption;
+  maxWidth?: number;
+}) {
   const font = useLoader(FontLoader, fontFile ?? DEFAULT_TEXT_FONT);
   const geometry = useMemo(() => {
-    const g = new TextGeometry(safeText(font, text) || " ", { font, size, depth, curveSegments: 6, bevelEnabled: true, bevelThickness: depth * 0.2, bevelSize: size * 0.015, bevelSegments: 1 });
+    const g = new TextGeometry(safeText(font, text) || " ", {
+      font,
+      size,
+      depth,
+      curveSegments: 6,
+      bevelEnabled: true,
+      bevelThickness: depth * 0.2,
+      bevelSize: size * 0.015,
+      bevelSegments: 1,
+    });
     g.center();
     if (maxWidth) {
       g.computeBoundingBox();

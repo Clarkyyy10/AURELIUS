@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { checkCustomDraft, checkServiceDraft, editCustomDraft, summarizeCustomDraft, summarizeServiceDraft, type CustomDraft, type ServiceDraft } from "./drafts";
+import {
+  checkCustomDraft,
+  checkServiceDraft,
+  editCustomDraft,
+  summarizeCustomDraft,
+  summarizeServiceDraft,
+  type CustomDraft,
+  type ServiceDraft,
+} from "./drafts";
 import { seedOptions } from "@/lib/data/seed/options";
 import { seedServices } from "@/lib/data/seed/catalog";
 
@@ -8,7 +16,16 @@ const services = seedServices();
 
 const ring: CustomDraft = {
   kind: "custom_order",
-  config: { productType: "ring", materialId: "mat-18k", finishId: "fin-white", gemstoneId: "gem-ruby", cutId: "cut-oval", stoneQuantity: 3, sizeId: "size-ring-us6", choices: { style: "style-ring-three_stone" } },
+  config: {
+    productType: "ring",
+    materialId: "mat-18k",
+    finishId: "fin-white",
+    gemstoneId: "gem-ruby",
+    cutId: "cut-oval",
+    stoneQuantity: 3,
+    sizeId: "size-ring-us6",
+    choices: { style: "style-ring-three_stone" },
+  },
   notes: "Engrave M&J inside",
 };
 
@@ -21,7 +38,15 @@ describe("custom order drafts in the chat (FR-36, manuscript V2)", () => {
 
   it("summarizes the draft as text rows, including the notes", () => {
     const rows = Object.fromEntries(summarizeCustomDraft(ring, options));
-    expect(rows).toMatchObject({ Piece: "Ring", Style: "Three-stone", Material: "18K Gold", Gemstone: "Ruby (lab) × 3", Cut: "Oval", Size: "US 6", Notes: "Engrave M&J inside" });
+    expect(rows).toMatchObject({
+      Piece: "Ring",
+      Style: "Three-stone",
+      Material: "18K Gold",
+      Gemstone: "Ruby (lab) × 3",
+      Cut: "Oval",
+      Size: "US 6",
+      Notes: "Engrave M&J inside",
+    });
   });
 
   it("edits follow the same rules as the customizer", () => {
@@ -34,7 +59,10 @@ describe("custom order drafts in the chat (FR-36, manuscript V2)", () => {
   });
 
   it("reports what must be fixed before sending", () => {
-    const named: CustomDraft = { kind: "custom_order", config: { productType: "name_pendant", materialId: "mat-14k", finishId: "fin-yellow", fontId: "font-allura" } };
+    const named: CustomDraft = {
+      kind: "custom_order",
+      config: { productType: "name_pendant", materialId: "mat-14k", finishId: "fin-yellow", fontId: "font-allura" },
+    };
     expect(checkCustomDraft(named, options).problem).toMatch(/name/i);
     // over-long notes are trimmed to the 500-character limit, as in the customizer
     const long = checkCustomDraft({ ...ring, notes: "x".repeat(600) }, options);
@@ -44,7 +72,15 @@ describe("custom order drafts in the chat (FR-36, manuscript V2)", () => {
 });
 
 describe("service request drafts in the chat (FR-37)", () => {
-  const draft: ServiceDraft = { kind: "service_request", fields: { itemType: "jewelry", itemDescription: "Gold chain bracelet, 14K", serviceIds: ["svc-repair", "svc-polishing"], details: "The clasp is broken and it looks dull." } };
+  const draft: ServiceDraft = {
+    kind: "service_request",
+    fields: {
+      itemType: "jewelry",
+      itemDescription: "Gold chain bracelet, 14K",
+      serviceIds: ["svc-repair", "svc-polishing"],
+      details: "The clasp is broken and it looks dull.",
+    },
+  };
 
   it("a complete draft has no problem and is summarized with service names", () => {
     expect(checkServiceDraft(draft)).toBeNull();

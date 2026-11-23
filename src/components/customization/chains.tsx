@@ -103,7 +103,8 @@ function buildChain(pattern: ChainPattern, curve: THREE.Curve<THREE.Vector3>, le
 
   switch (pattern) {
     case "cable": {
-      const sx = 1.4, tube = 0.28 * G;
+      const sx = 1.4,
+        tube = 0.28 * G;
       const sp = 2 * G * sx - 2 * tube;
       return [{ geometry: new THREE.TorusGeometry(G, tube, 8, 20), matrices: M(along(length, sp).map((s, i) => ({ s, rot: flip(i), scale: [sx, 1, 1] }))) }];
     }
@@ -113,12 +114,14 @@ function buildChain(pattern: ChainPattern, curve: THREE.Curve<THREE.Vector3>, le
       return [{ geometry: new THREE.TorusGeometry(G, tube, 10, 20), matrices: M(along(length, sp).map((s, i) => ({ s, rot: flip(i) }))) }];
     }
     case "paperclip": {
-      const sx = 2.6, tube = 0.22 * G;
+      const sx = 2.6,
+        tube = 0.22 * G;
       const sp = 2 * G * sx - 2 * tube;
       return [{ geometry: new THREE.TorusGeometry(G, tube, 8, 28), matrices: M(along(length, sp).map((s, i) => ({ s, rot: flip(i), scale: [sx, 0.9, 1] }))) }];
     }
     case "mariner": {
-      const sx = 1.5, tube = 0.3 * G;
+      const sx = 1.5,
+        tube = 0.3 * G;
       const sp = 2 * G * sx - 2 * tube;
       const items = along(length, sp).map((s, i) => ({ s, rot: flip(i), scale: [sx, 1.05, 1] as V3 }));
       return [
@@ -141,11 +144,16 @@ function buildChain(pattern: ChainPattern, curve: THREE.Curve<THREE.Vector3>, le
       return [{ geometry: new THREE.TorusGeometry(G, tube, 8, 24), matrices: M(items) }];
     }
     case "satellite": {
-      const g = G * 0.75, sx = 1.4, tube = 0.26 * g;
+      const g = G * 0.75,
+        sx = 1.4,
+        tube = 0.26 * g;
       const sp = 2 * g * sx - 2 * tube;
       const pos = along(length, sp);
       return [
-        { geometry: new THREE.TorusGeometry(g, tube, 8, 18), matrices: M(pos.filter((_, i) => i % 8 !== 4).map((s, i) => ({ s, rot: flip(i), scale: [sx, 1, 1] }))) },
+        {
+          geometry: new THREE.TorusGeometry(g, tube, 8, 18),
+          matrices: M(pos.filter((_, i) => i % 8 !== 4).map((s, i) => ({ s, rot: flip(i), scale: [sx, 1, 1] }))),
+        },
         { geometry: new THREE.SphereGeometry(1.25 * G, 16, 12), matrices: M(pos.filter((_, i) => i % 8 === 4).map((s) => ({ s }))) },
       ];
     }
@@ -158,12 +166,24 @@ function buildChain(pattern: ChainPattern, curve: THREE.Curve<THREE.Vector3>, le
       ];
     }
     case "curb": {
-      const sx = 1.5, tube = 0.33 * G;
-      return [{ geometry: new THREE.TorusGeometry(G, tube, 8, 22), matrices: M(along(length, 1.9 * G).map((s, i) => ({ s, rot: twist(i, 0.45), scale: [sx, 1, 1] }))) }];
+      const sx = 1.5,
+        tube = 0.33 * G;
+      return [
+        {
+          geometry: new THREE.TorusGeometry(G, tube, 8, 22),
+          matrices: M(along(length, 1.9 * G).map((s, i) => ({ s, rot: twist(i, 0.45), scale: [sx, 1, 1] }))),
+        },
+      ];
     }
     case "cuban": {
-      const r = 1.15 * G, tube = 0.5 * G;
-      return [{ geometry: new THREE.TorusGeometry(r, tube, 10, 24), matrices: M(along(length, 1.9 * G).map((s, i) => ({ s, rot: twist(i, 0.4), scale: [1.35, 1, 0.8] }))) }];
+      const r = 1.15 * G,
+        tube = 0.5 * G;
+      return [
+        {
+          geometry: new THREE.TorusGeometry(r, tube, 10, 24),
+          matrices: M(along(length, 1.9 * G).map((s, i) => ({ s, rot: twist(i, 0.4), scale: [1.35, 1, 0.8] }))),
+        },
+      ];
     }
     case "herringbone": {
       // flat V-shaped links in alternating directions, packed tightly into a smooth tape
@@ -174,23 +194,39 @@ function buildChain(pattern: ChainPattern, curve: THREE.Curve<THREE.Vector3>, le
     }
     case "rope": {
       // three strands twisted around each other
-      const R = 0.55 * G, pitch = 3.2 * G;
-      return [0, 1, 2].map((k) => ({ geometry: strand(curve, length, 0.48 * G, (s) => { const a = (s / pitch) * TAU + (k * TAU) / 3; return [R * Math.cos(a), R * Math.sin(a)]; }) }));
+      const R = 0.55 * G,
+        pitch = 3.2 * G;
+      return [0, 1, 2].map((k) => ({
+        geometry: strand(curve, length, 0.48 * G, (s) => {
+          const a = (s / pitch) * TAU + (k * TAU) / 3;
+          return [R * Math.cos(a), R * Math.sin(a)];
+        }),
+      }));
     }
     case "singapore": {
       // one fine curb twisted along its length: two thin, flatter strands with a tight twist
-      const R = 0.38 * G, pitch = 1.8 * G;
-      return [0, 1].map((k) => ({ geometry: strand(curve, length, 0.3 * G, (s) => { const a = (s / pitch) * TAU + k * Math.PI; return [R * Math.cos(a), 0.6 * R * Math.sin(a)]; }) }));
+      const R = 0.38 * G,
+        pitch = 1.8 * G;
+      return [0, 1].map((k) => ({
+        geometry: strand(curve, length, 0.3 * G, (s) => {
+          const a = (s / pitch) * TAU + k * Math.PI;
+          return [R * Math.cos(a), 0.6 * R * Math.sin(a)];
+        }),
+      }));
     }
     case "wheat": {
       // four strands of twisted ovals braided: each step turns 90° around the chain and tilts forward
-      return [{
-        geometry: new THREE.SphereGeometry(G, 12, 8),
-        matrices: M(along(length, 0.55 * G).map((s, i) => {
-          const a = (i % 4) * (Math.PI / 2);
-          return { s, rot: [a, 0, 0.6], offset: [0, 0.42 * G * Math.cos(a), 0.42 * G * Math.sin(a)], scale: [1.55, 0.6, 0.5] };
-        })),
-      }];
+      return [
+        {
+          geometry: new THREE.SphereGeometry(G, 12, 8),
+          matrices: M(
+            along(length, 0.55 * G).map((s, i) => {
+              const a = (i % 4) * (Math.PI / 2);
+              return { s, rot: [a, 0, 0.6], offset: [0, 0.42 * G * Math.cos(a), 0.42 * G * Math.sin(a)], scale: [1.55, 0.6, 0.5] };
+            }),
+          ),
+        },
+      ];
     }
     case "franco": {
       // V-links on all four sides of a square chain, all pointing the same way
@@ -205,7 +241,9 @@ function buildChain(pattern: ChainPattern, curve: THREE.Curve<THREE.Vector3>, le
     }
     case "byzantine": {
       // 2-2-2 units of paired rings (flat pair, standing pair, flat pair); each unit turns 90° to the last
-      const ring = 0.75 * G, tube = 0.26 * G, unit = 4.2 * G;
+      const ring = 0.75 * G,
+        tube = 0.26 * G,
+        unit = 4.2 * G;
       const items: Item[] = [];
       for (const [u, s0] of along(length, unit).entries()) {
         const turn = u % 2 ? Math.PI / 2 : 0;
@@ -226,7 +264,9 @@ function buildChain(pattern: ChainPattern, curve: THREE.Curve<THREE.Vector3>, le
       // two curb rows side by side, offset by half a link
       const items: Item[] = [];
       for (const side of [-1, 1])
-        along(length, 1.6 * G).forEach((s, i) => items.push({ s: s + (side > 0 ? 0.8 * G : 0), rot: twist(i, 0.5), offset: [0, side * 0.95 * G, 0], scale: [1.4, 1, 1] }));
+        along(length, 1.6 * G).forEach((s, i) =>
+          items.push({ s: s + (side > 0 ? 0.8 * G : 0), rot: twist(i, 0.5), offset: [0, side * 0.95 * G, 0], scale: [1.4, 1, 1] }),
+        );
       return [{ geometry: new THREE.TorusGeometry(0.85 * G, 0.3 * G, 8, 20), matrices: M(items) }];
     }
     case "box":
@@ -251,10 +291,7 @@ function buildChain(pattern: ChainPattern, curve: THREE.Curve<THREE.Vector3>, le
           items.push({ s, offset: [0, 0.55 * G * Math.cos(a), 0.55 * G * Math.sin(a)] });
         }
       });
-      return [
-        { geometry: strand(curve, length, 0.5 * G, () => [0, 0]) },
-        { geometry: new THREE.SphereGeometry(0.42 * G, 10, 8), matrices: M(items) },
-      ];
+      return [{ geometry: strand(curve, length, 0.5 * G, () => [0, 0]) }, { geometry: new THREE.SphereGeometry(0.42 * G, 10, 8), matrices: M(items) }];
     }
   }
 }
@@ -316,7 +353,17 @@ export function Clasp({ kind, start, end, finish }: { kind: ClaspKind; start: TH
 }
 
 /** Any chain style laid along a curve that lies in the x–y plane (necklaces, bracelets, anklets). */
-export function ChainAlong({ pattern, curve, length, finish }: { pattern: ChainPattern; curve: THREE.Curve<THREE.Vector3>; length: number; finish: FinishOption }) {
+export function ChainAlong({
+  pattern,
+  curve,
+  length,
+  finish,
+}: {
+  pattern: ChainPattern;
+  curve: THREE.Curve<THREE.Vector3>;
+  length: number;
+  finish: FinishOption;
+}) {
   const parts = useMemo(() => buildChain(pattern, curve, length), [pattern, curve, length]);
   useLayoutEffect(() => () => parts.forEach((p) => p.geometry.dispose()), [parts]);
   return (

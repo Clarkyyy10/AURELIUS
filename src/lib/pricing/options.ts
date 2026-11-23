@@ -7,7 +7,9 @@ import { GROUP_LABEL } from "./design";
 export function activeOptions(o: CustomizationOptions): CustomizationOptions {
   return {
     productTypes: o.productTypes.filter((x) => x.active),
-    materials: o.materials.filter((x) => x.active).map((m) => ({ ...m, finishIds: m.finishIds.filter((id) => o.finishes.some((f) => f.id === id && f.active)) })),
+    materials: o.materials
+      .filter((x) => x.active)
+      .map((m) => ({ ...m, finishIds: m.finishIds.filter((id) => o.finishes.some((f) => f.id === id && f.active)) })),
     finishes: o.finishes.filter((x) => x.active),
     gemstones: o.gemstones.filter((x) => x.active),
     cuts: o.cuts.filter((x) => x.active),
@@ -34,7 +36,8 @@ export function validateOptions(o: CustomizationOptions): void {
     need(o.chainStyles ?? [], "chain style");
     need(o.clasps ?? [], "clasp");
   }
-  for (const c of o.chainStyles ?? []) if (!(c.weightFactor > 0) || c.weightFactor > 10) throw new UserFacingError(`${c.label} weight factor must be greater than 0.`);
+  for (const c of o.chainStyles ?? [])
+    if (!(c.weightFactor > 0) || c.weightFactor > 10) throw new UserFacingError(`${c.label} weight factor must be greater than 0.`);
   for (const c of o.clasps ?? []) if (!(c.fee >= 0) || !Number.isFinite(c.fee)) throw new UserFacingError(`${c.label} fee must be 0 or more.`);
   for (const d of o.designOptions ?? []) {
     if (!(d.weightFactor > 0) || d.weightFactor > 10) throw new UserFacingError(`${d.label} weight factor must be greater than 0.`);
@@ -47,8 +50,15 @@ export function validateOptions(o: CustomizationOptions): void {
       if (list.length && !list.some((d) => d.active)) throw new UserFacingError(`Keep at least one active ${GROUP_LABEL[group].toLowerCase()} for ${p.label}.`);
     }
   const nums: [number, string][] = [
-    ...o.productTypes.flatMap((p): [number, string][] => [[p.baseWeightG, `${p.label} base weight`], [p.laborFee, `${p.label} labor fee`], [p.maxStones, `${p.label} max stones`]]),
-    ...o.materials.flatMap((m): [number, string][] => [[m.ratePerGram, `${m.label} rate per gram`], [m.densityRatio, `${m.label} density ratio`]]),
+    ...o.productTypes.flatMap((p): [number, string][] => [
+      [p.baseWeightG, `${p.label} base weight`],
+      [p.laborFee, `${p.label} labor fee`],
+      [p.maxStones, `${p.label} max stones`],
+    ]),
+    ...o.materials.flatMap((m): [number, string][] => [
+      [m.ratePerGram, `${m.label} rate per gram`],
+      [m.densityRatio, `${m.label} density ratio`],
+    ]),
     ...o.finishes.map((f): [number, string] => [f.fee, `${f.label} fee`]),
     ...o.gemstones.map((g): [number, string] => [g.basePrice, `${g.label} price`]),
   ];

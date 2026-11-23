@@ -27,7 +27,9 @@ export default function AdminDashboard() {
   const c = ownerCounts(all);
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
   const thisMonth = all.filter((t) => t.createdAt >= monthStart);
-  const openBalances = all.filter((t) => t.quotation?.response?.decision === "accepted" && !["cancelled", "completed", "claimed"].includes(t.status)).reduce((s, t) => s + balance(t), 0);
+  const openBalances = all
+    .filter((t) => t.quotation?.response?.decision === "accepted" && !["cancelled", "completed", "claimed"].includes(t.status))
+    .reduce((s, t) => s + balance(t), 0);
 
   const readyKind = (["custom", "order", "service"] as const).find((k) => all.some((t) => t.kind === k && t.status === "ready_for_claiming")) ?? "custom";
   const readyHref = `${{ custom: "/admin/custom-requests", order: "/admin/orders", service: "/admin/service-requests" }[readyKind]}?status=ready_for_claiming`;
@@ -63,7 +65,10 @@ export default function AdminDashboard() {
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {cards.map(({ label, n, href, icon: Icon }) => (
           <li key={label}>
-            <Link href={href} className={cn("flex h-full flex-col gap-2 rounded-2xl border p-4 hover:shadow-sm", n > 0 ? "border-gold/50 bg-gold/5" : "border-line bg-paper")}>
+            <Link
+              href={href}
+              className={cn("flex h-full flex-col gap-2 rounded-2xl border p-4 hover:shadow-sm", n > 0 ? "border-gold/50 bg-gold/5" : "border-line bg-paper")}
+            >
               <Icon className="size-5 text-gold-dark" aria-hidden />
               <span className="font-heading text-4xl font-semibold">{n}</span>
               <span className="text-sm text-muted-foreground">{label}</span>

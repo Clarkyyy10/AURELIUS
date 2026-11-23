@@ -48,7 +48,15 @@ export default function ForgotPasswordPage() {
     );
 
   return (
-    <AuthCard title="Forgot your password?" description="Enter your email and we'll send you a link to choose a new one." footer={<Link href="/login" className="text-gold-dark hover:underline">Back to log in</Link>}>
+    <AuthCard
+      title="Forgot your password?"
+      description="Enter your email and we'll send you a link to choose a new one."
+      footer={
+        <Link href="/login" className="text-gold-dark hover:underline">
+          Back to log in
+        </Link>
+      }
+    >
       <form onSubmit={onSubmit} noValidate className="space-y-4">
         <FormError message={error} />
         <Field label="Email address" error={form.formState.errors.email?.message}>

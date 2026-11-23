@@ -80,7 +80,11 @@ export function ConfirmDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle className="font-heading text-2xl">{title}</AlertDialogTitle>
-          {description && <AlertDialogDescription asChild><div>{description}</div></AlertDialogDescription>}
+          {description && (
+            <AlertDialogDescription asChild>
+              <div>{description}</div>
+            </AlertDialogDescription>
+          )}
         </AlertDialogHeader>
         {children}
         {reason && (
@@ -109,7 +113,12 @@ export function ConfirmDialog({
         )}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={busy}>{cancelLabel}</AlertDialogCancel>
-          <Button variant={destructive ? "destructive" : "default"} onClick={confirm} disabled={busy} className={destructive ? "bg-danger text-white hover:bg-danger/90" : ""}>
+          <Button
+            variant={destructive ? "destructive" : "default"}
+            onClick={confirm}
+            disabled={busy}
+            className={destructive ? "bg-danger text-white hover:bg-danger/90" : ""}
+          >
             {busy && <Spinner />} {confirmLabel}
           </Button>
         </AlertDialogFooter>

@@ -1,15 +1,7 @@
 import { describe, expect, it } from "vitest";
-import {
-  checkFile,
-  customerPaymentSchema,
-  phPhone,
-  quotationSchema,
-  registerSchema,
-  serviceRequestSchema,
-} from "./schemas";
+import { checkFile, customerPaymentSchema, phPhone, quotationSchema, registerSchema, serviceRequestSchema } from "./schemas";
 
-const firstError = (r: { success: boolean; error?: { issues: { message: string }[] } }) =>
-  r.success ? null : r.error!.issues[0].message;
+const firstError = (r: { success: boolean; error?: { issues: { message: string }[] } }) => (r.success ? null : r.error!.issues[0].message);
 
 const validRegister = {
   fullName: "Maria Santos",
@@ -32,9 +24,7 @@ describe("registerSchema (FR-41, FR-45)", () => {
   });
 
   it("requires matching passwords of at least 8 characters", () => {
-    expect(firstError(registerSchema.safeParse({ ...validRegister, password: "short", confirmPassword: "short" }))).toMatch(
-      /at least 8/,
-    );
+    expect(firstError(registerSchema.safeParse({ ...validRegister, password: "short", confirmPassword: "short" }))).toMatch(/at least 8/);
     expect(firstError(registerSchema.safeParse({ ...validRegister, confirmPassword: "different1" }))).toMatch(/don't match/);
   });
 });
@@ -63,9 +53,7 @@ describe("serviceRequestSchema (FR-26)", () => {
     expect(firstError(serviceRequestSchema.safeParse({ ...base, serviceIds: [] }))).toBe("Choose at least one service.");
   });
   it("rejects past drop-off dates", () => {
-    expect(firstError(serviceRequestSchema.safeParse({ ...base, preferredDropOffDate: "2000-01-01" }))).toBe(
-      "Choose today or a later date.",
-    );
+    expect(firstError(serviceRequestSchema.safeParse({ ...base, preferredDropOffDate: "2000-01-01" }))).toBe("Choose today or a later date.");
   });
 });
 
@@ -87,9 +75,7 @@ describe("payments (FR-17)", () => {
   });
   it("rejects files over 5 MB and wrong types", () => {
     expect(checkFile({ type: "image/png", size: 6 * 1024 * 1024 }, ["image/png"])).toMatch(/larger than 5 MB/);
-    expect(checkFile({ type: "image/gif", size: 10 }, ["image/png", "image/jpeg", "application/pdf"])).toMatch(
-      /JPG, PNG, or PDF/,
-    );
+    expect(checkFile({ type: "image/gif", size: 10 }, ["image/png", "image/jpeg", "application/pdf"])).toMatch(/JPG, PNG, or PDF/);
     expect(checkFile({ type: "application/pdf", size: 10 }, ["image/png", "image/jpeg", "application/pdf"])).toBeNull();
   });
   it("rejects zero amounts", () => {
@@ -107,7 +93,14 @@ describe("quotationSchema (FR-15)", () => {
 describe("dates use the local calendar day", () => {
   it("accepts today's local date as a payment date, even when UTC is still yesterday", async () => {
     const { todayISODate } = await import("@/lib/utils/format");
-    const r = customerPaymentSchema.safeParse({ kind: "down_payment", amount: 100, paidOn: todayISODate(), method: "gcash", referenceNumber: "1234", proofFile: { name: "a.png", type: "image/png", sizeBytes: 10 } });
+    const r = customerPaymentSchema.safeParse({
+      kind: "down_payment",
+      amount: 100,
+      paidOn: todayISODate(),
+      method: "gcash",
+      referenceNumber: "1234",
+      proofFile: { name: "a.png", type: "image/png", sizeBytes: 10 },
+    });
     expect(r.success).toBe(true);
   });
 });

@@ -71,8 +71,7 @@ export function DataTable<T>({
   const current = Math.min(page, pages - 1);
   const visible = filtered.slice(current * pageSize, current * pageSize + pageSize);
 
-  const toggleSort = (key: string) =>
-    setSort((s) => (s?.key === key ? (s.dir === "asc" ? { key, dir: "desc" } : null) : { key, dir: "asc" }));
+  const toggleSort = (key: string) => setSort((s) => (s?.key === key ? (s.dir === "asc" ? { key, dir: "desc" } : null) : { key, dir: "asc" }));
 
   const go = (row: T) => {
     if (onRowClick) onRowClick(row);
@@ -104,7 +103,10 @@ export function DataTable<T>({
       )}
 
       {filtered.length === 0 ? (
-        <EmptyState title={empty?.title ?? "Nothing here yet"} description={query ? "No results match your search. Try different words." : empty?.description} />
+        <EmptyState
+          title={empty?.title ?? "Nothing here yet"}
+          description={query ? "No results match your search. Try different words." : empty?.description}
+        />
       ) : (
         <>
           {/* Desktop table */}
@@ -113,11 +115,24 @@ export function DataTable<T>({
               <thead className="bg-muted/60 text-left text-muted-foreground">
                 <tr>
                   {columns.map((c) => (
-                    <th key={c.key} scope="col" className={cn("px-4 py-2.5 font-medium", c.className)} aria-sort={sort?.key === c.key ? (sort.dir === "asc" ? "ascending" : "descending") : undefined}>
+                    <th
+                      key={c.key}
+                      scope="col"
+                      className={cn("px-4 py-2.5 font-medium", c.className)}
+                      aria-sort={sort?.key === c.key ? (sort.dir === "asc" ? "ascending" : "descending") : undefined}
+                    >
                       {c.sortValue ? (
                         <button type="button" className="inline-flex items-center gap-1 hover:text-ink" onClick={() => toggleSort(c.key)}>
                           {c.header}
-                          {sort?.key === c.key ? sort.dir === "asc" ? <ArrowUp className="size-3.5" /> : <ArrowDown className="size-3.5" /> : <ArrowUpDown className="size-3.5 opacity-50" />}
+                          {sort?.key === c.key ? (
+                            sort.dir === "asc" ? (
+                              <ArrowUp className="size-3.5" />
+                            ) : (
+                              <ArrowDown className="size-3.5" />
+                            )
+                          ) : (
+                            <ArrowUpDown className="size-3.5 opacity-50" />
+                          )}
                         </button>
                       ) : (
                         c.header
@@ -158,7 +173,13 @@ export function DataTable<T>({
                     onKeyDown={clickable ? (e) => (e.key === "Enter" || e.key === " ") && go(row) : undefined}
                     className={cn("rounded-xl border border-line bg-paper p-4", clickable && "cursor-pointer hover:bg-muted/40")}
                   >
-                    {primary.length > 0 && <div className="mb-2 flex flex-wrap items-center gap-2 font-medium">{primary.map((c) => <span key={c.key}>{c.cell(row)}</span>)}</div>}
+                    {primary.length > 0 && (
+                      <div className="mb-2 flex flex-wrap items-center gap-2 font-medium">
+                        {primary.map((c) => (
+                          <span key={c.key}>{c.cell(row)}</span>
+                        ))}
+                      </div>
+                    )}
                     <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
                       {rest.map((c) => (
                         <div key={c.key} className="contents">

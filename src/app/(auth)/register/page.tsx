@@ -71,7 +71,11 @@ function RegisterForm() {
         <Field label="Email address" error={errors.email?.message} hint="We'll send a confirmation link to this address.">
           <Input type="email" autoComplete="email" {...form.register("email")} />
         </Field>
-        <Field label="Mobile number" error={errors.contactNumber?.message} hint="For example 09171234567. The owner uses this to contact you about your orders.">
+        <Field
+          label="Mobile number"
+          error={errors.contactNumber?.message}
+          hint="For example 09171234567. The owner uses this to contact you about your orders."
+        >
           <Input type="tel" inputMode="tel" autoComplete="tel" {...form.register("contactNumber")} />
         </Field>
         <Field label="Password" error={errors.password?.message} hint={`At least 8 characters. Strength: ${pw.label}.`}>
@@ -92,10 +96,12 @@ function RegisterForm() {
           </h2>
           <div className="max-h-36 overflow-y-auto px-4 pt-1 pb-3 text-sm text-muted-foreground" tabIndex={0}>
             <p>
-              We collect your name, email address, and mobile number, plus the details of your orders, designs, service requests, and payment proofs. We use them only to process your orders and requests and to contact you about them.
+              We collect your name, email address, and mobile number, plus the details of your orders, designs, service requests, and payment proofs. We use
+              them only to process your orders and requests and to contact you about them.
             </p>
             <p className="mt-2">
-              Only you and the store owner can see your personal data. We keep it while your account is active and as required by law. Under the Data Privacy Act of 2012 (RA 10173) you can ask to see, correct, or delete your data.
+              Only you and the store owner can see your personal data. We keep it while your account is active and as required by law. Under the Data Privacy
+              Act of 2012 (RA 10173) you can ask to see, correct, or delete your data.
             </p>
             <p className="mt-2">
               Read the full{" "}

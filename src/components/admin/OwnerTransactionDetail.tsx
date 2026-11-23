@@ -62,7 +62,9 @@ export function OwnerTransactionDetail({ kind, id }: { kind: TransactionKind; id
         description={
           <span className="flex flex-wrap items-center gap-2">
             <CodeChip code={tx.code} /> Submitted <DateText value={tx.createdAt} withTime />
-            {tx.kind !== "order" && tx.source === "chatbot" && <span className="rounded-full bg-info/10 px-2 py-0.5 text-xs text-info">Prepared with the assistant</span>}
+            {tx.kind !== "order" && tx.source === "chatbot" && (
+              <span className="rounded-full bg-info/10 px-2 py-0.5 text-xs text-info">Prepared with the assistant</span>
+            )}
             {tx.kind === "custom" && tx.source === "catalog" && <span className="rounded-full bg-muted px-2 py-0.5 text-xs">From the shop</span>}
           </span>
         }
@@ -227,7 +229,11 @@ function NextActions({ tx }: { tx: Transaction }) {
     );
   } else if (tx.kind === "service" && tx.status === "under_assessment") {
     content = (
-      <QuotationForm tx={tx} suggestedPrice={tx.quotation?.finalPrice ?? 0} trigger={<Button>{tx.quotation ? "Re-issue quotation after inspection" : "Issue service quotation"}</Button>} />
+      <QuotationForm
+        tx={tx}
+        suggestedPrice={tx.quotation?.finalPrice ?? 0}
+        trigger={<Button>{tx.quotation ? "Re-issue quotation after inspection" : "Issue service quotation"}</Button>}
+      />
     );
   } else if (tx.kind === "service" && tx.status === "awaiting_drop_off") {
     content = (
@@ -239,7 +245,11 @@ function NextActions({ tx }: { tx: Transaction }) {
   } else if (tx.status === "quoted") {
     content = <p className="text-sm text-muted-foreground">Waiting for the customer to accept or decline the quotation.</p>;
   } else if (tx.status === "awaiting_payment") {
-    content = <p className="text-sm text-muted-foreground">Waiting for the down payment. Verify it below when the customer submits it — the order is confirmed automatically.</p>;
+    content = (
+      <p className="text-sm text-muted-foreground">
+        Waiting for the down payment. Verify it below when the customer submits it — the order is confirmed automatically.
+      </p>
+    );
   } else if (tx.kind === "custom" && tx.status === "revision_requested") {
     content = <p className="text-sm text-muted-foreground">Waiting for the customer to update the design.</p>;
   }

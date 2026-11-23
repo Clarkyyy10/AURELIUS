@@ -115,12 +115,12 @@ export function DemoBar() {
             <SheetContent className="w-full overflow-y-auto sm:max-w-md">
               <SheetHeader>
                 <SheetTitle className="font-heading text-2xl">Simulated emails</SheetTitle>
-                <SheetDescription>
-                  In Phase 1 no real emails are sent. Every email the system would send appears here, newest first.
-                </SheetDescription>
+                <SheetDescription>In Phase 1 no real emails are sent. Every email the system would send appears here, newest first.</SheetDescription>
               </SheetHeader>
               <ul className="space-y-3 px-4 pb-6">
-                {emails.length === 0 && <li className="text-sm text-muted-foreground">No emails yet. Register, reset a password, or trigger a customer notification.</li>}
+                {emails.length === 0 && (
+                  <li className="text-sm text-muted-foreground">No emails yet. Register, reset a password, or trigger a customer notification.</li>
+                )}
                 {emails.map((m) => (
                   <li key={m.id} className="rounded-xl border border-line bg-paper p-3 text-sm">
                     <p className="text-xs text-muted-foreground">
@@ -142,7 +142,12 @@ export function DemoBar() {
           </Sheet>
 
           <label className="flex min-h-8 cursor-pointer items-center gap-1.5 rounded-md px-2 hover:bg-white/10">
-            <Switch checked={simulateErrors} onCheckedChange={(v) => useDemoStore.getState().setSimulateErrors(v)} aria-label="Simulate errors" className="scale-75" />
+            <Switch
+              checked={simulateErrors}
+              onCheckedChange={(v) => useDemoStore.getState().setSimulateErrors(v)}
+              aria-label="Simulate errors"
+              className="scale-75"
+            />
             Simulate errors
           </label>
 
@@ -169,7 +174,12 @@ export function DemoBar() {
             }}
           />
 
-          <button type="button" onClick={() => setCollapsedStored(true)} className="flex min-h-8 items-center rounded-md px-1.5 hover:bg-white/10" aria-label="Hide the demo bar">
+          <button
+            type="button"
+            onClick={() => setCollapsedStored(true)}
+            className="flex min-h-8 items-center rounded-md px-1.5 hover:bg-white/10"
+            aria-label="Hide the demo bar"
+          >
             <ChevronUp className="size-4" aria-hidden />
           </button>
         </div>

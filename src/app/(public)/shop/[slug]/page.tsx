@@ -79,8 +79,17 @@ function ProductDetail({ product }: { product: Product }) {
   const requestPiece = async () => {
     try {
       const options = await repos.customization.getOptions();
-      const config = { ...productDesign(product, options), notes: `Requesting “${product.name}” as shown in the shop.${notes.trim() ? ` ${notes.trim()}` : ""}` };
-      const tx = await repos.customOrders.submit({ config, source: "catalog", basedOnProductId: product.id, snapshotDataUrl: product.photos[0], clientRequestId: requestId });
+      const config = {
+        ...productDesign(product, options),
+        notes: `Requesting “${product.name}” as shown in the shop.${notes.trim() ? ` ${notes.trim()}` : ""}`,
+      };
+      const tx = await repos.customOrders.submit({
+        config,
+        source: "catalog",
+        basedOnProductId: product.id,
+        snapshotDataUrl: product.photos[0],
+        clientRequestId: requestId,
+      });
       setRequestId(newRequestId());
       router.push(`/customize/submitted?id=${tx.id}`);
     } catch (e) {
@@ -91,7 +100,17 @@ function ProductDetail({ product }: { product: Product }) {
 
   const orderButton = (label: string, onConfirm: () => Promise<unknown>, description: React.ReactNode) =>
     user && user.role === "customer" && user.emailVerified ? (
-      <ConfirmDialog trigger={<Button size="lg" className="w-full sm:w-auto">{label}</Button>} title={`${label}?`} description={description} confirmLabel={label} onConfirm={onConfirm} />
+      <ConfirmDialog
+        trigger={
+          <Button size="lg" className="w-full sm:w-auto">
+            {label}
+          </Button>
+        }
+        title={`${label}?`}
+        description={description}
+        confirmLabel={label}
+        onConfirm={onConfirm}
+      />
     ) : (
       <Button size="lg" className="w-full sm:w-auto" onClick={() => guard(user)}>
         {label}
@@ -129,7 +148,14 @@ function ProductDetail({ product }: { product: Product }) {
                 </button>
               )}
               {product.photos.map((p, i) => (
-                <button key={p} type="button" onClick={() => setPhoto(i)} aria-label={`Show photo ${i + 1}`} aria-pressed={i === photo} className={`overflow-hidden rounded-lg border-2 ${i === photo ? "border-gold-dark" : "border-transparent"}`}>
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => setPhoto(i)}
+                  aria-label={`Show photo ${i + 1}`}
+                  aria-pressed={i === photo}
+                  className={`overflow-hidden rounded-lg border-2 ${i === photo ? "border-gold-dark" : "border-transparent"}`}
+                >
                   <StoredImage src={p} alt="" className="size-16" />
                 </button>
               ))}
@@ -155,7 +181,10 @@ function ProductDetail({ product }: { product: Product }) {
           {product.availability === "unavailable" ? (
             <div className="rounded-xl border border-line bg-muted/50 p-4">
               <p className="font-medium">This item is currently unavailable.</p>
-              <Link href={`/customize?type=${product.category}&from=${product.id}`} className="mt-1 inline-flex items-center gap-1 text-gold-dark hover:underline">
+              <Link
+                href={`/customize?type=${product.category}&from=${product.id}`}
+                className="mt-1 inline-flex items-center gap-1 text-gold-dark hover:underline"
+              >
                 <Sparkles className="size-4" aria-hidden /> Design something similar
               </Link>
               <Button size="lg" className="mt-4 w-full sm:w-auto" disabled>
@@ -170,13 +199,25 @@ function ProductDetail({ product }: { product: Product }) {
                     Quantity
                   </p>
                   <div className="inline-flex items-center gap-2" role="group" aria-labelledby="qty">
-                    <Button variant="outline" size="icon" onClick={() => setQuantity((n) => Math.max(1, n - 1))} disabled={quantity <= 1} aria-label="Decrease quantity">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setQuantity((n) => Math.max(1, n - 1))}
+                      disabled={quantity <= 1}
+                      aria-label="Decrease quantity"
+                    >
                       <Minus className="size-4" />
                     </Button>
                     <span className="tabular w-8 text-center text-lg font-semibold" aria-live="polite">
                       {quantity}
                     </span>
-                    <Button variant="outline" size="icon" onClick={() => setQuantity((n) => Math.min(5, n + 1))} disabled={quantity >= 5} aria-label="Increase quantity">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setQuantity((n) => Math.min(5, n + 1))}
+                      disabled={quantity >= 5}
+                      aria-label="Increase quantity"
+                    >
                       <Plus className="size-4" />
                     </Button>
                     <span className="text-xs text-muted-foreground">1 to 5</span>
@@ -190,7 +231,8 @@ function ProductDetail({ product }: { product: Product }) {
                 <Textarea id="order-notes" maxLength={500} value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
               </div>
               <p className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Store className="size-4 text-gold-dark" aria-hidden /> Claim in store at Montalban Public Market. The owner confirms the final price in a quotation.
+                <Store className="size-4 text-gold-dark" aria-hidden /> Claim in store at Montalban Public Market. The owner confirms the final price in a
+                quotation.
               </p>
               <div className="flex flex-wrap gap-2">
                 {product.availability === "available"
@@ -198,13 +240,16 @@ function ProductDetail({ product }: { product: Product }) {
                       "Place order",
                       placeOrder,
                       <>
-                        {quantity} × {product.name} at <MoneyText value={product.price} /> each (<MoneyText value={product.price * quantity} /> total). Claim in store at Montalban Public Market. The owner will send a quotation to confirm.
+                        {quantity} × {product.name} at <MoneyText value={product.price} /> each (<MoneyText value={product.price * quantity} /> total). Claim in
+                        store at Montalban Public Market. The owner will send a quotation to confirm.
                       </>,
                     )
                   : orderButton(
                       "Request this piece",
                       requestPiece,
-                      <>This piece is made to order. We&apos;ll send your request to the owner, who will confirm the design, final price, and completion date.</>,
+                      <>
+                        This piece is made to order. We&apos;ll send your request to the owner, who will confirm the design, final price, and completion date.
+                      </>,
                     )}
                 {product.availability === "made_to_order" && (
                   <Button asChild variant="outline" size="lg">

@@ -53,7 +53,11 @@ export function Prongs({ r, finish, count = 4, height }: { r: number; finish: Fi
       {Array.from({ length: count }, (_, i) => {
         const a = (i / count) * Math.PI * 2 + Math.PI / 4;
         return (
-          <mesh key={i} position={[Math.cos(a) * r * 0.95, height / 2 - r * 0.2, Math.sin(a) * r * 0.95]} rotation={[Math.sin(a) * 0.15, 0, -Math.cos(a) * 0.15]}>
+          <mesh
+            key={i}
+            position={[Math.cos(a) * r * 0.95, height / 2 - r * 0.2, Math.sin(a) * r * 0.95]}
+            rotation={[Math.sin(a) * 0.15, 0, -Math.cos(a) * 0.15]}
+          >
             <cylinderGeometry args={[r * 0.09, r * 0.12, height, 8]} />
             <MetalMaterial finish={finish} />
           </mesh>
@@ -79,7 +83,16 @@ export function NamePendantModel({ finish, sizeFactor, nameText, fontFile, scrip
   const ringR = 0.06 * sizeFactor;
 
   const { geometry, width, height, rings } = useMemo(() => {
-    const g = new TextGeometry(safeText(font, text) || "?", { font, size: letter, depth, curveSegments: 10, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.01, bevelSegments: 2 });
+    const g = new TextGeometry(safeText(font, text) || "?", {
+      font,
+      size: letter,
+      depth,
+      curveSegments: 10,
+      bevelEnabled: true,
+      bevelThickness: 0.012,
+      bevelSize: 0.01,
+      bevelSegments: 2,
+    });
     g.center();
     g.computeBoundingBox();
     const b = g.boundingBox!;

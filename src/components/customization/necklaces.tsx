@@ -31,7 +31,21 @@ export function necklaceCurve(sizeFactor: number, depth = 1) {
   return { curve: c, length: c.getLength() };
 }
 
-function Strand({ sizeFactor, depth = 1, pattern, clasp, finish, z = 0 }: { sizeFactor: number; depth?: number; pattern: ChainPattern; clasp?: ClaspKind; finish: FinishOption; z?: number }) {
+function Strand({
+  sizeFactor,
+  depth = 1,
+  pattern,
+  clasp,
+  finish,
+  z = 0,
+}: {
+  sizeFactor: number;
+  depth?: number;
+  pattern: ChainPattern;
+  clasp?: ClaspKind;
+  finish: FinishOption;
+  z?: number;
+}) {
   const { curve, length } = useMemo(() => necklaceCurve(sizeFactor, depth), [sizeFactor, depth]);
   return (
     <group position={[0, 0, z]}>
@@ -50,7 +64,15 @@ function Collar({ sizeFactor, finish }: { sizeFactor: number; finish: FinishOpti
   // a rigid, polished torc: a thick round wire, open at the back with a ball at each end
   const { g, ends } = useMemo(() => {
     const w = 1.05 * Math.sqrt(sizeFactor);
-    const curve = new THREE.CatmullRomCurve3([V(-w * 0.45, 0.85, -0.2), V(-w, 0.2, 0), V(-w * 0.7, -0.55, 0.12), V(0, -0.8, 0.18), V(w * 0.7, -0.55, 0.12), V(w, 0.2, 0), V(w * 0.45, 0.85, -0.2)]);
+    const curve = new THREE.CatmullRomCurve3([
+      V(-w * 0.45, 0.85, -0.2),
+      V(-w, 0.2, 0),
+      V(-w * 0.7, -0.55, 0.12),
+      V(0, -0.8, 0.18),
+      V(w * 0.7, -0.55, 0.12),
+      V(w, 0.2, 0),
+      V(w * 0.45, 0.85, -0.2),
+    ]);
     return { g: new THREE.TubeGeometry(curve, 160, 0.06, 16, false), ends: [curve.getPointAt(0), curve.getPointAt(1)] };
   }, [sizeFactor]);
   useEffect(() => () => g.dispose(), [g]);
@@ -69,7 +91,21 @@ function Collar({ sizeFactor, finish }: { sizeFactor: number; finish: FinishOpti
   );
 }
 
-function Lariat({ sizeFactor, pattern, clasp, finish, gem, cut }: { sizeFactor: number; pattern: ChainPattern; clasp: ClaspKind; finish: FinishOption; gem: GemstoneOption | null; cut: CutOption | null }) {
+function Lariat({
+  sizeFactor,
+  pattern,
+  clasp,
+  finish,
+  gem,
+  cut,
+}: {
+  sizeFactor: number;
+  pattern: ChainPattern;
+  clasp: ClaspKind;
+  finish: FinishOption;
+  gem: GemstoneOption | null;
+  cut: CutOption | null;
+}) {
   const { curve } = useMemo(() => necklaceCurve(sizeFactor), [sizeFactor]);
   const { tail, tailLength, bottom } = useMemo(() => {
     const b = curve.getPointAt(0.5);
@@ -99,7 +135,23 @@ function Lariat({ sizeFactor, pattern, clasp, finish, gem, cut }: { sizeFactor: 
   );
 }
 
-function Station({ sizeFactor, pattern, clasp, finish, gem, cut, stones }: { sizeFactor: number; pattern: ChainPattern; clasp: ClaspKind; finish: FinishOption; gem: GemstoneOption | null; cut: CutOption | null; stones: number }) {
+function Station({
+  sizeFactor,
+  pattern,
+  clasp,
+  finish,
+  gem,
+  cut,
+  stones,
+}: {
+  sizeFactor: number;
+  pattern: ChainPattern;
+  clasp: ClaspKind;
+  finish: FinishOption;
+  gem: GemstoneOption | null;
+  cut: CutOption | null;
+  stones: number;
+}) {
   const { curve } = useMemo(() => necklaceCurve(sizeFactor), [sizeFactor]);
   const points = useMemo(() => along(curve, Math.max(stones, 1), 0.22, 0.78), [curve, stones]);
   return (
@@ -116,7 +168,21 @@ function Station({ sizeFactor, pattern, clasp, finish, gem, cut, stones }: { siz
 }
 
 /** A continuous line of stones (tennis) or pearls (strand) along the necklace, with a clasp. */
-function StoneLine({ sizeFactor, finish, gem, stones, clasp, pearls }: { sizeFactor: number; finish: FinishOption; gem: GemstoneOption | null; stones: number; clasp: ClaspKind; pearls?: boolean }) {
+function StoneLine({
+  sizeFactor,
+  finish,
+  gem,
+  stones,
+  clasp,
+  pearls,
+}: {
+  sizeFactor: number;
+  finish: FinishOption;
+  gem: GemstoneOption | null;
+  stones: number;
+  clasp: ClaspKind;
+  pearls?: boolean;
+}) {
   const { curve, length } = useMemo(() => necklaceCurve(sizeFactor), [sizeFactor]);
   const n = Math.max(stones, 1);
   const r = Math.min(pearls ? 0.11 : 0.08, (length / n) * (pearls ? 0.49 : 0.42));
@@ -155,7 +221,13 @@ function Bib({ sizeFactor, pattern, clasp, finish }: { sizeFactor: number; patte
     const b = curve.getPointAt(0.7);
     const bottom = curve.getPointAt(0.5);
     return [0.35, 0.7, 1.05, 1.4].map((drop) => {
-      const c = new THREE.CatmullRomCurve3([a, V(a.x * 0.6, bottom.y - drop * 0.6, bottom.z + 0.02), V(0, bottom.y - drop, bottom.z + 0.03), V(b.x * 0.6, bottom.y - drop * 0.6, bottom.z + 0.02), b]);
+      const c = new THREE.CatmullRomCurve3([
+        a,
+        V(a.x * 0.6, bottom.y - drop * 0.6, bottom.z + 0.02),
+        V(0, bottom.y - drop, bottom.z + 0.03),
+        V(b.x * 0.6, bottom.y - drop * 0.6, bottom.z + 0.02),
+        b,
+      ]);
       return { curve: c, length: c.getLength() };
     });
   }, [curve]);

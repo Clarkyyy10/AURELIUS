@@ -11,7 +11,10 @@ export const LazyJewelryViewer = dynamic(() => import("./JewelryViewer").then((m
 
 export function ViewerLoading({ className }: { className?: string }) {
   return (
-    <div className={cn("flex h-full min-h-64 w-full items-center justify-center rounded-2xl bg-gradient-to-b from-[#FFFDF9] to-[#EFE7DA]", className)} role="status">
+    <div
+      className={cn("flex h-full min-h-64 w-full items-center justify-center rounded-2xl bg-gradient-to-b from-[#FFFDF9] to-[#EFE7DA]", className)}
+      role="status"
+    >
       <span className="text-sm text-muted-foreground">Loading 3D preview…</span>
     </div>
   );

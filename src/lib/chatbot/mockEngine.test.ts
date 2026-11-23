@@ -15,7 +15,11 @@ const kb: KnowledgeBase = {
   policies: seedPolicies,
 };
 
-const say = (...msgs: string[]): ChatTurn[] => msgs.flatMap((m) => [{ role: "user" as const, content: m }, { role: "assistant" as const, content: "…" }]);
+const say = (...msgs: string[]): ChatTurn[] =>
+  msgs.flatMap((m) => [
+    { role: "user" as const, content: m },
+    { role: "assistant" as const, content: "…" },
+  ]);
 const last = (...msgs: string[]) => respond(say(...msgs), kb);
 
 describe("custom order flow (FR-36)", () => {
@@ -23,7 +27,16 @@ describe("custom order flow (FR-36)", () => {
     const r = last("Design a custom piece", "Ring", "Toi et moi", "18K Gold", "White", "Ruby (lab)", "Oval", "US 6", "Engrave M&J inside");
     expect(r.draft?.kind).toBe("custom_order");
     const cfg = (r.draft as { config: DesignConfig }).config;
-    expect(cfg).toMatchObject({ productType: "ring", materialId: "mat-18k", finishId: "fin-white", gemstoneId: "gem-ruby", cutId: "cut-oval", stoneQuantity: 2, sizeId: "size-ring-us6", choices: { style: "style-ring-toi_et_moi" } });
+    expect(cfg).toMatchObject({
+      productType: "ring",
+      materialId: "mat-18k",
+      finishId: "fin-white",
+      gemstoneId: "gem-ruby",
+      cutId: "cut-oval",
+      stoneQuantity: 2,
+      sizeId: "size-ring-us6",
+      choices: { style: "style-ring-toi_et_moi" },
+    });
     expect(cfg.notes).toBe("Engrave M&J inside");
     expect(() => estimate(cfg, kb.options)).not.toThrow();
     expect(r.reply).toContain("won't submit");
@@ -56,7 +69,12 @@ describe("service request flow (FR-37)", () => {
     const r = last("Request a repair or service", "Jewelry", "Gold chain bracelet, 14K", "Repair, Polishing", "The clasp is broken and it looks dull.");
     expect(r.draft).toEqual({
       kind: "service_request",
-      fields: { itemType: "jewelry", itemDescription: "Gold chain bracelet, 14K", serviceIds: ["svc-polishing", "svc-repair"], details: "The clasp is broken and it looks dull." },
+      fields: {
+        itemType: "jewelry",
+        itemDescription: "Gold chain bracelet, 14K",
+        serviceIds: ["svc-polishing", "svc-repair"],
+        details: "The clasp is broken and it looks dull.",
+      },
     });
   });
 
@@ -66,11 +84,14 @@ describe("service request flow (FR-37)", () => {
 });
 
 describe("guardrails (FR-39, FR-40)", () => {
-  it.each(["What's the weather today?", "Can you help me with my homework?", "Who will win the election?", "Recommend a restaurant"])("refers out-of-scope question to the owner: %s", (q) => {
-    const r = last(q);
-    expect(r.referToOwner).toBe(true);
-    expect(r.reply).toMatch(/contact the owner/);
-  });
+  it.each(["What's the weather today?", "Can you help me with my homework?", "Who will win the election?", "Recommend a restaurant"])(
+    "refers out-of-scope question to the owner: %s",
+    (q) => {
+      const r = last(q);
+      expect(r.referToOwner).toBe(true);
+      expect(r.reply).toMatch(/contact the owner/);
+    },
+  );
 
   it.each(["How much is a gold ring?", "When will my ring be ready?", "What is the final price?"])("never states a final price or date: %s", (q) => {
     const r = last(q);
@@ -100,7 +121,13 @@ describe("necklace flow with chain style and clasp", () => {
   it("asks for chain, length and clasp and returns a complete draft", () => {
     const r = last("I want a necklace", "Chain", "18K Gold", "Yellow", "Rope", "20 in · Matinee", "Toggle", "No notes");
     const cfg = (r.draft as { config: DesignConfig }).config;
-    expect(cfg).toMatchObject({ productType: "necklace", chainStyleId: "chain-rope", claspId: "clasp-toggle", sizeId: "size-necklace-20in", gemstoneId: "gem-none" });
+    expect(cfg).toMatchObject({
+      productType: "necklace",
+      chainStyleId: "chain-rope",
+      claspId: "clasp-toggle",
+      sizeId: "size-necklace-20in",
+      gemstoneId: "gem-none",
+    });
     expect(() => estimate(cfg, kb.options)).not.toThrow();
     expect(r.reply).toContain("Rope chain with toggle clasp");
   });

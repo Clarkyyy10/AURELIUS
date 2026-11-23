@@ -69,11 +69,25 @@ function VerifyEmail() {
 
   const email = params.get("email") ?? user?.email;
   return (
-    <AuthCard title="Check your email" description={email ? <>We sent a confirmation link to <strong className="text-ink">{email}</strong>.</> : "We sent you a confirmation link."}>
+    <AuthCard
+      title="Check your email"
+      description={
+        email ? (
+          <>
+            We sent a confirmation link to <strong className="text-ink">{email}</strong>.
+          </>
+        ) : (
+          "We sent you a confirmation link."
+        )
+      }
+    >
       <MailCheck className="mb-3 size-10 text-gold" aria-hidden />
-      <p className="text-muted-foreground">Open the email and click the link to confirm your address. You need to do this before you can place orders or submit requests.</p>
+      <p className="text-muted-foreground">
+        Open the email and click the link to confirm your address. You need to do this before you can place orders or submit requests.
+      </p>
       <p className="mt-3 rounded-lg bg-gold/10 p-3 text-sm">
-        <strong>Demo mode:</strong> no real email is sent. Open <strong>“Simulated emails”</strong> in the dark bar at the top of the page and click <strong>Verify my email</strong>.
+        <strong>Demo mode:</strong> no real email is sent. Open <strong>“Simulated emails”</strong> in the dark bar at the top of the page and click{" "}
+        <strong>Verify my email</strong>.
       </p>
       <div className="mt-6 flex flex-wrap gap-2">
         {user && !user.emailVerified && (

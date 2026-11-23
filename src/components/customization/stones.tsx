@@ -19,18 +19,38 @@ export function outline(cut: string): THREE.Vector2[] {
   };
   const cutCorners = (w: number, h: number, c: number) =>
     [
-      [w, h - c], [w - c, h], [-w + c, h], [-w, h - c], [-w, -h + c], [-w + c, -h], [w - c, -h], [w, -h + c],
+      [w, h - c],
+      [w - c, h],
+      [-w + c, h],
+      [-w, h - c],
+      [-w, -h + c],
+      [-w + c, -h],
+      [w - c, -h],
+      [w, -h + c],
     ].forEach(([x, y]) => pts.push(new THREE.Vector2(x, y)));
   switch (cut) {
     case "oval":
-      ring(24, (a) => 1.3 * Math.cos(a), (a) => 0.9 * Math.sin(a));
+      ring(
+        24,
+        (a) => 1.3 * Math.cos(a),
+        (a) => 0.9 * Math.sin(a),
+      );
       break;
     case "princess":
-      [[1, 1], [-1, 1], [-1, -1], [1, -1]].forEach(([x, y]) => pts.push(new THREE.Vector2(x * 0.85, y * 0.85)));
+      [
+        [1, 1],
+        [-1, 1],
+        [-1, -1],
+        [1, -1],
+      ].forEach(([x, y]) => pts.push(new THREE.Vector2(x * 0.85, y * 0.85)));
       break;
     case "cushion":
       // a square with softly rounded corners
-      ring(32, (a) => Math.sign(Math.cos(a)) * Math.abs(Math.cos(a)) ** 0.55, (a) => Math.sign(Math.sin(a)) * Math.abs(Math.sin(a)) ** 0.55);
+      ring(
+        32,
+        (a) => Math.sign(Math.cos(a)) * Math.abs(Math.cos(a)) ** 0.55,
+        (a) => Math.sign(Math.sin(a)) * Math.abs(Math.sin(a)) ** 0.55,
+      );
       pts.forEach((p) => p.multiplyScalar(0.92));
       break;
     case "emerald":
@@ -116,10 +136,35 @@ export const ACCENT_GEM: GemstoneOption = { id: "accent", label: "Accent", baseP
 
 export function GemMaterial({ gem }: { gem: GemstoneOption }) {
   if (gem.surface === "pearl") {
-    return <meshPhysicalMaterial color={gem.colorHex} roughness={0.25} metalness={0} sheen={1} sheenColor="#ffe8f0" sheenRoughness={0.4} clearcoat={1} clearcoatRoughness={0.15} iridescence={0.5} envMapIntensity={1.2} />;
+    return (
+      <meshPhysicalMaterial
+        color={gem.colorHex}
+        roughness={0.25}
+        metalness={0}
+        sheen={1}
+        sheenColor="#ffe8f0"
+        sheenRoughness={0.4}
+        clearcoat={1}
+        clearcoatRoughness={0.15}
+        iridescence={0.5}
+        envMapIntensity={1.2}
+      />
+    );
   }
   if (gem.surface === "opal") {
-    return <meshPhysicalMaterial color={gem.colorHex} roughness={0.15} metalness={0} transmission={0.25} thickness={0.5} iridescence={1} iridescenceIOR={1.6} clearcoat={1} envMapIntensity={1.6} />;
+    return (
+      <meshPhysicalMaterial
+        color={gem.colorHex}
+        roughness={0.15}
+        metalness={0}
+        transmission={0.25}
+        thickness={0.5}
+        iridescence={1}
+        iridescenceIOR={1.6}
+        clearcoat={1}
+        envMapIntensity={1.6}
+      />
+    );
   }
   // Partly transparent with strong reflections and flat facets, so stones read as cut gems
   // (fully transparent glass looks empty against a light background).

@@ -25,14 +25,32 @@ interface HeadSpec {
 const radial = (theta: number, radius: number, z = 0) => new THREE.Vector3(Math.sin(theta) * radius, Math.cos(theta) * radius, z);
 const normalAt = (theta: number) => new THREE.Vector3(Math.sin(theta), Math.cos(theta), 0);
 
-function Band({ R, T, W, profile, shank, gap, finish }: { R: number; T: number; W: number; profile?: string; shank?: string; gap: number; finish: FinishOption }) {
+function Band({
+  R,
+  T,
+  W,
+  profile,
+  shank,
+  gap,
+  finish,
+}: {
+  R: number;
+  T: number;
+  W: number;
+  profile?: string;
+  shank?: string;
+  gap: number;
+  finish: FinishOption;
+}) {
   const geometries = useMemo(() => {
     const from = gap;
     const to = TAU - gap;
     if (shank === "twisted") {
       const rope = circleSection(W * 0.26, 12, T / 2);
       const a = W * 0.2;
-      return [0, Math.PI].map((phase) => sweepBand(R, rope, { from, to, segs: 260, offset: (t) => [Math.cos(t * 14 + phase) * a * 0.6, Math.sin(t * 14 + phase) * a] }));
+      return [0, Math.PI].map((phase) =>
+        sweepBand(R, rope, { from, to, segs: 260, offset: (t) => [Math.cos(t * 14 + phase) * a * 0.6, Math.sin(t * 14 + phase) * a] }),
+      );
     }
     if (shank === "split") {
       const strand = profileSection(profile, T, W * 0.5);
@@ -69,7 +87,11 @@ function layout(style: string | undefined, stones: number, cut: CutOption | null
       const c = 0.23;
       const s = 0.17;
       const t = (along(c) + along(s)) / 2 + 0.03;
-      return [{ theta: -t, r: s }, { theta: 0, r: c, main: true }, { theta: t, r: s }];
+      return [
+        { theta: -t, r: s },
+        { theta: 0, r: c, main: true },
+        { theta: t, r: s },
+      ];
     }
     case "toi_et_moi":
       return [
@@ -109,7 +131,10 @@ function RingBody({ finish, gem, cut, stones, sizeFactor, design, textFontFile, 
   const W = toe ? 0.2 : style === "eternity" ? 0.34 : 0.3;
   const top = R + T;
 
-  const heads = useMemo(() => (toe ? (stones > 0 ? [{ theta: 0, r: 0.14, main: true }] : []) : layout(style, stones, cut, top)), [toe, style, stones, cut, top]);
+  const heads = useMemo(
+    () => (toe ? (stones > 0 ? [{ theta: 0, r: 0.14, main: true }] : []) : layout(style, stones, cut, top)),
+    [toe, style, stones, cut, top],
+  );
   const main = heads.find((h) => h.main);
   const isTension = setting === "tension" && heads.length === 1 && main && style !== "cocktail" && style !== "halo" && style !== "cluster";
   const gap = isTension && main ? Math.asin(Math.min(0.9, (main.r * halfLength(cut) * 0.92) / (R + T / 2))) : 0;
@@ -126,23 +151,50 @@ function RingBody({ finish, gem, cut, stones, sizeFactor, design, textFontFile, 
     if (style === "halo" && c) {
       const ra = c.r * 0.2;
       const pts = perimeterPoints(cutKeyOf(cut), 16, 1.32 * c.r);
-      accents.push({ r: ra, spots: pts.map((p) => ({ position: new THREE.Vector3(p.x, cy - c.r * 0.02, -p.y), normal: new THREE.Vector3(p.x * 0.4, 1, -p.y * 0.4) })) });
+      accents.push({
+        r: ra,
+        spots: pts.map((p) => ({ position: new THREE.Vector3(p.x, cy - c.r * 0.02, -p.y), normal: new THREE.Vector3(p.x * 0.4, 1, -p.y * 0.4) })),
+      });
     }
     if (style === "cluster" && c) {
       const ra = 0.1;
-      accents.push({ r: ra, spots: Array.from({ length: 8 }, (_, i) => { const a = (i / 8) * TAU; return { position: new THREE.Vector3(Math.cos(a) * 0.27, top + 0.1, Math.sin(a) * 0.27), normal: new THREE.Vector3(Math.cos(a) * 0.5, 1, Math.sin(a) * 0.5) }; }) });
+      accents.push({
+        r: ra,
+        spots: Array.from({ length: 8 }, (_, i) => {
+          const a = (i / 8) * TAU;
+          return {
+            position: new THREE.Vector3(Math.cos(a) * 0.27, top + 0.1, Math.sin(a) * 0.27),
+            normal: new THREE.Vector3(Math.cos(a) * 0.5, 1, Math.sin(a) * 0.5),
+          };
+        }),
+      });
     }
     if (style === "cocktail" && c) {
       const pts = perimeterPoints(cutKeyOf(cut), 18, 1.3 * c.r);
-      accents.push({ r: c.r * 0.15, spots: pts.map((p) => ({ position: new THREE.Vector3(p.x, cy - c.r * 0.45, -p.y), normal: new THREE.Vector3(p.x, 1.2, -p.y) })) });
+      accents.push({
+        r: c.r * 0.15,
+        spots: pts.map((p) => ({ position: new THREE.Vector3(p.x, cy - c.r * 0.45, -p.y), normal: new THREE.Vector3(p.x, 1.2, -p.y) })),
+      });
     }
     if (style === "eternity") {
       const n = stones;
       const r = Math.min(0.16, ((Math.PI * top) / n) * 0.8);
       const rad = top + (setting === "channel" ? -r * 0.15 : r * 0.2);
-      accents.push({ r, spots: Array.from({ length: n }, (_, i) => { const t = (i / n) * TAU; return { position: radial(t, rad), normal: normalAt(t) }; }) });
+      accents.push({
+        r,
+        spots: Array.from({ length: n }, (_, i) => {
+          const t = (i / n) * TAU;
+          return { position: radial(t, rad), normal: normalAt(t) };
+        }),
+      });
       if (setting !== "channel" && setting !== "bezel")
-        beads.push({ r: r * 0.22, spots: Array.from({ length: n * 2 }, (_, k) => { const t = ((Math.floor(k / 2) + 0.5) / n) * TAU; return { position: radial(t, rad + r * 0.15, (k % 2 ? 1 : -1) * r * 0.75), normal: normalAt(t) }; }) });
+        beads.push({
+          r: r * 0.22,
+          spots: Array.from({ length: n * 2 }, (_, k) => {
+            const t = ((Math.floor(k / 2) + 0.5) / n) * TAU;
+            return { position: radial(t, rad + r * 0.15, (k % 2 ? 1 : -1) * r * 0.75), normal: normalAt(t) };
+          }),
+        });
     }
     if (setting === "pave" && style !== "eternity") {
       // tiny stones along the shoulders, both sides of the centre
@@ -185,16 +237,23 @@ function RingBody({ finish, gem, cut, stones, sizeFactor, design, textFontFile, 
       )}
 
       {/* channel-set eternity: rails on both edges of the band */}
-      {style === "eternity" && setting === "channel" &&
+      {style === "eternity" &&
+        setting === "channel" &&
         [-1, 1].map((side) => (
           <mesh key={side} position={[0, 0, side * W * 0.47]} name="metal">
             <torusGeometry args={[top - 0.005, 0.03, 8, 160]} />
             {metal}
           </mesh>
         ))}
-      {style === "eternity" && setting === "bezel" && gem &&
+      {style === "eternity" &&
+        setting === "bezel" &&
+        gem &&
         extras.accents[0]?.spots.map((s, i) => (
-          <mesh key={i} position={s.position.clone().addScaledVector(s.normal, -0.02)} quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), s.normal)}>
+          <mesh
+            key={i}
+            position={s.position.clone().addScaledVector(s.normal, -0.02)}
+            quaternion={new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), s.normal)}
+          >
             <torusGeometry args={[extras.accents[0].r * 1.05, 0.018, 6, 20]} />
             {metal}
           </mesh>
@@ -224,7 +283,10 @@ function RingBody({ finish, gem, cut, stones, sizeFactor, design, textFontFile, 
 
       {/* cocktail: a domed mount; halo and cluster: a metal plate under the accent stones */}
       {gem && main && (style === "cocktail" || style === "halo" || style === "cluster") && (
-        <mesh position={[0, style === "cluster" ? top - 0.01 : top + liftFor(setting, main.r) - main.r * (style === "cocktail" ? 0.6 : 0.3), 0]} scale={[style === "halo" ? halfLength(cut) : 1, style === "cocktail" ? 0.55 : 0.18, 1]}>
+        <mesh
+          position={[0, style === "cluster" ? top - 0.01 : top + liftFor(setting, main.r) - main.r * (style === "cocktail" ? 0.6 : 0.3), 0]}
+          scale={[style === "halo" ? halfLength(cut) : 1, style === "cocktail" ? 0.55 : 0.18, 1]}
+        >
           <sphereGeometry args={[style === "cocktail" ? main.r * 1.35 : style === "halo" ? main.r * 1.5 : 0.4, 32, 16, 0, TAU, 0, Math.PI / 2]} />
           {metal}
         </mesh>

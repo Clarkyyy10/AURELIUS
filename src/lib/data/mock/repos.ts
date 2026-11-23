@@ -121,9 +121,7 @@ function visible<T extends Transaction>(list: T[], customerId?: ID): T[] {
   const user = sessionUser();
   if (!user) return [];
   const filterId = user.role === "customer" ? user.id : customerId;
-  return [...list]
-    .filter((t) => !filterId || t.customerId === filterId)
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  return [...list].filter((t) => !filterId || t.customerId === filterId).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
 /** Idempotent submit: a repeated clientRequestId returns the record created the first time. */
@@ -140,9 +138,7 @@ function customerName(d: DbState, id: ID) {
 function setStatus(d: DbState, tx: Transaction, to: AnyStatus, actor: Actor, note?: string) {
   assertTransition(tx.kind, tx.status, to, actor);
   if (requiresZeroBalance(tx.kind, to) && balance(tx) > 0) {
-    throw new UserFacingError(
-      `The customer still has a balance of ${formatPesoExact(balance(tx))}. Record the payment settled in the store first.`,
-    );
+    throw new UserFacingError(`The customer still has a balance of ${formatPesoExact(balance(tx))}. Record the payment settled in the store first.`);
   }
   tx.status = to as never;
   tx.history.push({ status: to, at: now(), by: actor, note: note || undefined });
@@ -162,7 +158,14 @@ function notifyCustomerStatus(d: DbState, tx: Transaction, note?: string) {
       link,
     );
   } else {
-    notify(d, tx.customerId, "status_changed", `${tx.code}: ${statusLabel(tx.status)}`, note ? `Note from the store: ${note}` : `The status of ${tx.code} is now “${statusLabel(tx.status)}”.`, link);
+    notify(
+      d,
+      tx.customerId,
+      "status_changed",
+      `${tx.code}: ${statusLabel(tx.status)}`,
+      note ? `Note from the store: ${note}` : `The status of ${tx.code} is now “${statusLabel(tx.status)}”.`,
+      link,
+    );
   }
 }
 
@@ -227,7 +230,8 @@ export const mockRepositories: Repositories = {
           const count = (attempt?.count ?? 0) + 1;
           d.failedLogins[key] = count >= 5 ? { count, lockedUntil: new Date(Date.now() + 15 * 60_000).toISOString() } : { count };
           return {
-            error: count >= 5 ? "Too many failed attempts. Please wait 15 minutes and try again." : "The email or password is incorrect. Check them and try again.",
+            error:
+              count >= 5 ? "Too many failed attempts. Please wait 15 minutes and try again." : "The email or password is incorrect. Check them and try again.",
           };
         }
         delete d.failedLogins[key];
@@ -396,7 +400,11 @@ export const mockRepositories: Repositories = {
     async listServices(opts = {}) {
       await io();
       const showHidden = opts.includeHidden && sessionUser()?.role === "owner";
-      return structuredClone(db().services.filter((s) => showHidden || !s.hidden).sort((a, b) => a.sortOrder - b.sortOrder));
+      return structuredClone(
+        db()
+          .services.filter((s) => showHidden || !s.hidden)
+          .sort((a, b) => a.sortOrder - b.sortOrder),
+      );
     },
 
     async saveService(input) {
@@ -502,7 +510,14 @@ export const mockRepositories: Repositories = {
         d.customOrders.push(tx);
         d.processed[input.clientRequestId] = tx.id;
         d.pendingDesign = null;
-        notify(d, ownerId(d), "new_custom_request", "New custom order request", `${user.fullName} submitted a ${version.labels.productType.toLowerCase()} design (${tx.code}).`, detailHref("custom", tx.id, "owner"));
+        notify(
+          d,
+          ownerId(d),
+          "new_custom_request",
+          "New custom order request",
+          `${user.fullName} submitted a ${version.labels.productType.toLowerCase()} design (${tx.code}).`,
+          detailHref("custom", tx.id, "owner"),
+        );
         return tx;
       });
     },
@@ -517,7 +532,14 @@ export const mockRepositories: Repositories = {
         setStatus(d, tx, "under_review", "customer", `Version ${version.version} submitted.`);
         tx.versions.push(version);
         d.processed[input.clientRequestId] = tx.id;
-        notify(d, ownerId(d), "new_custom_request", `Updated design for ${tx.code}`, `${customerName(d, tx.customerId)} submitted version ${version.version} after your remarks.`, detailHref("custom", tx.id, "owner"));
+        notify(
+          d,
+          ownerId(d),
+          "new_custom_request",
+          `Updated design for ${tx.code}`,
+          `${customerName(d, tx.customerId)} submitted version ${version.version} after your remarks.`,
+          detailHref("custom", tx.id, "owner"),
+        );
         return tx;
       });
     },
@@ -542,7 +564,14 @@ export const mockRepositories: Repositories = {
         const tx = findTx(d, "custom", id) as CustomOrderRequest;
         setStatus(d, tx, "revision_requested", "owner", remarks);
         tx.revisionRemarks.push({ at: now(), text: remarks });
-        notify(d, tx.customerId, "revision_requested", `The owner asked for changes to ${tx.code}`, `Remarks: “${remarks}” Open your request to edit the design and resubmit.`, detailHref("custom", tx.id, "customer"));
+        notify(
+          d,
+          tx.customerId,
+          "revision_requested",
+          `The owner asked for changes to ${tx.code}`,
+          `Remarks: “${remarks}” Open your request to edit the design and resubmit.`,
+          detailHref("custom", tx.id, "customer"),
+        );
         return tx;
       });
     },
@@ -553,7 +582,14 @@ export const mockRepositories: Repositories = {
         requireOwner(d);
         const tx = findTx(d, "custom", id) as CustomOrderRequest;
         setStatus(d, tx, "approved", "owner");
-        notify(d, tx.customerId, "status_changed", `Your design ${tx.code} was approved`, "The owner approved your design. A quotation with the final price and date will follow.", detailHref("custom", tx.id, "customer"));
+        notify(
+          d,
+          tx.customerId,
+          "status_changed",
+          `Your design ${tx.code} was approved`,
+          "The owner approved your design. A quotation with the final price and date will follow.",
+          detailHref("custom", tx.id, "customer"),
+        );
         return tx;
       });
     },
@@ -596,7 +632,9 @@ export const mockRepositories: Repositories = {
         const p = d.products.find((x) => x.id === input.productId && !x.hidden);
         if (!p) throw new UserFacingError("This product is no longer in the shop.");
         if (p.availability !== "available") {
-          throw new UserFacingError(p.availability === "unavailable" ? "This item is currently unavailable." : "This item is made to order. Use “Request this piece” instead.");
+          throw new UserFacingError(
+            p.availability === "unavailable" ? "This item is currently unavailable." : "This item is made to order. Use “Request this piece” instead.",
+          );
         }
         if (input.quantity < 1 || input.quantity > 5) throw new UserFacingError("You can order between 1 and 5 at a time.");
         const tx: ProductOrder = {
@@ -616,7 +654,14 @@ export const mockRepositories: Repositories = {
         };
         d.orders.push(tx);
         d.processed[input.clientRequestId] = tx.id;
-        notify(d, ownerId(d), "new_order", "New order", `${user.fullName} ordered ${input.quantity} × ${p.name} (${tx.code}).`, detailHref("order", tx.id, "owner"));
+        notify(
+          d,
+          ownerId(d),
+          "new_order",
+          "New order",
+          `${user.fullName} ordered ${input.quantity} × ${p.name} (${tx.code}).`,
+          detailHref("order", tx.id, "owner"),
+        );
         return tx;
       });
     },
@@ -671,8 +716,18 @@ export const mockRepositories: Repositories = {
         };
         d.serviceRequests.push(tx);
         d.processed[clientRequestId] = tx.id;
-        const names = d.services.filter((s) => input.serviceIds.includes(s.id)).map((s) => s.name.toLowerCase()).join(", ");
-        notify(d, ownerId(d), "new_service_request", "New service request", `${user.fullName} asked for ${names} (${tx.code}).`, detailHref("service", tx.id, "owner"));
+        const names = d.services
+          .filter((s) => input.serviceIds.includes(s.id))
+          .map((s) => s.name.toLowerCase())
+          .join(", ");
+        notify(
+          d,
+          ownerId(d),
+          "new_service_request",
+          "New service request",
+          `${user.fullName} asked for ${names} (${tx.code}).`,
+          detailHref("service", tx.id, "owner"),
+        );
         return tx;
       });
     },
@@ -682,7 +737,13 @@ export const mockRepositories: Repositories = {
       return write((d) => {
         requireOwner(d);
         const tx = findTx(d, "service", id) as ServiceRequest;
-        setStatus(d, tx, "received", "owner", input.downPayment > 0 ? `Item received. Down payment of ${formatPesoExact(input.downPayment)} collected.` : "Item received.");
+        setStatus(
+          d,
+          tx,
+          "received",
+          "owner",
+          input.downPayment > 0 ? `Item received. Down payment of ${formatPesoExact(input.downPayment)} collected.` : "Item received.",
+        );
         tx.droppedOffAt = new Date(input.receivedOn).toISOString();
         if (input.downPayment > 0) {
           tx.payments.push({
@@ -699,7 +760,14 @@ export const mockRepositories: Repositories = {
           });
         }
         const bal = balance(tx);
-        notify(d, tx.customerId, "status_changed", `${tx.code}: Item received`, `We received your item${bal > 0 ? `. Remaining balance to settle on claiming: ${formatPesoExact(bal)}` : ""}.`, detailHref("service", tx.id, "customer"));
+        notify(
+          d,
+          tx.customerId,
+          "status_changed",
+          `${tx.code}: Item received`,
+          `We received your item${bal > 0 ? `. Remaining balance to settle on claiming: ${formatPesoExact(bal)}` : ""}.`,
+          detailHref("service", tx.id, "customer"),
+        );
         return tx;
       });
     },
@@ -719,7 +787,11 @@ export const mockRepositories: Repositories = {
     async listAll(opts = {}) {
       await io();
       const d = db();
-      return structuredClone([...visible(d.orders, opts.customerId), ...visible(d.customOrders, opts.customerId), ...visible(d.serviceRequests, opts.customerId)].sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
+      return structuredClone(
+        [...visible(d.orders, opts.customerId), ...visible(d.customOrders, opts.customerId), ...visible(d.serviceRequests, opts.customerId)].sort((a, b) =>
+          b.createdAt.localeCompare(a.createdAt),
+        ),
+      );
     },
 
     async changeStatus(kind, id, to, actor, note) {
@@ -771,7 +843,14 @@ export const mockRepositories: Repositories = {
         else to = downPaymentDue(tx) > 0 ? "awaiting_payment" : "confirmed";
         setStatus(d, tx, to, "customer", decision === "declined" ? reason : "Quotation accepted.");
         tx.quotation.response = { decision, at: now(), reason: reason || undefined };
-        notify(d, ownerId(d), "status_changed", `${tx.code}: quotation ${decision}`, `${user.fullName} ${decision} the quotation${reason ? `: “${reason}”` : "."}`, detailHref(kind, tx.id, "owner"));
+        notify(
+          d,
+          ownerId(d),
+          "status_changed",
+          `${tx.code}: quotation ${decision}`,
+          `${user.fullName} ${decision} the quotation${reason ? `: “${reason}”` : "."}`,
+          detailHref(kind, tx.id, "owner"),
+        );
         return tx;
       });
     },
@@ -786,7 +865,14 @@ export const mockRepositories: Repositories = {
         }
         setStatus(d, tx, "cancelled", user.role, reason);
         if (user.role === "customer") {
-          notify(d, ownerId(d), "cancelled_by_customer", `${tx.code} was cancelled by the customer`, `${user.fullName} cancelled ${tx.code}${reason ? `: “${reason}”` : "."}`, detailHref(kind, tx.id, "owner"));
+          notify(
+            d,
+            ownerId(d),
+            "cancelled_by_customer",
+            `${tx.code} was cancelled by the customer`,
+            `${user.fullName} cancelled ${tx.code}${reason ? `: “${reason}”` : "."}`,
+            detailHref(kind, tx.id, "owner"),
+          );
         } else {
           notifyCustomerStatus(d, tx, reason);
         }
@@ -818,7 +904,14 @@ export const mockRepositories: Repositories = {
         tx.payments.push(p);
         tx.updatedAt = now();
         d.processed[clientRequestId] = p.id;
-        notify(d, ownerId(d), "payment_submitted", "Payment to verify", `${user.fullName} submitted ${formatPesoExact(input.amount)} for ${tx.code} (ref. ${input.referenceNumber}).`, "/admin/payments");
+        notify(
+          d,
+          ownerId(d),
+          "payment_submitted",
+          "Payment to verify",
+          `${user.fullName} submitted ${formatPesoExact(input.amount)} for ${tx.code} (ref. ${input.referenceNumber}).`,
+          "/admin/payments",
+        );
         return p;
       });
     },
@@ -856,7 +949,14 @@ export const mockRepositories: Repositories = {
         p.status = "verified";
         p.verifiedAt = now();
         tx.updatedAt = now();
-        notify(d, tx.customerId, "payment_verified", `Payment verified for ${tx.code}`, `Your payment of ${formatPesoExact(p.amount)} was verified. Remaining balance: ${formatPesoExact(balance(tx))}.`, detailHref(kind, tx.id, "customer"));
+        notify(
+          d,
+          tx.customerId,
+          "payment_verified",
+          `Payment verified for ${tx.code}`,
+          `Your payment of ${formatPesoExact(p.amount)} was verified. Remaining balance: ${formatPesoExact(balance(tx))}.`,
+          detailHref(kind, tx.id, "customer"),
+        );
         afterVerified(d, tx);
         return p;
       });
@@ -873,7 +973,14 @@ export const mockRepositories: Repositories = {
         p.status = "rejected";
         p.rejectionReason = reason;
         tx.updatedAt = now();
-        notify(d, tx.customerId, "payment_rejected", `Payment not accepted for ${tx.code}`, `Your payment of ${formatPesoExact(p.amount)} was not accepted: “${reason}” Please submit it again with the correct details.`, detailHref(kind, tx.id, "customer"));
+        notify(
+          d,
+          tx.customerId,
+          "payment_rejected",
+          `Payment not accepted for ${tx.code}`,
+          `Your payment of ${formatPesoExact(p.amount)} was not accepted: “${reason}” Please submit it again with the correct details.`,
+          detailHref(kind, tx.id, "customer"),
+        );
         return p;
       });
     },
@@ -979,7 +1086,7 @@ export const mockRepositories: Repositories = {
     async save(draft) {
       await io();
       return write((d) => {
-        const full = { ...draft, id: uid("draft"), createdAt: now() } as typeof d.drafts[number];
+        const full = { ...draft, id: uid("draft"), createdAt: now() } as (typeof d.drafts)[number];
         d.drafts.push(full);
         return full;
       });

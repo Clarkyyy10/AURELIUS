@@ -14,6 +14,7 @@ Playwright. The ERD (manuscript §3.11) names: users, custom_designs, orders, or
 payments, service_requests, chat_sessions, notifications, products, design_options, services.
 
 ## Steps (one Claude Code session each)
+
 1. **Supabase project + schema.** Tables mirroring `data-model.md` (profiles, store_settings,
    product_type_options, material_options, finish_options, gemstone_options, cut_options,
    size_options, products, service_catalog, custom_order_requests, design_versions,

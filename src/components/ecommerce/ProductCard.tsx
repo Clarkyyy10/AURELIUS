@@ -30,7 +30,12 @@ export function ProductCard({ product, options }: { product: Product; options?: 
     <article className="group overflow-hidden rounded-2xl border border-line bg-paper transition-shadow hover:shadow-md">
       <div className="relative">
         {show3d ? (
-          <ProductModelView config={productDesign(product, options!)} options={options!} className="aspect-square w-full" label={`3D model of ${product.name}`} />
+          <ProductModelView
+            config={productDesign(product, options!)}
+            options={options!}
+            className="aspect-square w-full"
+            label={`3D model of ${product.name}`}
+          />
         ) : (
           <Link href={href} tabIndex={-1} aria-hidden>
             <StoredImage src={product.photos[0]} alt="" className="aspect-square w-full" />

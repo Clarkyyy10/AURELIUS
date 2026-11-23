@@ -17,7 +17,18 @@ function List() {
     <>
       <PageHeader title="Custom order requests" description="Review designs, ask for changes, approve, and send quotations." />
       <QueryView query={q}>
-        {(rows) => <TransactionTable key={status} rows={rows} kind="custom" role="owner" serviceNames={serviceNames} customers={map} initialStatus={status} empty={{ title: "No Custom requests to review yet" }} />}
+        {(rows) => (
+          <TransactionTable
+            key={status}
+            rows={rows}
+            kind="custom"
+            role="owner"
+            serviceNames={serviceNames}
+            customers={map}
+            initialStatus={status}
+            empty={{ title: "No Custom requests to review yet" }}
+          />
+        )}
       </QueryView>
     </>
   );

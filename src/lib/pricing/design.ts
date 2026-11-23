@@ -16,7 +16,11 @@ export function optionsFor(options: CustomizationOptions, productType: ProductTy
   return (options.designOptions ?? []).filter((o) => o.group === group && o.productTypes.includes(productType));
 }
 
-export function chosenOption(config: Pick<DesignConfig, "choices" | "productType">, options: CustomizationOptions, group: OptionGroup): DesignOption | undefined {
+export function chosenOption(
+  config: Pick<DesignConfig, "choices" | "productType">,
+  options: CustomizationOptions,
+  group: OptionGroup,
+): DesignOption | undefined {
   const id = config.choices?.[group];
   if (!id) return undefined;
   return optionsFor(options, config.productType, group).find((o) => o.id === id);

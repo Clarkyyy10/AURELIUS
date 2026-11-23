@@ -105,7 +105,10 @@ export interface ServiceRepo {
   list(opts?: { customerId?: ID }): Promise<ServiceRequest[]>;
   get(id: ID): Promise<ServiceRequest | null>;
   submit(
-    input: Pick<ServiceRequest, "itemType" | "itemDescription" | "brandModel" | "material" | "serviceIds" | "details" | "photos" | "preferredDropOffDate" | "source"> &
+    input: Pick<
+      ServiceRequest,
+      "itemType" | "itemDescription" | "brandModel" | "material" | "serviceIds" | "details" | "photos" | "preferredDropOffDate" | "source"
+    > &
       SubmitMeta,
   ): Promise<ServiceRequest>;
   /** FR-30: owner records drop-off and the down payment collected. */

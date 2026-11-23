@@ -22,7 +22,10 @@ function ResetPassword() {
   const token = useSearchParams().get("token");
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const form = useForm<z.input<typeof resetPasswordSchema>>({ resolver: zodResolver(resetPasswordSchema), defaultValues: { password: "", confirmPassword: "" } });
+  const form = useForm<z.input<typeof resetPasswordSchema>>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: { password: "", confirmPassword: "" },
+  });
 
   if (!token)
     return (

@@ -22,10 +22,19 @@ export const PRICE_GUARDRAIL =
 
 type State =
   | { flow: "idle" }
-  | { flow: "custom"; step: "type" | "style" | "styleText" | "material" | "finish" | "chain" | "gem" | "cut" | "qty" | "size" | "clasp" | "name" | "font" | "notes"; config: Partial<DesignConfig> }
+  | {
+      flow: "custom";
+      step: "type" | "style" | "styleText" | "material" | "finish" | "chain" | "gem" | "cut" | "qty" | "size" | "clasp" | "name" | "font" | "notes";
+      config: Partial<DesignConfig>;
+    }
   | { flow: "service"; step: "itemType" | "item" | "services" | "details"; fields: NonNullable<Extract<ChatDraft, { kind: "service_request" }>["fields"]> };
 
-const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]+/g, " ").replace(/\s+/g, " ").trim();
+const norm = (s: string) =>
+  s
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 
 function matchOne<T extends { label: string }>(text: string, list: T[]): T | undefined {
   const t = norm(text);
@@ -56,7 +65,10 @@ function findFaq(text: string, kb: KnowledgeBase) {
   const t = ` ${norm(text)} `;
   let best: { score: number; answer: string } | null = null;
   for (const f of kb.faqs.filter((x) => x.active)) {
-    const score = f.keywords.reduce((s, k) => (t.includes(` ${norm(k)} `) || (norm(k).includes(" ") && t.includes(norm(k))) ? s + (norm(k).includes(" ") ? 2 : 1) : s), 0);
+    const score = f.keywords.reduce(
+      (s, k) => (t.includes(` ${norm(k)} `) || (norm(k).includes(" ") && t.includes(norm(k))) ? s + (norm(k).includes(" ") ? 2 : 1) : s),
+      0,
+    );
     if (score > 0 && (!best || score > best.score)) best = { score, answer: f.answer };
   }
   return best?.answer ?? null;
@@ -95,12 +107,20 @@ function askCustom(state: Extract<State, { flow: "custom" }>, kb: KnowledgeBase,
       return { reply: `${p}What kind of piece would you like?`, quickReplies: o.productTypes.map((x) => x.label) };
     case "style": {
       const styles = stylesOf(kb, c.productType);
-      return { reply: `${p}Which style would you like? For example: ${styles.slice(0, 3).map((x) => `${x.label} (${x.description.charAt(0).toLowerCase()}${x.description.slice(1).replace(/\.$/, "")})`).join("; ")}.`, quickReplies: styles.map((x) => x.label) };
+      return {
+        reply: `${p}Which style would you like? For example: ${styles
+          .slice(0, 3)
+          .map((x) => `${x.label} (${x.description.charAt(0).toLowerCase()}${x.description.slice(1).replace(/\.$/, "")})`)
+          .join("; ")}.`,
+        quickReplies: styles.map((x) => x.label),
+      };
     }
     case "styleText": {
       const style = styleOf(asConfig(c), o);
       if (style?.key === "zodiac") return { reply: `${p}Which zodiac sign?`, quickReplies: ZODIAC_SIGNS };
-      return { reply: `${p}What letters or text should it have? Up to ${style?.textMax} characters.${TEXT_REQUIRED.has(style?.key ?? "") ? "" : " Or type “None”."}` };
+      return {
+        reply: `${p}What letters or text should it have? Up to ${style?.textMax} characters.${TEXT_REQUIRED.has(style?.key ?? "") ? "" : " Or type “None”."}`,
+      };
     }
     case "material":
       return { reply: `${p}Which material would you like for your ${pt?.label.toLowerCase()}?`, quickReplies: o.materials.map((m) => m.label) };
@@ -112,21 +132,31 @@ function askCustom(state: Extract<State, { flow: "custom" }>, kb: KnowledgeBase,
     case "gem": {
       const rule = stoneRule(asConfig(c), o);
       const gems = o.gemstones.filter((g) => !(g.isNone && rule.min > 0) && g.surface !== "pearl");
-      return { reply: rule.min > 0 ? `${p}Which stone would you like?` : `${p}Would you like a gemstone? You can choose up to ${rule.max}.`, quickReplies: gems.map((g) => g.label) };
+      return {
+        reply: rule.min > 0 ? `${p}Which stone would you like?` : `${p}Would you like a gemstone? You can choose up to ${rule.max}.`,
+        quickReplies: gems.map((g) => g.label),
+      };
     }
     case "cut":
       return { reply: `${p}Which cut for the stone?`, quickReplies: o.cuts.map((x) => x.label) };
     case "qty": {
       const rule = stoneRule(asConfig(c), o);
       const lo = Math.max(1, rule.min);
-      return { reply: `${p}How many stones? (${lo} to ${rule.max})`, quickReplies: rule.max - lo < 8 ? Array.from({ length: rule.max - lo + 1 }, (_, i) => String(lo + i)) : [String(lo), String(rule.default), String(rule.max)] };
+      return {
+        reply: `${p}How many stones? (${lo} to ${rule.max})`,
+        quickReplies:
+          rule.max - lo < 8 ? Array.from({ length: rule.max - lo + 1 }, (_, i) => String(lo + i)) : [String(lo), String(rule.default), String(rule.max)],
+      };
     }
     case "size": {
       const sizes = o.sizes.filter((s) => s.productType === c.productType).sort((a, b) => a.sortOrder - b.sortOrder);
       return { reply: `${p}What size? If you're not sure, choose the middle size — you can change it later.`, quickReplies: sizes.map((s) => s.label) };
     }
     case "chain":
-      return { reply: `${p}Which chain style? Popular choices are Cable, Rope, Box, Figaro and Cuban — tap one to see it, or type another style.`, quickReplies: (o.chainStyles ?? []).map((c) => c.label) };
+      return {
+        reply: `${p}Which chain style? Popular choices are Cable, Rope, Box, Figaro and Cuban — tap one to see it, or type another style.`,
+        quickReplies: (o.chainStyles ?? []).map((c) => c.label),
+      };
     case "clasp":
       return { reply: `${p}Which clasp? A lobster claw is the most secure and popular.`, quickReplies: (o.clasps ?? []).map((c) => c.label) };
     case "name":
@@ -164,7 +194,12 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
     }
     case "styleText": {
       const style = styleOf(asConfig(c), o);
-      const value = /^(none|no|wala)$/i.test(text.trim()) && !TEXT_REQUIRED.has(style?.key ?? "") ? "" : style?.key === "zodiac" ? (ZODIAC_SIGNS.find((z) => z.toLowerCase() === text.trim().toLowerCase()) ?? text.trim()) : text.trim();
+      const value =
+        /^(none|no|wala)$/i.test(text.trim()) && !TEXT_REQUIRED.has(style?.key ?? "")
+          ? ""
+          : style?.key === "zodiac"
+            ? (ZODIAC_SIGNS.find((z) => z.toLowerCase() === text.trim().toLowerCase()) ?? text.trim())
+            : text.trim();
       const problem = styleTextProblem(style, value);
       if (problem) return again(problem);
       c.styleText = value || undefined;
@@ -178,7 +213,10 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
     }
     case "finish": {
       const m = o.materials.find((x) => x.id === c.materialId)!;
-      const f = matchOne(text, o.finishes.filter((x) => m.finishIds.includes(x.id)));
+      const f = matchOne(
+        text,
+        o.finishes.filter((x) => m.finishIds.includes(x.id)),
+      );
       if (!f) return again(`That finish isn't available for ${m.label}.`);
       c.finishId = f.id;
       const rule = stoneRule(asConfig(c), o);
@@ -196,7 +234,14 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       }
       if (usesChain(asConfig(c), o)) return next("chain");
       if (rule.max > 0) return next("gem");
-      return pt().type === "name_pendant" ? next("size") : next("size", style ? `The ${style.label} style has no stones, so we'll skip that.` : `Gemstones aren't available for a ${pt().label.toLowerCase()}, so we'll skip that.`);
+      return pt().type === "name_pendant"
+        ? next("size")
+        : next(
+            "size",
+            style
+              ? `The ${style.label} style has no stones, so we'll skip that.`
+              : `Gemstones aren't available for a ${pt().label.toLowerCase()}, so we'll skip that.`,
+          );
     }
     case "gem": {
       const rule = stoneRule(asConfig(c), o);
@@ -223,7 +268,10 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       return next("qty");
     }
     case "qty": {
-      const n = Number.parseInt(text.match(/\d+/)?.[0] ?? (/\b(one|isa)\b/i.test(text) ? "1" : /\b(two|dalawa)\b/i.test(text) ? "2" : /\b(three|tatlo)\b/i.test(text) ? "3" : ""), 10);
+      const n = Number.parseInt(
+        text.match(/\d+/)?.[0] ?? (/\b(one|isa)\b/i.test(text) ? "1" : /\b(two|dalawa)\b/i.test(text) ? "2" : /\b(three|tatlo)\b/i.test(text) ? "3" : ""),
+        10,
+      );
       const rule = stoneRule(asConfig(c), o);
       const lo = Math.max(1, rule.min);
       if (!(n >= lo && n <= rule.max)) return again(`Please choose a number from ${lo} to ${rule.max}.`);
@@ -231,7 +279,10 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       return next("size");
     }
     case "size": {
-      const s = matchOne(text, o.sizes.filter((x) => x.productType === c.productType));
+      const s = matchOne(
+        text,
+        o.sizes.filter((x) => x.productType === c.productType),
+      );
       if (!s) return again("Please choose one of these sizes.");
       c.sizeId = s.id;
       return c.productType === "name_pendant" ? next("name") : usesChain(asConfig(c), o) ? next("clasp") : next("notes");
@@ -268,11 +319,18 @@ function customStep(state: Extract<State, { flow: "custom" }>, text: string, kb:
       const g = o.gemstones.find((x) => x.id === c.gemstoneId);
       const cut = o.cuts.find((x) => x.id === c.cutId);
       const s = o.sizes.find((x) => x.id === c.sizeId);
-      const chained = usesChain(asConfig(c), o) ? ` · ${(o.chainStyles ?? []).find((x) => x.id === c.chainStyleId)?.label} chain with ${(o.clasps ?? []).find((x) => x.id === c.claspId)?.label.toLowerCase()} clasp` : "";
+      const chained = usesChain(asConfig(c), o)
+        ? ` · ${(o.chainStyles ?? []).find((x) => x.id === c.chainStyleId)?.label} chain with ${(o.clasps ?? []).find((x) => x.id === c.claspId)?.label.toLowerCase()} clasp`
+        : "";
       const named = c.productType === "name_pendant" ? ` “${c.nameText}” in ${(o.fonts ?? []).find((x) => x.id === c.fontId)?.label.toLowerCase()}` : "";
       const style = styleOf(asConfig(c), o);
       const styled = style ? ` (${style.label.toLowerCase()}${c.styleText ? ` “${c.styleText}”` : ""})` : "";
-      const summary = [`${f?.label} ${m?.label} ${pt().label.toLowerCase()}${styled}${named}`, g && !g.isNone ? `${g.label}, ${cut?.label} cut × ${c.stoneQuantity}` : "no gemstone", `size ${s?.label}`].join(" · ") + chained;
+      const summary =
+        [
+          `${f?.label} ${m?.label} ${pt().label.toLowerCase()}${styled}${named}`,
+          g && !g.isNone ? `${g.label}, ${cut?.label} cut × ${c.stoneQuantity}` : "no gemstone",
+          `size ${s?.label}`,
+        ].join(" · ") + chained;
       return {
         state: { flow: "idle" },
         result: {
@@ -295,23 +353,47 @@ function serviceStep(state: Extract<State, { flow: "service" }>, text: string, k
       const t = /watch|relo/i.test(text) ? "watch" : /jewel|ring|necklace|bracelet|earring|pendant|alahas/i.test(text) ? "jewelry" : null;
       if (!t) return { state, result: { reply: "Is it a piece of jewelry or a watch?", quickReplies: ["Jewelry", "Watch"] } };
       f.itemType = t;
-      return { state: { flow: "service", step: "item", fields: f }, result: { reply: t === "watch" ? "Please describe the watch, including the brand and model if you know it. For example: “Seiko 5 automatic, stainless steel”." : "Please describe the item. For example: “18K gold wedding ring, plain band”." } };
+      return {
+        state: { flow: "service", step: "item", fields: f },
+        result: {
+          reply:
+            t === "watch"
+              ? "Please describe the watch, including the brand and model if you know it. For example: “Seiko 5 automatic, stainless steel”."
+              : "Please describe the item. For example: “18K gold wedding ring, plain band”.",
+        },
+      };
     }
     case "item": {
       if (text.trim().length < 10) return { state, result: { reply: "Could you describe it in a bit more detail (at least 10 characters)?" } };
       f.itemDescription = text.trim().slice(0, 300);
       if (f.itemType === "watch") f.brandModel = text.trim().slice(0, 80);
-      return { state: { flow: "service", step: "services", fields: f }, result: { reply: "Which service do you need? You can pick more than one — type them separated by commas.", quickReplies: relevant().map((s) => s.name) } };
+      return {
+        state: { flow: "service", step: "services", fields: f },
+        result: {
+          reply: "Which service do you need? You can pick more than one — type them separated by commas.",
+          quickReplies: relevant().map((s) => s.name),
+        },
+      };
     }
     case "services": {
       const t = norm(text);
-      const picked = relevant().filter((s) => t.includes(norm(s.name)) || norm(s.name).split(" ").some((w) => w.length > 4 && t.split(" ").includes(w)));
+      const picked = relevant().filter(
+        (s) =>
+          t.includes(norm(s.name)) ||
+          norm(s.name)
+            .split(" ")
+            .some((w) => w.length > 4 && t.split(" ").includes(w)),
+      );
       if (picked.length === 0) return { state, result: { reply: "Please choose one of these services.", quickReplies: relevant().map((s) => s.name) } };
       f.serviceIds = picked.map((s) => s.id);
-      return { state: { flow: "service", step: "details", fields: f }, result: { reply: `Got it: ${picked.map((s) => s.name).join(", ")}. What's wrong with the item, or what would you like done?` } };
+      return {
+        state: { flow: "service", step: "details", fields: f },
+        result: { reply: `Got it: ${picked.map((s) => s.name).join(", ")}. What's wrong with the item, or what would you like done?` },
+      };
     }
     case "details": {
-      if (text.trim().length < 10) return { state, result: { reply: "Please tell me a little more (at least 10 characters), so the owner understands what you need." } };
+      if (text.trim().length < 10)
+        return { state, result: { reply: "Please tell me a little more (at least 10 characters), so the owner understands what you need." } };
       f.details = text.trim().slice(0, 1000);
       return {
         state: { flow: "idle" },
@@ -332,7 +414,10 @@ function productsAnswer(kb: KnowledgeBase): ChatResult {
   const visible = kb.products.filter((p) => !p.hidden);
   const avail = visible.filter((p) => p.availability === "available");
   const mto = visible.filter((p) => p.availability === "made_to_order");
-  const examples = avail.slice(0, 4).map((p) => p.name).join(", ");
+  const examples = avail
+    .slice(0, 4)
+    .map((p) => p.name)
+    .join(", ");
   return {
     reply: `We have ${visible.length} pieces in the shop: ${avail.length} ready to order (for example ${examples}) and ${mto.length} made to order. Shop prices are listed on each product; the owner confirms the final price in a quotation. [Browse the shop](/shop) or [design your own](/customize).`,
     quickReplies: ["Design a custom piece", "Request a repair or service"],
@@ -343,7 +428,10 @@ function idleStep(text: string, kb: KnowledgeBase): { state: State; result: Chat
   const t = norm(text);
   const idle: State = { flow: "idle" };
 
-  if (/design a custom piece|custom|design|customi[sz]e|make me|made to order|personali[sz]e/.test(t) || (/\b(want|like|need|gusto)\b/.test(t) && detectType(text, kb))) {
+  if (
+    /design a custom piece|custom|design|customi[sz]e|make me|made to order|personali[sz]e/.test(t) ||
+    (/\b(want|like|need|gusto)\b/.test(t) && detectType(text, kb))
+  ) {
     const config: Partial<DesignConfig> = {};
     const type = detectType(text, kb);
     if (type) config.productType = type;
@@ -358,9 +446,15 @@ function idleStep(text: string, kb: KnowledgeBase): { state: State; result: Chat
     if (/watch|relo|battery|strap/.test(t)) {
       s.fields.itemType = "watch";
       s.step = "item";
-      return { state: s, result: { reply: "I can help you prepare a watch service request. Please describe the watch, including the brand and model if you know it." } };
+      return {
+        state: s,
+        result: { reply: "I can help you prepare a watch service request. Please describe the watch, including the brand and model if you know it." },
+      };
     }
-    return { state: s, result: { reply: "I can help you prepare a service request. Is it a piece of jewelry or a watch?", quickReplies: ["Jewelry", "Watch"] } };
+    return {
+      state: s,
+      result: { reply: "I can help you prepare a service request. Is it a piece of jewelry or a watch?", quickReplies: ["Jewelry", "Watch"] },
+    };
   }
   if (/ask about products|products|shop|catalog|collection|available|stock|items|sell/.test(t)) return { state: idle, result: productsAnswer(kb) };
   if (/store hours and location/.test(t)) {
@@ -371,10 +465,18 @@ function idleStep(text: string, kb: KnowledgeBase): { state: State; result: Chat
   const priceOrDate = PRICE_WORDS.test(text) || DATE_WORDS.test(text);
   if (faq) return { state: idle, result: { reply: priceOrDate ? `${faq} ${PRICE_GUARDRAIL}` : faq, quickReplies: QUICK_START } };
   if (priceOrDate) {
-    return { state: idle, result: { reply: `${PRICE_GUARDRAIL} You can see an estimate in the [3D customizer](/customize), or [request a service](/services/request) to get a quotation.`, quickReplies: QUICK_START } };
+    return {
+      state: idle,
+      result: {
+        reply: `${PRICE_GUARDRAIL} You can see an estimate in the [3D customizer](/customize), or [request a service](/services/request) to get a quotation.`,
+        quickReplies: QUICK_START,
+      },
+    };
   }
-  if (/^(hi|hello|hey|good (morning|afternoon|evening)|kumusta|hello po|hi po)\b/.test(t)) return { state: idle, result: { reply: WELCOME, quickReplies: QUICK_START } };
-  if (/^(thanks|thank you|salamat|ok|okay)\b/.test(t)) return { state: idle, result: { reply: "You're welcome! Is there anything else I can help with?", quickReplies: QUICK_START } };
+  if (/^(hi|hello|hey|good (morning|afternoon|evening)|kumusta|hello po|hi po)\b/.test(t))
+    return { state: idle, result: { reply: WELCOME, quickReplies: QUICK_START } };
+  if (/^(thanks|thank you|salamat|ok|okay)\b/.test(t))
+    return { state: idle, result: { reply: "You're welcome! Is there anything else I can help with?", quickReplies: QUICK_START } };
   return { state: idle, result: referToOwner(kb) }; // FR-39
 }
 
@@ -392,7 +494,8 @@ export function respond(history: ChatTurn[], kb: KnowledgeBase): ChatResult {
       result = { reply: "Okay, let's start over. What would you like to do?", quickReplies: QUICK_START };
       continue;
     }
-    const step: { state: State; result: ChatResult } = state.flow === "custom" ? customStep(state, text, kb) : state.flow === "service" ? serviceStep(state, text, kb) : idleStep(text, kb);
+    const step: { state: State; result: ChatResult } =
+      state.flow === "custom" ? customStep(state, text, kb) : state.flow === "service" ? serviceStep(state, text, kb) : idleStep(text, kb);
     state = step.state;
     result = step.result;
     // Mid-flow price/date questions get the guardrail, and the flow continues (FR-40).

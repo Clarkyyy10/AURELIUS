@@ -68,12 +68,18 @@ export function QuotationForm({ tx, suggestedPrice, trigger }: { tx: Transaction
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-heading text-2xl">{tx.quotation ? "Re-issue quotation" : isService ? "Issue service quotation" : "Issue quotation"}</DialogTitle>
+          <DialogTitle className="font-heading text-2xl">
+            {tx.quotation ? "Re-issue quotation" : isService ? "Issue service quotation" : "Issue quotation"}
+          </DialogTitle>
           <DialogDescription>The customer will be notified and can accept or decline.</DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} noValidate className="space-y-4">
           <FormError message={error} />
-          <Field label={isService ? "Estimated cost (₱)" : "Final price (₱)"} error={errors.finalPrice?.message} hint={suggestedPrice ? `Suggested: ${formatPesoExact(suggestedPrice)}` : undefined}>
+          <Field
+            label={isService ? "Estimated cost (₱)" : "Final price (₱)"}
+            error={errors.finalPrice?.message}
+            hint={suggestedPrice ? `Suggested: ${formatPesoExact(suggestedPrice)}` : undefined}
+          >
             <Input type="number" inputMode="decimal" min={0} step="1" {...form.register("finalPrice", { valueAsNumber: true })} />
           </Field>
           <div className="space-y-1.5">
@@ -81,14 +87,29 @@ export function QuotationForm({ tx, suggestedPrice, trigger }: { tx: Transaction
               <Label htmlFor="dp">Down payment required</Label>
               <div className="flex rounded-lg border border-line p-0.5 text-xs" role="radiogroup" aria-label="Down payment as">
                 {(["peso", "percent"] as const).map((m) => (
-                  <button key={m} type="button" role="radio" aria-checked={dpMode === m} onClick={() => setDpMode(m)} className={`rounded-md px-2 py-1 ${dpMode === m ? "bg-emerald text-ivory" : ""}`}>
+                  <button
+                    key={m}
+                    type="button"
+                    role="radio"
+                    aria-checked={dpMode === m}
+                    onClick={() => setDpMode(m)}
+                    className={`rounded-md px-2 py-1 ${dpMode === m ? "bg-emerald text-ivory" : ""}`}
+                  >
                     {m === "peso" ? "₱" : "%"}
                   </button>
                 ))}
               </div>
             </div>
             {dpMode === "peso" ? (
-              <Input id="dp" type="number" inputMode="decimal" min={0} step="1" {...form.register("downPaymentRequired", { valueAsNumber: true })} aria-invalid={Boolean(errors.downPaymentRequired)} />
+              <Input
+                id="dp"
+                type="number"
+                inputMode="decimal"
+                min={0}
+                step="1"
+                {...form.register("downPaymentRequired", { valueAsNumber: true })}
+                aria-invalid={Boolean(errors.downPaymentRequired)}
+              />
             ) : (
               <div className="flex items-center gap-2">
                 <Input id="dp" type="number" min={0} max={100} value={pct} onChange={(e) => setPct(Number(e.target.value))} className="w-24" />
@@ -124,7 +145,17 @@ export function QuotationForm({ tx, suggestedPrice, trigger }: { tx: Transaction
 }
 
 /** Statuses handled by their own buttons instead of the generic status control. */
-const SPECIAL: AnyStatus[] = ["quoted", "received", "revision_requested", "approved", "rejected", "under_review", "awaiting_payment", "awaiting_drop_off", "declined"];
+const SPECIAL: AnyStatus[] = [
+  "quoted",
+  "received",
+  "revision_requested",
+  "approved",
+  "rejected",
+  "under_review",
+  "awaiting_payment",
+  "awaiting_drop_off",
+  "declined",
+];
 
 /** FR-20 / FR-29 — move to the next allowed status, with an optional note. */
 export function StatusControl({ tx }: { tx: Transaction }) {
@@ -171,9 +202,17 @@ export function StatusControl({ tx }: { tx: Transaction }) {
           {busy && <Spinner />} Update status
         </Button>
       </div>
-      <Textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="Note for the customer (optional)" rows={2} aria-label="Note for the customer" />
+      <Textarea
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder="Note for the customer (optional)"
+        rows={2}
+        aria-label="Note for the customer"
+      />
       {needsBalance && <p className="text-sm text-danger">The customer still owes {formatPesoExact(bal)}. Record the payment settled in the store first.</p>}
-      {value === "ready_for_claiming" && <p className="text-xs text-muted-foreground">The customer will be told the item is ready and how much balance to bring.</p>}
+      {value === "ready_for_claiming" && (
+        <p className="text-xs text-muted-foreground">The customer will be told the item is ready and how much balance to bring.</p>
+      )}
     </div>
   );
 }
@@ -409,7 +448,11 @@ export function DropOffDialog({ tx }: { tx: Transaction }) {
           <Field label="Date received" error={errors.receivedOn?.message}>
             <Input type="date" max={todayISODate()} {...form.register("receivedOn")} />
           </Field>
-          <Field label="Down payment collected (₱)" error={errors.downPayment?.message} hint={tx.quotation ? `Quotation asked for ${formatPesoExact(tx.quotation.downPaymentRequired)}.` : undefined}>
+          <Field
+            label="Down payment collected (₱)"
+            error={errors.downPayment?.message}
+            hint={tx.quotation ? `Quotation asked for ${formatPesoExact(tx.quotation.downPaymentRequired)}.` : undefined}
+          >
             <Input type="number" min={0} {...form.register("downPayment", { valueAsNumber: true })} />
           </Field>
           <div className="space-y-1.5">

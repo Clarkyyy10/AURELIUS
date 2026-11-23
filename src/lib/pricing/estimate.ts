@@ -125,12 +125,17 @@ export function resolveSelection(config: DesignConfig, options: CustomizationOpt
   if (hasStone && (stoneQuantity < Math.max(1, rule.min) || stoneQuantity > rule.max)) {
     throw new EstimateError(
       rule.max === 0
-        ? style ? `The ${style.label} style has no stones.` : "Gemstones are not available for this piece."
-        : rule.min === rule.max ? `This style takes exactly ${rule.max} stones.` : `Choose between ${Math.max(1, rule.min)} and ${rule.max} stones.`,
+        ? style
+          ? `The ${style.label} style has no stones.`
+          : "Gemstones are not available for this piece."
+        : rule.min === rule.max
+          ? `This style takes exactly ${rule.max} stones.`
+          : `Choose between ${Math.max(1, rule.min)} and ${rule.max} stones.`,
     );
   }
   if (!hasStone && rule.min > 0) throw new EstimateError(`The ${style?.label ?? "chosen"} style needs a gemstone. Choose one to see an estimate.`);
-  if (style?.requiresSurface && gemstone.surface !== style.requiresSurface) throw new EstimateError(`The ${style.label} style needs pearls. Choose Pearl as the stone.`);
+  if (style?.requiresSurface && gemstone.surface !== style.requiresSurface)
+    throw new EstimateError(`The ${style.label} style needs pearls. Choose Pearl as the stone.`);
 
   // A setting only applies when there are stones to hold.
   const counted = picked.filter((o) => o.group !== "setting" || stoneQuantity > 0);
@@ -160,9 +165,7 @@ export function estimateFromSelection(sel: ResolvedSelection): Estimate {
   // Everything below is in micro-pesos (peso × 10^6) so we can sum exactly.
   const metalMicro = centigrams * toScaled(sel.material.ratePerGram, MONEY_SCALE) * 100; // cg × centavos/g × 100
   const stonesMicro =
-    sel.cut && sel.stoneQuantity > 0
-      ? toScaled(sel.gemstone.basePrice, MONEY_SCALE) * toScaled(sel.cut.multiplier, FACTOR_SCALE) * sel.stoneQuantity
-      : 0;
+    sel.cut && sel.stoneQuantity > 0 ? toScaled(sel.gemstone.basePrice, MONEY_SCALE) * toScaled(sel.cut.multiplier, FACTOR_SCALE) * sel.stoneQuantity : 0;
   const laborMicro = toScaled(sel.productType.laborFee, MONEY_SCALE) * FACTOR_SCALE;
   const finishMicro = toScaled(sel.finish.fee, MONEY_SCALE) * FACTOR_SCALE;
   const claspMicro = toScaled(sel.claspFee, MONEY_SCALE) * FACTOR_SCALE;

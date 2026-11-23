@@ -8,7 +8,14 @@ const options = seedOptions();
 describe("normalizeConfig", () => {
   it("fills a full default design for a piece type", () => {
     const { config, notices } = normalizeConfig({ productType: "ring" }, options);
-    expect(config).toMatchObject({ materialId: "mat-18k", finishId: "fin-yellow", gemstoneId: "gem-none", cutId: null, stoneQuantity: 0, sizeId: "size-ring-us7" });
+    expect(config).toMatchObject({
+      materialId: "mat-18k",
+      finishId: "fin-yellow",
+      gemstoneId: "gem-none",
+      cutId: null,
+      stoneQuantity: 0,
+      sizeId: "size-ring-us7",
+    });
     expect(notices).toEqual([]);
     expect(() => estimate(config, options)).not.toThrow();
   });
@@ -20,7 +27,10 @@ describe("normalizeConfig", () => {
   });
 
   it("removes stones from styles that can't hold them (D-25)", () => {
-    const { config, notices } = normalizeConfig({ productType: "necklace", gemstoneId: "gem-ruby", cutId: "cut-round", stoneQuantity: 1, choices: { style: "style-necklace-chain" } }, options);
+    const { config, notices } = normalizeConfig(
+      { productType: "necklace", gemstoneId: "gem-ruby", cutId: "cut-round", stoneQuantity: 1, choices: { style: "style-necklace-chain" } },
+      options,
+    );
     expect(config.gemstoneId).toBe("gem-none");
     expect(config.stoneQuantity).toBe(0);
     expect(notices[0]).toMatch(/The Chain style has no stones/);
@@ -78,5 +88,18 @@ describe("productDesign (3D models in the shop)", () => {
 });
 
 function seedProductsStub() {
-  return { id: "x", slug: "x", name: "X", description: "", category: "ring" as const, material: "", price: 1, photos: [], availability: "available" as const, hidden: false, createdAt: "", updatedAt: "" };
+  return {
+    id: "x",
+    slug: "x",
+    name: "X",
+    description: "",
+    category: "ring" as const,
+    material: "",
+    price: 1,
+    photos: [],
+    availability: "available" as const,
+    hidden: false,
+    createdAt: "",
+    updatedAt: "",
+  };
 }

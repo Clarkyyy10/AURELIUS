@@ -11,7 +11,15 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/shared/States";
 import { repos } from "@/lib/data";
 import { errorMessage, newRequestId, useCurrentUser, useQuery } from "@/lib/data/hooks";
-import { checkCustomDraft, checkServiceDraft, editCustomDraft, summarizeCustomDraft, summarizeServiceDraft, type CustomDraft, type ServiceDraft } from "@/lib/chatbot/drafts";
+import {
+  checkCustomDraft,
+  checkServiceDraft,
+  editCustomDraft,
+  summarizeCustomDraft,
+  summarizeServiceDraft,
+  type CustomDraft,
+  type ServiceDraft,
+} from "@/lib/chatbot/drafts";
 import type { ChatDraft } from "@/lib/chatbot/types";
 import { ZODIAC_SIGNS } from "@/lib/data/seed/designs";
 import { optionsFor, stoneRule, styleOf, usesChain } from "@/lib/pricing/design";
@@ -26,7 +34,19 @@ export interface SentInfo {
 
 const fieldClass = "h-9 w-full rounded-md border border-line bg-paper px-2 text-sm focus-visible:outline-2 focus-visible:outline-gold";
 
-function Sel({ id, label, value, items, onChange }: { id: string; label: string; value: string; items: { id: string; label: string }[]; onChange: (v: string) => void }) {
+function Sel({
+  id,
+  label,
+  value,
+  items,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  items: { id: string; label: string }[];
+  onChange: (v: string) => void;
+}) {
   return (
     <div className="space-y-1">
       <label htmlFor={id} className="text-xs font-medium">
@@ -43,7 +63,21 @@ function Sel({ id, label, value, items, onChange }: { id: string; label: string;
   );
 }
 
-function Txt({ id, label, value, onChange, max, area }: { id: string; label: string; value: string; onChange: (v: string) => void; max: number; area?: boolean }) {
+function Txt({
+  id,
+  label,
+  value,
+  onChange,
+  max,
+  area,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  max: number;
+  area?: boolean;
+}) {
   return (
     <div className="space-y-1">
       <label htmlFor={id} className="text-xs font-medium">
@@ -58,7 +92,17 @@ function Txt({ id, label, value, onChange, max, area }: { id: string; label: str
   );
 }
 
-function CustomEditor({ draft, options, uid, onChange }: { draft: CustomDraft; options: CustomizationOptions; uid: string; onChange: (patch: Partial<DesignConfig>) => void }) {
+function CustomEditor({
+  draft,
+  options,
+  uid,
+  onChange,
+}: {
+  draft: CustomDraft;
+  options: CustomizationOptions;
+  uid: string;
+  onChange: (patch: Partial<DesignConfig>) => void;
+}) {
   const c = checkCustomDraft(draft, options).config;
   const style = styleOf(c, options);
   const rule = stoneRule(c, options);
@@ -70,7 +114,9 @@ function CustomEditor({ draft, options, uid, onChange }: { draft: CustomDraft; o
   const id = (k: string) => `${uid}-${k}`;
   return (
     <div className="mt-3 grid gap-2">
-      {styles.length > 0 && <Sel id={id("style")} label="Style" value={c.choices?.style ?? ""} items={styles} onChange={(v) => onChange({ choices: { ...c.choices, style: v } })} />}
+      {styles.length > 0 && (
+        <Sel id={id("style")} label="Style" value={c.choices?.style ?? ""} items={styles} onChange={(v) => onChange({ choices: { ...c.choices, style: v } })} />
+      )}
       {c.productType === "name_pendant" && (
         <>
           <Txt id={id("name")} label="Name" value={c.nameText ?? ""} max={10} onChange={(v) => onChange({ nameText: v })} />
@@ -79,16 +125,40 @@ function CustomEditor({ draft, options, uid, onChange }: { draft: CustomDraft; o
       )}
       {style?.textMax ? (
         style.key === "zodiac" ? (
-          <Sel id={id("text")} label="Zodiac sign" value={c.styleText ?? ""} items={ZODIAC_SIGNS.map((z) => ({ id: z, label: z }))} onChange={(v) => onChange({ styleText: v })} />
+          <Sel
+            id={id("text")}
+            label="Zodiac sign"
+            value={c.styleText ?? ""}
+            items={ZODIAC_SIGNS.map((z) => ({ id: z, label: z }))}
+            onChange={(v) => onChange({ styleText: v })}
+          />
         ) : (
-          <Txt id={id("text")} label={`Letters or text (up to ${style.textMax})`} value={c.styleText ?? ""} max={style.textMax} onChange={(v) => onChange({ styleText: v })} />
+          <Txt
+            id={id("text")}
+            label={`Letters or text (up to ${style.textMax})`}
+            value={c.styleText ?? ""}
+            max={style.textMax}
+            onChange={(v) => onChange({ styleText: v })}
+          />
         )
       ) : null}
       <Sel id={id("material")} label="Material" value={c.materialId} items={options.materials} onChange={(v) => onChange({ materialId: v })} />
-      <Sel id={id("finish")} label="Color / finish" value={c.finishId} items={options.finishes.filter((f) => material?.finishIds.includes(f.id))} onChange={(v) => onChange({ finishId: v })} />
+      <Sel
+        id={id("finish")}
+        label="Color / finish"
+        value={c.finishId}
+        items={options.finishes.filter((f) => material?.finishIds.includes(f.id))}
+        onChange={(v) => onChange({ finishId: v })}
+      />
       {usesChain(c, options) && (
         <>
-          <Sel id={id("chain")} label="Chain style" value={c.chainStyleId ?? ""} items={options.chainStyles ?? []} onChange={(v) => onChange({ chainStyleId: v })} />
+          <Sel
+            id={id("chain")}
+            label="Chain style"
+            value={c.chainStyleId ?? ""}
+            items={options.chainStyles ?? []}
+            onChange={(v) => onChange({ chainStyleId: v })}
+          />
           <Sel id={id("clasp")} label="Clasp" value={c.claspId ?? ""} items={options.clasps ?? []} onChange={(v) => onChange({ claspId: v })} />
         </>
       )}
@@ -107,7 +177,15 @@ function CustomEditor({ draft, options, uid, onChange }: { draft: CustomDraft; o
           <label htmlFor={id("qty")} className="text-xs font-medium">
             Number of stones ({Math.max(1, rule.min)} to {rule.max})
           </label>
-          <input id={id("qty")} type="number" className={fieldClass} min={Math.max(1, rule.min)} max={rule.max} value={c.stoneQuantity} onChange={(e) => onChange({ stoneQuantity: Number(e.target.value) || 1 })} />
+          <input
+            id={id("qty")}
+            type="number"
+            className={fieldClass}
+            min={Math.max(1, rule.min)}
+            max={rule.max}
+            value={c.stoneQuantity}
+            onChange={(e) => onChange({ stoneQuantity: Number(e.target.value) || 1 })}
+          />
         </div>
       )}
       <Sel
@@ -122,14 +200,38 @@ function CustomEditor({ draft, options, uid, onChange }: { draft: CustomDraft; o
   );
 }
 
-function ServiceEditor({ draft, services, uid, onChange }: { draft: ServiceDraft; services: ServiceCatalogItem[]; uid: string; onChange: (d: ServiceDraft) => void }) {
+function ServiceEditor({
+  draft,
+  services,
+  uid,
+  onChange,
+}: {
+  draft: ServiceDraft;
+  services: ServiceCatalogItem[];
+  uid: string;
+  onChange: (d: ServiceDraft) => void;
+}) {
   const f = draft.fields;
   const set = (patch: Partial<ServiceDraft["fields"]>) => onChange({ ...draft, fields: { ...f, ...patch } });
   const id = (k: string) => `${uid}-${k}`;
   const list = services.filter((s) => !f.itemType || s.appliesTo.includes(f.itemType));
   return (
     <div className="mt-3 grid gap-2">
-      <Sel id={id("type")} label="Item type" value={f.itemType ?? "jewelry"} items={[{ id: "jewelry", label: "Jewelry" }, { id: "watch", label: "Watch" }]} onChange={(v) => set({ itemType: v as "jewelry" | "watch", serviceIds: (f.serviceIds ?? []).filter((s) => services.find((x) => x.id === s)?.appliesTo.includes(v as "jewelry" | "watch")) })} />
+      <Sel
+        id={id("type")}
+        label="Item type"
+        value={f.itemType ?? "jewelry"}
+        items={[
+          { id: "jewelry", label: "Jewelry" },
+          { id: "watch", label: "Watch" },
+        ]}
+        onChange={(v) =>
+          set({
+            itemType: v as "jewelry" | "watch",
+            serviceIds: (f.serviceIds ?? []).filter((s) => services.find((x) => x.id === s)?.appliesTo.includes(v as "jewelry" | "watch")),
+          })
+        }
+      />
       <Txt id={id("item")} label="Item" value={f.itemDescription ?? ""} max={300} onChange={(v) => set({ itemDescription: v })} />
       <Txt id={id("brand")} label="Brand / model (optional)" value={f.brandModel ?? ""} max={80} onChange={(v) => set({ brandModel: v })} />
       <Txt id={id("material")} label="Material (optional)" value={f.material ?? ""} max={80} onChange={(v) => set({ material: v })} />
@@ -154,7 +256,23 @@ function ServiceEditor({ draft, services, uid, onChange }: { draft: ServiceDraft
   );
 }
 
-export function DraftCard({ draft, sent, uid, onDraftChange, onSent, onStartOver, onNavigate }: { draft: ChatDraft; sent?: SentInfo; uid: string; onDraftChange: (d: ChatDraft) => void; onSent: (info: SentInfo) => void; onStartOver: () => void; onNavigate: () => void }) {
+export function DraftCard({
+  draft,
+  sent,
+  uid,
+  onDraftChange,
+  onSent,
+  onStartOver,
+  onNavigate,
+}: {
+  draft: ChatDraft;
+  sent?: SentInfo;
+  uid: string;
+  onDraftChange: (d: ChatDraft) => void;
+  onSent: (info: SentInfo) => void;
+  onStartOver: () => void;
+  onNavigate: () => void;
+}) {
   const { user } = useCurrentUser();
   const optionsQ = useQuery("options:active", () => repos.customization.getOptions());
   const servicesQ = useQuery("services:visible", () => repos.catalog.listServices());
@@ -221,7 +339,11 @@ export function DraftCard({ draft, sent, uid, onDraftChange, onSent, onStartOver
         {custom ? "Custom order draft" : "Service request draft"}
       </p>
       <p className="mt-0.5 text-xs text-muted-foreground">
-        {sent ? `Sent to the owner as ${sent.code}.` : editing ? "Editing — your changes are not saved until you press Done." : "Not sent yet. Check it, edit anything, then confirm."}
+        {sent
+          ? `Sent to the owner as ${sent.code}.`
+          : editing
+            ? "Editing — your changes are not saved until you press Done."
+            : "Not sent yet. Check it, edit anything, then confirm."}
       </p>
 
       {editing ? (
@@ -271,7 +393,9 @@ export function DraftCard({ draft, sent, uid, onDraftChange, onSent, onStartOver
 
       {sent ? (
         <div className="mt-3 space-y-2">
-          <p className="text-xs text-muted-foreground">The owner will review it and confirm the final price. You&apos;ll get a notification when there&apos;s an update.</p>
+          <p className="text-xs text-muted-foreground">
+            The owner will review it and confirm the final price. You&apos;ll get a notification when there&apos;s an update.
+          </p>
           <Button size="sm" variant="outline" asChild>
             <Link href={sent.href} onClick={onNavigate}>
               View {sent.code}

@@ -54,9 +54,27 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-4" aria-label="What you can do">
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            { icon: Sparkles, title: "Design in 3D", text: "Pick the metal, color, stone, and size. Watch your piece change as you go.", href: "/customize", cta: "Start designing" },
-            { icon: ShoppingBag, title: "Shop ready-made", text: "Rings, pendants, necklaces, bracelets, and earrings — ready to order or made to order.", href: "/shop", cta: "Browse the shop" },
-            { icon: Wrench, title: "Repairs and services", text: "Cleaning, resizing, stone setting, watch batteries, and more.", href: "/services", cta: "See services" },
+            {
+              icon: Sparkles,
+              title: "Design in 3D",
+              text: "Pick the metal, color, stone, and size. Watch your piece change as you go.",
+              href: "/customize",
+              cta: "Start designing",
+            },
+            {
+              icon: ShoppingBag,
+              title: "Shop ready-made",
+              text: "Rings, pendants, necklaces, bracelets, and earrings — ready to order or made to order.",
+              href: "/shop",
+              cta: "Browse the shop",
+            },
+            {
+              icon: Wrench,
+              title: "Repairs and services",
+              text: "Cleaning, resizing, stone setting, watch batteries, and more.",
+              href: "/services",
+              cta: "See services",
+            },
           ].map(({ icon: Icon, title, text, href, cta }) => (
             <Link key={title} href={href} className="group rounded-2xl border border-line bg-paper p-6 transition-shadow hover:shadow-md">
               <Icon className="size-7 text-gold" aria-hidden />

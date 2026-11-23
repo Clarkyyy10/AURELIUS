@@ -25,7 +25,10 @@ const V = (x: number, y: number, z = 0) => new THREE.Vector3(x, y, z);
 const facing = V(0, 0, 1);
 
 function Tube({ points, radius, finish, closed = false }: { points: THREE.Vector3[]; radius: number; finish: FinishOption; closed?: boolean }) {
-  const g = useMemo(() => new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points, closed), Math.max(24, points.length * 12), radius, 8, closed), [points, radius, closed]);
+  const g = useMemo(
+    () => new THREE.TubeGeometry(new THREE.CatmullRomCurve3(points, closed), Math.max(24, points.length * 12), radius, 8, closed),
+    [points, radius, closed],
+  );
   useEffect(() => () => g.dispose(), [g]);
   return (
     <mesh geometry={g} name="metal">
@@ -54,7 +57,21 @@ function Ball({ r, finish, position }: { r: number; finish: FinishOption; positi
 }
 
 /** A stone set facing the viewer (table toward +Z). */
-function FrontStone({ gem, cut, r, setting, finish, position }: { gem: GemstoneOption; cut: CutOption | null; r: number; setting?: string; finish: FinishOption; position?: [number, number, number] }) {
+function FrontStone({
+  gem,
+  cut,
+  r,
+  setting,
+  finish,
+  position,
+}: {
+  gem: GemstoneOption;
+  cut: CutOption | null;
+  r: number;
+  setting?: string;
+  finish: FinishOption;
+  position?: [number, number, number];
+}) {
   return (
     <group position={position} rotation={[Math.PI / 2, 0, 0]}>
       <Head setting={setting === "bezel" ? "bezel" : "prong"} r={r} gem={gem} cut={cut} finish={finish} />
@@ -73,8 +90,26 @@ function Post({ finish, z = -0.05 }: { finish: FinishOption; z?: number }) {
 }
 
 /** Small round drop at the end of a chain: the stone, or a polished metal bead. */
-function DropEnd({ gem, cut, r, setting, finish, position }: { gem: GemstoneOption | null; cut: CutOption | null; r: number; setting?: string; finish: FinishOption; position: [number, number, number] }) {
-  return gem ? <FrontStone gem={gem} cut={cut} r={r} setting={setting} finish={finish} position={position} /> : <Ball r={r * 0.7} finish={finish} position={position} />;
+function DropEnd({
+  gem,
+  cut,
+  r,
+  setting,
+  finish,
+  position,
+}: {
+  gem: GemstoneOption | null;
+  cut: CutOption | null;
+  r: number;
+  setting?: string;
+  finish: FinishOption;
+  position: [number, number, number];
+}) {
+  return gem ? (
+    <FrontStone gem={gem} cut={cut} r={r} setting={setting} finish={finish} position={position} />
+  ) : (
+    <Ball r={r * 0.7} finish={finish} position={position} />
+  );
 }
 
 function Earring({ style, setting, finish, gem, cut, stones, s }: One) {
@@ -147,7 +182,11 @@ function Earring({ style, setting, finish, gem, cut, stones, s }: One) {
           {stone ? <FrontStone gem={stone} cut={cut} r={0.08 * s} setting={setting} finish={finish} /> : <Ball r={0.07 * s} finish={finish} />}
           <Post finish={finish} />
           <Tube points={[V(0, -0.06 * s), V(0, top)]} radius={0.014 * s} finish={finish} />
-          <Tube points={[V(-w, top - 0.12 * s), V(-w * 0.5, top - 0.02 * s), V(0, top), V(w * 0.5, top - 0.02 * s), V(w, top - 0.12 * s)]} radius={0.02 * s} finish={finish} />
+          <Tube
+            points={[V(-w, top - 0.12 * s), V(-w * 0.5, top - 0.02 * s), V(0, top), V(w * 0.5, top - 0.02 * s), V(w, top - 0.12 * s)]}
+            radius={0.02 * s}
+            finish={finish}
+          />
           <Tube points={[V(-w * 0.7, top - 0.3 * s), V(0, top - 0.42 * s), V(w * 0.7, top - 0.3 * s)]} radius={0.015 * s} finish={finish} />
           {strands.map((t) => {
             const x = t * w;
@@ -172,7 +211,11 @@ function Earring({ style, setting, finish, gem, cut, stones, s }: One) {
       return (
         <group rotation={[0, 0.7, 0]}>
           {/* the chain goes through the piercing: a short front strand and a longer back strand */}
-          <Tube points={[V(0, -0.3 * s, 0.03), V(0, -0.08 * s, 0.05), V(0, 0, 0), V(0, -0.05 * s, -0.12), V(0.02, -0.8 * s, -0.16)]} radius={0.01 * s} finish={finish} />
+          <Tube
+            points={[V(0, -0.3 * s, 0.03), V(0, -0.08 * s, 0.05), V(0, 0, 0), V(0, -0.05 * s, -0.12), V(0.02, -0.8 * s, -0.16)]}
+            radius={0.01 * s}
+            finish={finish}
+          />
           <DropEnd gem={stone} cut={cut} r={0.1 * s} setting={setting} finish={finish} position={[0, -0.38 * s, 0.03]} />
           <mesh position={[0.02, -0.86 * s, -0.16]} name="metal">
             <cylinderGeometry args={[0.018 * s, 0.018 * s, 0.14 * s, 8]} />

@@ -17,7 +17,14 @@ import { useQuery } from "@/lib/data/hooks";
 import type { ProductFilter } from "@/lib/data/repositories";
 import { PRODUCT_TYPES } from "@/types";
 
-const CATEGORY_LABEL: Record<string, string> = { ring: "Rings", pendant: "Pendants", name_pendant: "Name pendants", necklace: "Necklaces", bracelet: "Bracelets", earrings: "Earrings" };
+const CATEGORY_LABEL: Record<string, string> = {
+  ring: "Rings",
+  pendant: "Pendants",
+  name_pendant: "Name pendants",
+  necklace: "Necklaces",
+  bracelet: "Bracelets",
+  earrings: "Earrings",
+};
 const ALL = "all";
 
 /** FR-12 / FR-13 — catalog with filters synced to the URL. */
@@ -59,10 +66,21 @@ function Shop() {
           <Label htmlFor="shop-search">Search</Label>
           <div className="relative">
             <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-            <Input id="shop-search" defaultValue={filter.search} placeholder="Search by name" className="pl-9" onChange={(e) => set("q", e.target.value || null)} />
+            <Input
+              id="shop-search"
+              defaultValue={filter.search}
+              placeholder="Search by name"
+              className="pl-9"
+              onChange={(e) => set("q", e.target.value || null)}
+            />
           </div>
         </div>
-        <FilterSelect label="Category" value={filter.category} onChange={(v) => set("category", v)} options={PRODUCT_TYPES.map((t) => [t, CATEGORY_LABEL[t]])} />
+        <FilterSelect
+          label="Category"
+          value={filter.category}
+          onChange={(v) => set("category", v)}
+          options={PRODUCT_TYPES.map((t) => [t, CATEGORY_LABEL[t]])}
+        />
         <FilterSelect label="Material" value={filter.material} onChange={(v) => set("material", v)} options={materials.map((m) => [m, m])} />
         <FilterSelect
           label="Availability"
@@ -76,11 +94,25 @@ function Shop() {
         />
         <div className="space-y-1.5">
           <Label htmlFor="min-price">Min ₱</Label>
-          <Input id="min-price" type="number" min={0} inputMode="numeric" defaultValue={params.get("min") ?? ""} onChange={(e) => set("min", e.target.value || null)} />
+          <Input
+            id="min-price"
+            type="number"
+            min={0}
+            inputMode="numeric"
+            defaultValue={params.get("min") ?? ""}
+            onChange={(e) => set("min", e.target.value || null)}
+          />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="max-price">Max ₱</Label>
-          <Input id="max-price" type="number" min={0} inputMode="numeric" defaultValue={params.get("max") ?? ""} onChange={(e) => set("max", e.target.value || null)} />
+          <Input
+            id="max-price"
+            type="number"
+            min={0}
+            inputMode="numeric"
+            defaultValue={params.get("max") ?? ""}
+            onChange={(e) => set("max", e.target.value || null)}
+          />
         </div>
         <div className="space-y-1.5">
           <Label htmlFor="sort">Sort by</Label>
@@ -109,7 +141,11 @@ function Shop() {
         loadingRows={4}
         empty={(list) =>
           list.length === 0 ? (
-            <EmptyState title="No products match your filters" description="Try removing a filter, or design your own piece." action={{ label: "Design your own", href: "/customize" }} />
+            <EmptyState
+              title="No products match your filters"
+              description="Try removing a filter, or design your own piece."
+              action={{ label: "Design your own", href: "/customize" }}
+            />
           ) : null
         }
       >

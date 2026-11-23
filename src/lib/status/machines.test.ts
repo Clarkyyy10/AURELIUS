@@ -157,9 +157,7 @@ describe("helpers", () => {
     try {
       assertTransition("order", "completed", "pending", "customer");
     } catch (e) {
-      expect((e as Error).message).toBe(
-        'This request can\'t move from "Completed" to "Submitted". Please contact the store if you need help.',
-      );
+      expect((e as Error).message).toBe('This request can\'t move from "Completed" to "Submitted". Please contact the store if you need help.');
     }
     expect(statusLabel("awaiting_drop_off")).toBe("Waiting for drop-off");
   });

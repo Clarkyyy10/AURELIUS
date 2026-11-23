@@ -38,7 +38,14 @@ export default function CustomerDetailPage() {
     const list: Event[] = [];
     for (const t of tq.data ?? []) {
       const href = detailHref(t.kind, t.id, "owner");
-      list.push({ at: t.createdAt, type: t.kind, title: `${KIND_LABEL[t.kind]} ${t.code}`, detail: txTitle(t, serviceNames), href, badge: <StatusBadge status={t.status} /> });
+      list.push({
+        at: t.createdAt,
+        type: t.kind,
+        title: `${KIND_LABEL[t.kind]} ${t.code}`,
+        detail: txTitle(t, serviceNames),
+        href,
+        badge: <StatusBadge status={t.status} />,
+      });
       if (t.quotation)
         list.push({
           at: t.quotation.issuedAt,
@@ -74,12 +81,18 @@ export default function CustomerDetailPage() {
   const c = cq.data;
   if (!c) return <ErrorState message="We couldn't find that customer." />;
   const txs = tq.data ?? [];
-  const open = txs.filter((t) => t.quotation?.response?.decision === "accepted" && !["cancelled", "completed", "claimed"].includes(t.status)).reduce((s, t) => s + balance(t), 0);
+  const open = txs
+    .filter((t) => t.quotation?.response?.decision === "accepted" && !["cancelled", "completed", "claimed"].includes(t.status))
+    .reduce((s, t) => s + balance(t), 0);
   const shown = filter === "all" ? events : events.filter((e) => e.type === filter);
 
   return (
     <div className="space-y-6">
-      <PageHeader title={c.fullName} back={{ href: "/admin/customers", label: "Back to customers" }} description={`Customer since ${new Date(c.createdAt).toLocaleDateString("en-PH", { month: "long", year: "numeric" })}`} />
+      <PageHeader
+        title={c.fullName}
+        back={{ href: "/admin/customers", label: "Back to customers" }}
+        description={`Customer since ${new Date(c.createdAt).toLocaleDateString("en-PH", { month: "long", year: "numeric" })}`}
+      />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {[
           ["Email", c.email],

@@ -59,7 +59,9 @@ export function SubmitDesignDialog({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={snapshot} alt="Snapshot of your design" className="aspect-square w-full rounded-xl border border-line object-cover" />
           ) : (
-            <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-line bg-muted p-4 text-center text-xs text-muted-foreground">No 3D snapshot on this device</div>
+            <div className="flex aspect-square w-full items-center justify-center rounded-xl border border-line bg-muted p-4 text-center text-xs text-muted-foreground">
+              No 3D snapshot on this device
+            </div>
           )}
           <div className="space-y-4">
             <DesignSpecList labels={labels} config={config} />
@@ -73,8 +75,8 @@ export function SubmitDesignDialog({
           </div>
         </div>
         <label className="flex items-start gap-3 rounded-lg border border-line p-3 text-sm">
-          <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5 size-5" />
-          I understand the final price and completion date will be confirmed by the owner.
+          <Checkbox checked={agree} onCheckedChange={(v) => setAgree(v === true)} className="mt-0.5 size-5" />I understand the final price and completion date
+          will be confirmed by the owner.
         </label>
         <FormError message={error} />
         <DialogFooter>

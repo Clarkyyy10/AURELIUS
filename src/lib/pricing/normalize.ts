@@ -61,7 +61,11 @@ export function normalizeConfig(input: Partial<DesignConfig> & { productType?: P
   if (!options.gemstones.some((g) => g.id === c.gemstoneId)) c.gemstoneId = none?.id ?? options.gemstones[0]?.id ?? "";
   let gem = options.gemstones.find((g) => g.id === c.gemstoneId);
   if (gem && !gem.isNone && rule.max === 0) {
-    notices.push(style ? `The ${style.label} style has no stones, so we removed the stone.` : `Gemstones are not available for a ${type.label.toLowerCase()}, so we removed the stone.`);
+    notices.push(
+      style
+        ? `The ${style.label} style has no stones, so we removed the stone.`
+        : `Gemstones are not available for a ${type.label.toLowerCase()}, so we removed the stone.`,
+    );
     c.gemstoneId = none?.id ?? c.gemstoneId;
   }
   gem = options.gemstones.find((g) => g.id === c.gemstoneId);
@@ -84,7 +88,10 @@ export function normalizeConfig(input: Partial<DesignConfig> & { productType?: P
     if (!c.cutId || !options.cuts.some((x) => x.id === c.cutId)) c.cutId = options.cuts[0]?.id ?? null;
     const lo = Math.max(1, rule.min);
     const wanted = Math.round(c.stoneQuantity || rule.default || 1);
-    if (wanted > rule.max && rule.min !== rule.max) notices.push(`${style ? `The ${style.label} style` : `A ${type.label.toLowerCase()}`} can hold up to ${rule.max} stones, so we changed the quantity to ${rule.max}.`);
+    if (wanted > rule.max && rule.min !== rule.max)
+      notices.push(
+        `${style ? `The ${style.label} style` : `A ${type.label.toLowerCase()}`} can hold up to ${rule.max} stones, so we changed the quantity to ${rule.max}.`,
+      );
     c.stoneQuantity = Math.min(Math.max(wanted, lo), rule.max);
   } else {
     c.cutId = null;

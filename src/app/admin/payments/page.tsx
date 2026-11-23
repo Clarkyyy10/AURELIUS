@@ -25,7 +25,10 @@ export default function PaymentsPage() {
   const { map: customers } = useCustomerMap();
   const [status, setStatus] = useState("all");
 
-  const rows = useMemo<Row[]>(() => (q.data ?? []).flatMap((tx) => tx.payments.map((p) => ({ ...p, tx }))).sort((a, b) => b.createdAt.localeCompare(a.createdAt)), [q.data]);
+  const rows = useMemo<Row[]>(
+    () => (q.data ?? []).flatMap((tx) => tx.payments.map((p) => ({ ...p, tx }))).sort((a, b) => b.createdAt.localeCompare(a.createdAt)),
+    [q.data],
+  );
   const pending = rows.filter((r) => r.status === "pending_verification");
   const filtered = status === "all" ? rows : rows.filter((r) => r.status === status);
   const totals = {
@@ -45,12 +48,21 @@ export default function PaymentsPage() {
       ),
       sortValue: (r) => r.tx.code,
     },
-    { key: "customer", header: "Customer", cell: (r) => customers[r.tx.customerId]?.fullName ?? "—", sortValue: (r) => customers[r.tx.customerId]?.fullName ?? "" },
+    {
+      key: "customer",
+      header: "Customer",
+      cell: (r) => customers[r.tx.customerId]?.fullName ?? "—",
+      sortValue: (r) => customers[r.tx.customerId]?.fullName ?? "",
+    },
     { key: "kind", header: "For", cell: (r) => PAYMENT_KIND_LABEL[r.kind] },
     { key: "amount", header: "Amount", cell: (r) => <MoneyText value={r.amount} exact />, sortValue: (r) => r.amount },
     { key: "ref", header: "Reference", cell: (r) => `${PAYMENT_METHOD_LABEL[r.method]} · ${r.referenceNumber}` },
     { key: "date", header: "Paid on", cell: (r) => <DateText value={r.paidOn} />, sortValue: (r) => r.paidOn },
-    { key: "proof", header: "Proof", cell: (r) => (r.proofFile?.dataUrl ? <ProofThumb src={r.proofFile.dataUrl} name={r.proofFile.name} /> : <span className="text-muted-foreground">—</span>) },
+    {
+      key: "proof",
+      header: "Proof",
+      cell: (r) => (r.proofFile?.dataUrl ? <ProofThumb src={r.proofFile.dataUrl} name={r.proofFile.name} /> : <span className="text-muted-foreground">—</span>),
+    },
     { key: "status", header: "Status", primary: true, cell: (r) => <PaymentStatusBadge status={r.status} /> },
   ];
 
@@ -72,7 +84,14 @@ export default function PaymentsPage() {
               {pending.length === 0 ? (
                 <EmptyState title="No payments to verify" description="New payment submissions will appear here." />
               ) : (
-                <DataTable rows={pending} rowKey={(r) => r.id} columns={[...columns.filter((c) => c.key !== "status"), { key: "actions", header: "Action", cell: (r) => <VerifyButtons tx={r.tx} payment={r} /> }]} />
+                <DataTable
+                  rows={pending}
+                  rowKey={(r) => r.id}
+                  columns={[
+                    ...columns.filter((c) => c.key !== "status"),
+                    { key: "actions", header: "Action", cell: (r) => <VerifyButtons tx={r.tx} payment={r} /> },
+                  ]}
+                />
               )}
             </TabsContent>
             <TabsContent value="all" className="mt-4 space-y-4">

@@ -186,7 +186,19 @@ function Piece({ style, finish, gem, cut, stones, R, pattern, clasp, setting, te
 export function BraceletModel({ finish, gem, cut, stones, sizeFactor, design, chainPattern, claspKind, textFontFile }: ModelProps) {
   return (
     <group name="bracelet" rotation={[-0.85, 0, Math.PI + 0.1]}>
-      <Piece style={design?.style} finish={finish} gem={gem} cut={cut} stones={stones} R={1.0 * sizeFactor} pattern={chainPattern ?? "cable"} clasp={claspKind ?? "lobster"} setting={design?.setting} text={design?.text} fontFile={textFontFile} />
+      <Piece
+        style={design?.style}
+        finish={finish}
+        gem={gem}
+        cut={cut}
+        stones={stones}
+        R={1.0 * sizeFactor}
+        pattern={chainPattern ?? "cable"}
+        clasp={claspKind ?? "lobster"}
+        setting={design?.setting}
+        text={design?.text}
+        fontFile={textFontFile}
+      />
     </group>
   );
 }
@@ -194,7 +206,17 @@ export function BraceletModel({ finish, gem, cut, stones, sizeFactor, design, ch
 export function AnkletModel({ finish, gem, cut, stones, sizeFactor, design, chainPattern, claspKind }: ModelProps) {
   return (
     <group name="anklet" rotation={[-0.85, 0, Math.PI + 0.1]}>
-      <Piece style={design?.style ?? "chain"} finish={finish} gem={gem} cut={cut} stones={stones} R={1.3 * sizeFactor} pattern={chainPattern ?? "cable"} clasp={claspKind ?? "lobster"} setting={design?.setting} />
+      <Piece
+        style={design?.style ?? "chain"}
+        finish={finish}
+        gem={gem}
+        cut={cut}
+        stones={stones}
+        R={1.3 * sizeFactor}
+        pattern={chainPattern ?? "cable"}
+        clasp={claspKind ?? "lobster"}
+        setting={design?.setting}
+      />
     </group>
   );
 }

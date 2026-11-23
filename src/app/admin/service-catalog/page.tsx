@@ -41,16 +41,31 @@ export default function ServiceCatalogPage() {
           </Button>
         }
       />
-      <QueryView query={q} empty={(l) => (l.length === 0 ? <EmptyState title="No services yet" action={{ label: "Add a service", onClick: () => setEditing("new") }} /> : null)}>
+      <QueryView
+        query={q}
+        empty={(l) => (l.length === 0 ? <EmptyState title="No services yet" action={{ label: "Add a service", onClick: () => setEditing("new") }} /> : null)}
+      >
         {(list) => (
           <ol className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-paper">
             {list.map((s, i) => (
               <li key={s.id} className={`flex flex-wrap items-center gap-3 p-4 ${s.hidden ? "bg-muted/50" : ""}`}>
                 <div className="flex flex-col">
-                  <Button variant="ghost" size="icon-xs" disabled={i === 0} onClick={() => void repos.catalog.moveService(s.id, "up")} aria-label={`Move ${s.name} up`}>
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    disabled={i === 0}
+                    onClick={() => void repos.catalog.moveService(s.id, "up")}
+                    aria-label={`Move ${s.name} up`}
+                  >
                     <ArrowUp />
                   </Button>
-                  <Button variant="ghost" size="icon-xs" disabled={i === list.length - 1} onClick={() => void repos.catalog.moveService(s.id, "down")} aria-label={`Move ${s.name} down`}>
+                  <Button
+                    variant="ghost"
+                    size="icon-xs"
+                    disabled={i === list.length - 1}
+                    onClick={() => void repos.catalog.moveService(s.id, "down")}
+                    aria-label={`Move ${s.name} down`}
+                  >
                     <ArrowDown />
                   </Button>
                 </div>

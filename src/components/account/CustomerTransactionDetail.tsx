@@ -31,10 +31,7 @@ export function CustomerTransactionDetail({ kind, id }: { kind: TransactionKind;
   const serviceNames = useServiceNames();
   if (q.error) return <ErrorState message={q.error} onRetry={q.reload} />;
   if (q.loading) return <LoadingState rows={4} />;
-  if (!q.data)
-    return (
-      <ErrorState message="We couldn't find this record. It may belong to another account, or the link may be wrong." />
-    );
+  if (!q.data) return <ErrorState message="We couldn't find this record. It may belong to another account, or the link may be wrong." />;
   return <Detail tx={q.data} serviceNames={serviceNames} />;
 }
 
@@ -87,7 +84,15 @@ function Detail({ tx, serviceNames }: { tx: Transaction; serviceNames: Record<st
           <div>
             <p className="text-lg font-semibold">Your item is ready.</p>
             <p>
-              Visit the store to claim it{bal > 0 ? <> and settle any balance of <MoneyText value={bal} exact />.</> : "."}
+              Visit the store to claim it
+              {bal > 0 ? (
+                <>
+                  {" "}
+                  and settle any balance of <MoneyText value={bal} exact />.
+                </>
+              ) : (
+                "."
+              )}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
               {settings.address} · {settings.openingHours}
@@ -157,7 +162,11 @@ function Detail({ tx, serviceNames }: { tx: Transaction; serviceNames: Record<st
           <div className="rounded-2xl border border-line bg-paper p-5 text-sm">
             {cancellable ? (
               <ConfirmDialog
-                trigger={<Button variant="outline" className="border-danger/40 text-danger hover:bg-danger/5">Cancel this {KIND_LABEL[tx.kind].toLowerCase()}</Button>}
+                trigger={
+                  <Button variant="outline" className="border-danger/40 text-danger hover:bg-danger/5">
+                    Cancel this {KIND_LABEL[tx.kind].toLowerCase()}
+                  </Button>
+                }
                 title={`Cancel ${tx.code}?`}
                 description="The owner will be notified. This can't be undone — you would need to submit a new request."
                 confirmLabel="Yes, cancel it"
@@ -220,14 +229,21 @@ export function CustomItem({ tx }: { tx: CustomOrderRequest }) {
   return (
     <div className="space-y-4">
       <div className="grid gap-5 sm:grid-cols-[12rem_1fr]">
-        <StoredImage src={v.snapshotDataUrl} alt={`Snapshot of version ${v.version} of your design`} className="aspect-square w-full rounded-xl border border-line" />
+        <StoredImage
+          src={v.snapshotDataUrl}
+          alt={`Snapshot of version ${v.version} of your design`}
+          className="aspect-square w-full rounded-xl border border-line"
+        />
         <div className="space-y-3">
           <p className="text-sm text-muted-foreground">
             Version {v.version} · submitted <DateText value={v.submittedAt} />
           </p>
           <DesignSpecList labels={v.labels} config={v.config} />
           <div className="rounded-lg bg-muted/60 p-3 text-sm">
-            Estimated {formatWeight(v.estimate.weightG)} · <strong><MoneyText value={v.estimate.price} /></strong>
+            Estimated {formatWeight(v.estimate.weightG)} ·{" "}
+            <strong>
+              <MoneyText value={v.estimate.price} />
+            </strong>
             <EstimateNotice />
           </div>
         </div>

@@ -32,7 +32,12 @@ export function SiteHeader() {
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-  const links = user?.role === "customer" ? [...nav, { href: "/account", label: "My Account" }] : user?.role === "owner" ? [...nav, { href: "/admin", label: "Owner dashboard" }] : nav;
+  const links =
+    user?.role === "customer"
+      ? [...nav, { href: "/account", label: "My Account" }]
+      : user?.role === "owner"
+        ? [...nav, { href: "/admin", label: "Owner dashboard" }]
+        : nav;
 
   const logout = async () => {
     await repos.auth.logout();

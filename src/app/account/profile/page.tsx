@@ -22,11 +22,16 @@ export default function ProfilePage() {
   if (!user) return null;
   return (
     <div className="mx-auto max-w-2xl space-y-6">
-      <PageHeader title="Profile" back={{ href: "/account", label: "Back to my account" }} description="Keep your details up to date so the store can contact you." />
+      <PageHeader
+        title="Profile"
+        back={{ href: "/account", label: "Back to my account" }}
+        description="Keep your details up to date so the store can contact you."
+      />
       <ProfileForm user={user} />
       <PasswordForm />
       <p className="text-sm text-muted-foreground">
-        You agreed to the Privacy Notice on {user.privacyConsentAt ? <DateText value={user.privacyConsentAt} withTime /> : "—"}. To get a copy of your data or delete your account, contact the store.
+        You agreed to the Privacy Notice on {user.privacyConsentAt ? <DateText value={user.privacyConsentAt} withTime /> : "—"}. To get a copy of your data or
+        delete your account, contact the store.
       </p>
     </div>
   );
@@ -34,7 +39,10 @@ export default function ProfilePage() {
 
 function ProfileForm({ user }: { user: UserProfile }) {
   const [error, setError] = useState<string | null>(null);
-  const form = useForm<z.input<typeof profileSchema>>({ resolver: zodResolver(profileSchema), defaultValues: { fullName: user.fullName, contactNumber: user.contactNumber } });
+  const form = useForm<z.input<typeof profileSchema>>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: { fullName: user.fullName, contactNumber: user.contactNumber },
+  });
   const onSubmit = form.handleSubmit(async (values) => {
     setError(null);
     try {
@@ -68,7 +76,10 @@ function ProfileForm({ user }: { user: UserProfile }) {
 
 function PasswordForm() {
   const [error, setError] = useState<string | null>(null);
-  const form = useForm<z.input<typeof changePasswordSchema>>({ resolver: zodResolver(changePasswordSchema), defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" } });
+  const form = useForm<z.input<typeof changePasswordSchema>>({
+    resolver: zodResolver(changePasswordSchema),
+    defaultValues: { currentPassword: "", newPassword: "", confirmPassword: "" },
+  });
   const onSubmit = form.handleSubmit(async (v) => {
     setError(null);
     try {

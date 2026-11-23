@@ -82,7 +82,8 @@ export function PieceIcon({ type, className }: { type: ProductType; className?: 
 
 const MEASURE: Partial<Record<ProductType, string>> = {
   ring: "Wrap a thin strip of paper around the base of your finger, mark where it meets, and measure the length (inner circumference). US 7 ≈ 54.4 mm. You can also bring a ring that fits to the store.",
-  necklace: "Measure a necklace you like from clasp end to clasp end. Choker (14 in) sits around the neck, Princess (18 in) just below the collarbone, Matinee (20–24 in) on the upper chest, Opera (30 in) mid-chest.",
+  necklace:
+    "Measure a necklace you like from clasp end to clasp end. Choker (14 in) sits around the neck, Princess (18 in) just below the collarbone, Matinee (20–24 in) on the upper chest, Opera (30 in) mid-chest.",
   bracelet: "Measure around your wrist bone with a soft tape and add about 0.5 in (1.3 cm) for comfort.",
   pendant: "Small is about 1.5 cm tall, Medium about 2 cm, Large about 2.5 cm.",
   earrings: "Small is about 6 mm across, Medium about 8 mm, Large about 10 mm.",
@@ -91,7 +92,19 @@ const MEASURE: Partial<Record<ProductType, string>> = {
   name_pendant: "The size is the height of the capital letters. Longer names make a wider pendant; the owner confirms the final size and price.",
 };
 
-function Choice({ selected, onClick, children, className, label }: { selected: boolean; onClick: () => void; children: React.ReactNode; className?: string; label?: string }) {
+function Choice({
+  selected,
+  onClick,
+  children,
+  className,
+  label,
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+  className?: string;
+  label?: string;
+}) {
   return (
     <button
       type="button"
@@ -123,7 +136,13 @@ function GroupPicker({ group, list, value, onPick }: { group: OptionGroup; list:
             {list
               .filter((o) => (o.family ?? "") === fam)
               .map((o) => (
-                <Choice key={o.id} selected={o.id === value} onClick={() => onPick(o.id)} className="min-w-0 px-3 py-2 text-left break-words hyphens-auto" label={o.label}>
+                <Choice
+                  key={o.id}
+                  selected={o.id === value}
+                  onClick={() => onPick(o.id)}
+                  className="min-w-0 px-3 py-2 text-left break-words hyphens-auto"
+                  label={o.label}
+                >
                   <span className="block font-medium">{o.label}</span>
                   <span className="block text-xs leading-snug text-muted-foreground">{o.description}</span>
                 </Choice>
@@ -159,7 +178,9 @@ export function OptionsPanel({
   const rule = stoneRule(config, options);
   const styles = optionsFor(options, config.productType, "style");
   const pick = (group: OptionGroup) => (id: string) => onChange({ choices: { ...config.choices, [group]: id } });
-  const detailGroups = (["setting", "profile", "shank", "texture"] as const).filter((g) => optionsFor(options, config.productType, g).length > 0 && (g !== "setting" || hasStone));
+  const detailGroups = (["setting", "profile", "shank", "texture"] as const).filter(
+    (g) => optionsFor(options, config.productType, g).length > 0 && (g !== "setting" || hasStone),
+  );
   const textProblem = config.styleText ? styleTextProblem(style, config.styleText) : null;
   const textFonts = style?.textMax && style.key !== "zodiac";
   const pearlOnly = style?.requiresSurface === "pearl";
@@ -180,7 +201,12 @@ export function OptionsPanel({
         <AccordionContent>
           <div role="radiogroup" aria-label="Piece type" className="grid grid-cols-[repeat(auto-fill,minmax(5.75rem,1fr))] gap-2">
             {options.productTypes.map((p) => (
-              <Choice key={p.id} selected={p.type === config.productType} onClick={() => onChange({ productType: p.type })} className={cn("flex flex-col items-center gap-1 px-2 py-3", disabledTypes && p.type !== config.productType && "pointer-events-none opacity-40")}>
+              <Choice
+                key={p.id}
+                selected={p.type === config.productType}
+                onClick={() => onChange({ productType: p.type })}
+                className={cn("flex flex-col items-center gap-1 px-2 py-3", disabledTypes && p.type !== config.productType && "pointer-events-none opacity-40")}
+              >
                 <PieceIcon type={p.type} className="text-gold-dark" />
                 <span className="text-center text-xs leading-tight font-medium">{p.label}</span>
               </Choice>
@@ -204,7 +230,12 @@ export function OptionsPanel({
         <AccordionContent>
           <div role="radiogroup" aria-label="Material" className="grid grid-cols-2 gap-2">
             {options.materials.map((m) => (
-              <Choice key={m.id} selected={m.id === config.materialId} onClick={() => onChange({ materialId: m.id })} className="px-3 py-3 text-left font-medium">
+              <Choice
+                key={m.id}
+                selected={m.id === config.materialId}
+                onClick={() => onChange({ materialId: m.id })}
+                className="px-3 py-3 text-left font-medium"
+              >
                 {m.label}
               </Choice>
             ))}
@@ -217,8 +248,17 @@ export function OptionsPanel({
         <AccordionContent>
           <div role="radiogroup" aria-label="Color or finish" className="flex flex-wrap gap-3">
             {finishes.map((f) => (
-              <Choice key={f.id} selected={f.id === config.finishId} onClick={() => onChange({ finishId: f.id })} className="flex items-center gap-2 py-1.5 pr-3 pl-1.5">
-                <span className="size-8 rounded-full border border-black/10 shadow-inner" style={{ background: `radial-gradient(circle at 35% 30%, #fff 0%, ${f.colorHex} 45%, ${f.colorHex} 100%)` }} aria-hidden />
+              <Choice
+                key={f.id}
+                selected={f.id === config.finishId}
+                onClick={() => onChange({ finishId: f.id })}
+                className="flex items-center gap-2 py-1.5 pr-3 pl-1.5"
+              >
+                <span
+                  className="size-8 rounded-full border border-black/10 shadow-inner"
+                  style={{ background: `radial-gradient(circle at 35% 30%, #fff 0%, ${f.colorHex} 45%, ${f.colorHex} 100%)` }}
+                  aria-hidden
+                />
                 {f.label}
               </Choice>
             ))}
@@ -264,7 +304,13 @@ export function OptionsPanel({
                       <p className="mb-1.5 text-xs font-medium text-muted-foreground">{group}</p>
                       <div className="grid grid-cols-2 gap-2">
                         {list.map((f) => (
-                          <Choice key={f.id} selected={f.id === config.fontId} onClick={() => onChange({ fontId: f.id })} className="flex flex-col items-start gap-0.5 px-3 py-2 text-left" label={f.label}>
+                          <Choice
+                            key={f.id}
+                            selected={f.id === config.fontId}
+                            onClick={() => onChange({ fontId: f.id })}
+                            className="flex flex-col items-start gap-0.5 px-3 py-2 text-left"
+                            label={f.label}
+                          >
                             <span className="block w-full truncate text-2xl leading-tight text-ink" style={{ fontFamily: f.cssFamily }} aria-hidden>
                               {(config.nameText ?? "").trim() || "Maria"}
                             </span>
@@ -282,7 +328,9 @@ export function OptionsPanel({
 
       {style?.textMax ? (
         <AccordionItem value="text">
-          <AccordionTrigger className="text-base font-semibold">{n()}. {style.key === "zodiac" ? "Zodiac sign" : "Letters or text"}</AccordionTrigger>
+          <AccordionTrigger className="text-base font-semibold">
+            {n()}. {style.key === "zodiac" ? "Zodiac sign" : "Letters or text"}
+          </AccordionTrigger>
           <AccordionContent className="space-y-4">
             {style.key === "zodiac" ? (
               <div role="radiogroup" aria-label="Zodiac sign" className="grid grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-2">
@@ -294,7 +342,9 @@ export function OptionsPanel({
               </div>
             ) : (
               <div className="space-y-1.5">
-                <Label htmlFor="style-text">{style.textMax <= 3 ? "Initials" : "Text"} for the {style.label.toLowerCase()}</Label>
+                <Label htmlFor="style-text">
+                  {style.textMax <= 3 ? "Initials" : "Text"} for the {style.label.toLowerCase()}
+                </Label>
                 <Input
                   id="style-text"
                   maxLength={style.textMax}
@@ -317,7 +367,13 @@ export function OptionsPanel({
                 </p>
                 <div role="radiogroup" aria-labelledby="text-font-label" className="grid grid-cols-[repeat(auto-fill,minmax(8rem,1fr))] gap-2">
                   {fonts.map((f) => (
-                    <Choice key={f.id} selected={f.id === (config.fontId ?? fonts[0].id)} onClick={() => onChange({ fontId: f.id })} className="flex flex-col items-start gap-0.5 px-3 py-2 text-left" label={f.label}>
+                    <Choice
+                      key={f.id}
+                      selected={f.id === (config.fontId ?? fonts[0].id)}
+                      onClick={() => onChange({ fontId: f.id })}
+                      className="flex flex-col items-start gap-0.5 px-3 py-2 text-left"
+                      label={f.label}
+                    >
                       <span className="block w-full truncate text-xl leading-tight text-ink" style={{ fontFamily: f.cssFamily }} aria-hidden>
                         {(config.styleText ?? "").trim() || "AB"}
                       </span>
@@ -344,7 +400,13 @@ export function OptionsPanel({
                     <p className="mb-1.5 text-xs font-medium text-muted-foreground">{title}</p>
                     <div className="grid grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] gap-2">
                       {list.map((c) => (
-                        <Choice key={c.id} selected={c.id === config.chainStyleId} onClick={() => onChange({ chainStyleId: c.id })} className="min-w-0 px-3 py-2 text-left break-words hyphens-auto" label={c.label}>
+                        <Choice
+                          key={c.id}
+                          selected={c.id === config.chainStyleId}
+                          onClick={() => onChange({ chainStyleId: c.id })}
+                          className="min-w-0 px-3 py-2 text-left break-words hyphens-auto"
+                          label={c.label}
+                        >
                           <span className="block font-medium">{c.label}</span>
                           <span className="block text-xs leading-snug text-muted-foreground">{c.description}</span>
                         </Choice>
@@ -360,7 +422,13 @@ export function OptionsPanel({
               </p>
               <div role="radiogroup" aria-labelledby="clasp-label" className="grid grid-cols-[repeat(auto-fill,minmax(9.5rem,1fr))] gap-2">
                 {(options.clasps ?? []).map((c) => (
-                  <Choice key={c.id} selected={c.id === config.claspId} onClick={() => onChange({ claspId: c.id })} className="min-w-0 px-3 py-2 text-left break-words hyphens-auto" label={c.label}>
+                  <Choice
+                    key={c.id}
+                    selected={c.id === config.claspId}
+                    onClick={() => onChange({ claspId: c.id })}
+                    className="min-w-0 px-3 py-2 text-left break-words hyphens-auto"
+                    label={c.label}
+                  >
                     <span className="block font-medium">{c.label}</span>
                     <span className="block text-xs leading-snug text-muted-foreground">{c.description}</span>
                   </Choice>
@@ -372,73 +440,110 @@ export function OptionsPanel({
       )}
 
       {!isName && (rule.max > 0 || styles.length === 0 || type.maxStones > 0) && (
-      <AccordionItem value="gem">
-        <AccordionTrigger className="text-base font-semibold">{n()}. {pearlOnly ? "Pearls" : "Gemstone"}</AccordionTrigger>
-        <AccordionContent>
-          {rule.max === 0 ? (
-            <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
-              {style ? `The ${style.label} style has no stones. Choosing a stone switches to a style that holds one.` : "Gemstones are not available for this piece."}
-            </p>
-          ) : null}
-          {rule.max === 0 && styles.length === 0 ? null : (
-            <div className="space-y-4">
-              <div role="radiogroup" aria-label="Gemstone type" className="flex flex-wrap gap-2">
-                {gemList.map((g) => (
-                  <Choice key={g.id} selected={g.id === config.gemstoneId} onClick={() => onChange({ gemstoneId: g.id })} className="flex items-center gap-2 py-1.5 pr-3 pl-1.5">
-                    <span
-                      className={cn("size-7 rotate-45 rounded-[4px] border border-black/10", g.isNone && "rotate-0 rounded-full border-dashed border-muted-foreground bg-transparent")}
-                      style={g.isNone ? undefined : { background: `linear-gradient(135deg, #fff, ${g.colorHex})` }}
-                      aria-hidden
-                    />
-                    {g.label}
-                  </Choice>
-                ))}
+        <AccordionItem value="gem">
+          <AccordionTrigger className="text-base font-semibold">
+            {n()}. {pearlOnly ? "Pearls" : "Gemstone"}
+          </AccordionTrigger>
+          <AccordionContent>
+            {rule.max === 0 ? (
+              <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
+                {style
+                  ? `The ${style.label} style has no stones. Choosing a stone switches to a style that holds one.`
+                  : "Gemstones are not available for this piece."}
+              </p>
+            ) : null}
+            {rule.max === 0 && styles.length === 0 ? null : (
+              <div className="space-y-4">
+                <div role="radiogroup" aria-label="Gemstone type" className="flex flex-wrap gap-2">
+                  {gemList.map((g) => (
+                    <Choice
+                      key={g.id}
+                      selected={g.id === config.gemstoneId}
+                      onClick={() => onChange({ gemstoneId: g.id })}
+                      className="flex items-center gap-2 py-1.5 pr-3 pl-1.5"
+                    >
+                      <span
+                        className={cn(
+                          "size-7 rotate-45 rounded-[4px] border border-black/10",
+                          g.isNone && "rotate-0 rounded-full border-dashed border-muted-foreground bg-transparent",
+                        )}
+                        style={g.isNone ? undefined : { background: `linear-gradient(135deg, #fff, ${g.colorHex})` }}
+                        aria-hidden
+                      />
+                      {g.label}
+                    </Choice>
+                  ))}
+                </div>
+                {style?.key === "birthstone" && (
+                  <p className="text-xs text-muted-foreground">Each birthstone shows its month in brackets, for example Garnet (January).</p>
+                )}
+                {hasStone && (
+                  <>
+                    {!pearlOnly && (
+                      <div>
+                        <p className="mb-2 text-sm font-medium" id="cut-label">
+                          Cut
+                        </p>
+                        <div role="radiogroup" aria-labelledby="cut-label" className="flex flex-wrap gap-2">
+                          {options.cuts.map((c) => (
+                            <Choice key={c.id} selected={c.id === config.cutId} onClick={() => onChange({ cutId: c.id })} className="px-4 py-2">
+                              {c.label}
+                            </Choice>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {rule.max > 1 && (
+                      <div>
+                        <p className="mb-2 text-sm font-medium" id="qty-label">
+                          Number of stones {config.productType === "earrings" && <span className="font-normal text-muted-foreground">(for the pair)</span>}
+                        </p>
+                        <div className="inline-flex items-center gap-2" role="group" aria-labelledby="qty-label">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => onChange({ stoneQuantity: config.stoneQuantity - 1 })}
+                            disabled={config.stoneQuantity <= qtyMin}
+                            aria-label="Fewer stones"
+                          >
+                            <Minus className="size-4" />
+                          </Button>
+                          <span className="tabular w-8 text-center text-lg font-semibold" aria-live="polite">
+                            {config.stoneQuantity}
+                          </span>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => onChange({ stoneQuantity: config.stoneQuantity + 1 })}
+                            disabled={config.stoneQuantity >= rule.max}
+                            aria-label="More stones"
+                          >
+                            <Plus className="size-4" />
+                          </Button>
+                          <span className="text-xs text-muted-foreground">
+                            {qtyMin === rule.max ? `exactly ${rule.max}` : qtyMin > 1 ? `${qtyMin} to ${rule.max}` : `up to ${rule.max}`}
+                          </span>
+                        </div>
+                        {config.productType === "earrings" && rule.max === 2 && (
+                          <p className="mt-1 text-xs text-muted-foreground">Choose 2 for a matching pair (one stone in each earring).</p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
-              {style?.key === "birthstone" && <p className="text-xs text-muted-foreground">Each birthstone shows its month in brackets, for example Garnet (January).</p>}
-              {hasStone && (
-                <>
-                  {!pearlOnly && <div>
-                    <p className="mb-2 text-sm font-medium" id="cut-label">
-                      Cut
-                    </p>
-                    <div role="radiogroup" aria-labelledby="cut-label" className="flex flex-wrap gap-2">
-                      {options.cuts.map((c) => (
-                        <Choice key={c.id} selected={c.id === config.cutId} onClick={() => onChange({ cutId: c.id })} className="px-4 py-2">
-                          {c.label}
-                        </Choice>
-                      ))}
-                    </div>
-                  </div>}
-                  {rule.max > 1 && <div>
-                    <p className="mb-2 text-sm font-medium" id="qty-label">
-                      Number of stones {config.productType === "earrings" && <span className="font-normal text-muted-foreground">(for the pair)</span>}
-                    </p>
-                    <div className="inline-flex items-center gap-2" role="group" aria-labelledby="qty-label">
-                      <Button type="button" variant="outline" size="icon" onClick={() => onChange({ stoneQuantity: config.stoneQuantity - 1 })} disabled={config.stoneQuantity <= qtyMin} aria-label="Fewer stones">
-                        <Minus className="size-4" />
-                      </Button>
-                      <span className="tabular w-8 text-center text-lg font-semibold" aria-live="polite">
-                        {config.stoneQuantity}
-                      </span>
-                      <Button type="button" variant="outline" size="icon" onClick={() => onChange({ stoneQuantity: config.stoneQuantity + 1 })} disabled={config.stoneQuantity >= rule.max} aria-label="More stones">
-                        <Plus className="size-4" />
-                      </Button>
-                      <span className="text-xs text-muted-foreground">{qtyMin === rule.max ? `exactly ${rule.max}` : qtyMin > 1 ? `${qtyMin} to ${rule.max}` : `up to ${rule.max}`}</span>
-                    </div>
-                    {config.productType === "earrings" && rule.max === 2 && <p className="mt-1 text-xs text-muted-foreground">Choose 2 for a matching pair (one stone in each earring).</p>}
-                  </div>}
-                </>
-              )}
-            </div>
-          )}
-        </AccordionContent>
-      </AccordionItem>
-
+            )}
+          </AccordionContent>
+        </AccordionItem>
       )}
 
       {detailGroups.length > 0 && (
         <AccordionItem value="details">
-          <AccordionTrigger className="text-base font-semibold">{n()}. {detailGroups.length === 1 ? GROUP_LABEL[detailGroups[0]] : "Design details"}</AccordionTrigger>
+          <AccordionTrigger className="text-base font-semibold">
+            {n()}. {detailGroups.length === 1 ? GROUP_LABEL[detailGroups[0]] : "Design details"}
+          </AccordionTrigger>
           <AccordionContent className="space-y-4">
             {detailGroups.map((g) => (
               <div key={g}>
@@ -480,14 +585,28 @@ export function OptionsPanel({
         <AccordionContent className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="engraving">Engraving text</Label>
-            <Input id="engraving" maxLength={20} value={config.engravingText ?? ""} onChange={(e) => onChange({ engravingText: e.target.value })} aria-describedby="engraving-hint" />
+            <Input
+              id="engraving"
+              maxLength={20}
+              value={config.engravingText ?? ""}
+              onChange={(e) => onChange({ engravingText: e.target.value })}
+              aria-describedby="engraving-hint"
+            />
             <p id="engraving-hint" className="text-xs text-muted-foreground">
               Up to 20 characters ({20 - (config.engravingText?.length ?? 0)} left).
             </p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="notes">Notes for the owner</Label>
-            <Textarea id="notes" maxLength={500} rows={3} value={config.notes ?? ""} onChange={(e) => onChange({ notes: e.target.value })} aria-describedby="notes-hint" placeholder="Anything the owner should know about your design." />
+            <Textarea
+              id="notes"
+              maxLength={500}
+              rows={3}
+              value={config.notes ?? ""}
+              onChange={(e) => onChange({ notes: e.target.value })}
+              aria-describedby="notes-hint"
+              placeholder="Anything the owner should know about your design."
+            />
             <p id="notes-hint" className="text-xs text-muted-foreground">
               Up to 500 characters ({500 - (config.notes?.length ?? 0)} left).
             </p>

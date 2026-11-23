@@ -45,10 +45,13 @@ const shapes = {
     }).join("") + `<circle cx="120" cy="110" r="9" fill="url(#m)"/><circle cx="480" cy="110" r="9" fill="url(#m)"/>`,
   bracelet: () => `<ellipse cx="300" cy="320" rx="190" ry="120" fill="none" stroke="url(#m)" stroke-width="42"/>
     <ellipse cx="300" cy="320" rx="190" ry="120" fill="none" stroke="#FFFFFF" stroke-opacity=".4" stroke-width="5" transform="translate(-4 -10)"/>`,
-  earrings: () => [190, 410]
-    .map((x) => `<circle cx="${x}" cy="200" r="14" fill="url(#m)"/><line x1="${x}" y1="214" x2="${x}" y2="270" stroke="url(#m)" stroke-width="6"/>
-    <path d="M${x} 270 C${x + 60} 290 ${x + 50} 390 ${x} 420 C${x - 50} 390 ${x - 60} 290 ${x} 270 Z" fill="url(#m)"/>${stone(x, 345, 30)}`)
-    .join(""),
+  earrings: () =>
+    [190, 410]
+      .map(
+        (x) => `<circle cx="${x}" cy="200" r="14" fill="url(#m)"/><line x1="${x}" y1="214" x2="${x}" y2="270" stroke="url(#m)" stroke-width="6"/>
+    <path d="M${x} 270 C${x + 60} 290 ${x + 50} 390 ${x} 420 C${x - 50} 390 ${x - 60} 290 ${x} 270 Z" fill="url(#m)"/>${stone(x, 345, 30)}`,
+      )
+      .join(""),
 };
 
 shapes.name_pendant = () => `<path d="M120 120 Q300 200 480 120" fill="none" stroke="url(#m)" stroke-width="4"/>
@@ -78,9 +81,6 @@ writeFileSync(
 `,
 );
 
-writeFileSync(
-  join(out, "no-webgl.svg"),
-  frame(shapes.ring(), tones.gold, "Illustration of a ring"),
-);
+writeFileSync(join(out, "no-webgl.svg"), frame(shapes.ring(), tones.gold, "Illustration of a ring"));
 
 console.log("Placeholders written to", out);

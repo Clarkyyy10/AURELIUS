@@ -1,18 +1,21 @@
 # AURELIUS — Project Brief for Claude Code
 
 ## What this is
+
 AURELIUS is a BSIT capstone web platform for **Afable's Jewelry Store**, a single-owner jewelry and
 watch store in Montalban Public Market, Rizal, Philippines. The owner has no employees, so the
 system must reduce, never add to, the owner's workload.
 
 Four modules:
+
 1. **3D Design Customization** (FR-01 to FR-11)
 2. **E-Commerce**: catalog, orders, quotations, payment records, tracking (FR-12 to FR-24)
 3. **Service Management**: service catalog, requests, quotations, down payments, tracking (FR-25 to FR-34)
 4. **AI-Powered Chatbot** (FR-35 to FR-40)
-Plus accounts, admin, and notifications (FR-41 to FR-50).
+   Plus accounts, admin, and notifications (FR-41 to FR-50).
 
 Source of truth:
+
 - **`docs/manuscript-v2.md` — the AURELIUS manuscript, version 2 (Chapters 1–3). Everything built here
   follows it. When any other doc disagrees with the manuscript, the manuscript wins; update the doc.**
 - `docs/requirements.md` — every functional and non-functional requirement (Section 3.9 of the manuscript)
@@ -21,6 +24,7 @@ Source of truth:
 - `docs/backend-plan.md` — Phase 2 (Supabase + Prisma + Gemini API, manuscript §3.10), NOT built in Phase 1
 
 ## Current phase: PHASE 1 — FRONT END ONLY
+
 - Build the complete user interface for customers and the owner, working end to end on **mock data**.
 - **No Supabase, no real auth, no real API calls, no real emails in Phase 1.**
 - All data goes through the repository layer in `src/lib/data/` (interfaces + a mock implementation
@@ -30,6 +34,7 @@ Source of truth:
 - The chatbot runs on a scripted mock with the same interface the real Gemini API route will use.
 
 ## Stack
+
 - Next.js (latest stable, App Router, `src/` directory) + TypeScript (strict) + Tailwind CSS
 - shadcn/ui (Radix) components, lucide-react icons
 - react-hook-form + zod for every form (schemas in `src/lib/validation/`, reused by Phase 2 server code)
@@ -41,6 +46,7 @@ Source of truth:
   registration and password reset, hosted on Vercel; Playwright for browser tests; GitHub Actions CI
 
 ## Folder layout (keep modules separate — maintainability requirement)
+
 ```
 src/
   app/                      routes (see frontend-spec.md §3)
@@ -64,6 +70,7 @@ src/
 ```
 
 ## Rules
+
 - Plain, clear English in all user-facing text. Error messages say what went wrong and how to fix it.
 - Money is Philippine peso: format as `₱24,026` (no decimals for estimates/prices; payments may show centavos).
 - Estimates are always labeled: "Estimate only — final price is confirmed by the owner." (FR-06, FR-40)
@@ -85,6 +92,7 @@ src/
 - No external image hotlinks. Use local SVG placeholders in `public/placeholders/`.
 
 ## How we work
+
 - Reference FR numbers in commits and code comments where a feature implements a requirement.
 - Write tests for pure logic (pricing, status transitions, validation) and run them.
 - `npm run build`, `npm run lint`, and `npm test` must pass before calling a task done.

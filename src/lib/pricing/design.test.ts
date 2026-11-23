@@ -25,7 +25,16 @@ function caseFor(opt: DesignOption, type: ProductType, i: number) {
   const sizes = options.sizes.filter((s) => s.productType === type);
   const size = sizes[i % sizes.length];
   const pt = options.productTypes.find((p) => p.type === type)!;
-  const cfg: DesignConfig = { productType: type, materialId: material.id, finishId: finish.id, sizeId: size.id, gemstoneId: "gem-none", cutId: null, stoneQuantity: 0, choices: { [opt.group]: opt.id } };
+  const cfg: DesignConfig = {
+    productType: type,
+    materialId: material.id,
+    finishId: finish.id,
+    sizeId: size.id,
+    gemstoneId: "gem-none",
+    cutId: null,
+    stoneQuantity: 0,
+    choices: { [opt.group]: opt.id },
+  };
   const rule = stoneRule(cfg, options);
   // settings only count with stones, so give those a stone
   const wantStone = rule.max > 0 && (rule.min > 0 || opt.group === "setting" || i % 2 === 0);
@@ -64,7 +73,23 @@ function caseFor(opt: DesignOption, type: ProductType, i: number) {
 // Every stone (birthstones included) on a birthstone pendant, medium size, 14K gold, round cut.
 const birthstoneCases = options.gemstones
   .filter((g) => !g.isNone)
-  .map((g) => [g.label, { productType: "pendant", materialId: "mat-14k", finishId: "fin-yellow", sizeId: "size-pendant-medium", gemstoneId: g.id, cutId: "cut-round", stoneQuantity: 1, choices: { style: "style-pendant-birthstone" } } as DesignConfig, g.basePrice] as const);
+  .map(
+    (g) =>
+      [
+        g.label,
+        {
+          productType: "pendant",
+          materialId: "mat-14k",
+          finishId: "fin-yellow",
+          sizeId: "size-pendant-medium",
+          gemstoneId: g.id,
+          cutId: "cut-round",
+          stoneQuantity: 1,
+          choices: { style: "style-pendant-birthstone" },
+        } as DesignConfig,
+        g.basePrice,
+      ] as const,
+  );
 
 const designCases = options.designOptions.flatMap((opt, i) => opt.productTypes.map((type, j) => [`${opt.label} (${type})`, opt, type, i + j] as const));
 
@@ -99,9 +124,20 @@ describe("design options (D-25) — every style, setting, band shape, shank and 
   it("multiplies several design factors and adds their fees", () => {
     // 3 × 1.0 (US 7) × 1.51 (18K) × 1.15 (halo) × 1.15 (split) × 0.9 (knife edge) = 5.3891… → 5.39 g
     const cfg: DesignConfig = {
-      productType: "ring", materialId: "mat-18k", finishId: "fin-yellow", sizeId: options.sizes.find((s) => s.productType === "ring" && s.label === "US 7")!.id,
-      gemstoneId: "gem-diamond", cutId: "cut-round", stoneQuantity: 1,
-      choices: { style: "style-ring-halo", setting: "setting-all-prong", profile: "profile-ring-knife_edge", shank: "shank-ring-split", texture: "texture-all-hammered" },
+      productType: "ring",
+      materialId: "mat-18k",
+      finishId: "fin-yellow",
+      sizeId: options.sizes.find((s) => s.productType === "ring" && s.label === "US 7")!.id,
+      gemstoneId: "gem-diamond",
+      cutId: "cut-round",
+      stoneQuantity: 1,
+      choices: {
+        style: "style-ring-halo",
+        setting: "setting-all-prong",
+        profile: "profile-ring-knife_edge",
+        shank: "shank-ring-split",
+        texture: "texture-all-hammered",
+      },
     };
     const r = estimate(cfg, options);
     expect(r.weightG).toBe(5.39);
@@ -113,7 +149,15 @@ describe("design options (D-25) — every style, setting, band shape, shank and 
 
 describe("stone rules per style", () => {
   const ring = (style: string, extra: Partial<DesignConfig> = {}): DesignConfig => ({
-    productType: "ring", materialId: "mat-14k", finishId: "fin-yellow", sizeId: options.sizes.find((s) => s.productType === "ring")!.id, gemstoneId: "gem-cz", cutId: "cut-round", stoneQuantity: 1, choices: { style }, ...extra,
+    productType: "ring",
+    materialId: "mat-14k",
+    finishId: "fin-yellow",
+    sizeId: options.sizes.find((s) => s.productType === "ring")!.id,
+    gemstoneId: "gem-cz",
+    cutId: "cut-round",
+    stoneQuantity: 1,
+    choices: { style },
+    ...extra,
   });
 
   it("three-stone always has exactly 3 stones", () => {

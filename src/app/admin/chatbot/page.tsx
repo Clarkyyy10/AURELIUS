@@ -35,7 +35,10 @@ export default function ChatbotKnowledgePage() {
         }
       />
       <div className="grid gap-6 xl:grid-cols-[1fr_24rem]">
-        <QueryView query={q} empty={(l) => (l.length === 0 ? <EmptyState title="No answers yet" action={{ label: "Add an answer", onClick: () => setEditing("new") }} /> : null)}>
+        <QueryView
+          query={q}
+          empty={(l) => (l.length === 0 ? <EmptyState title="No answers yet" action={{ label: "Add an answer", onClick: () => setEditing("new") }} /> : null)}
+        >
           {(list) => (
             <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-paper">
               {list.map((f) => (
@@ -130,7 +133,15 @@ function FaqDialog({ entry, onClose }: { entry: FaqEntry | null; onClose: () => 
   const [busy, setBusy] = useState(false);
 
   const submit = async () => {
-    const r = faqSchema.safeParse({ question, answer, keywords: keywords.split(",").map((k) => k.trim().toLowerCase()).filter(Boolean), active });
+    const r = faqSchema.safeParse({
+      question,
+      answer,
+      keywords: keywords
+        .split(",")
+        .map((k) => k.trim().toLowerCase())
+        .filter(Boolean),
+      active,
+    });
     if (!r.success) {
       setErrors(Object.fromEntries(r.error.issues.map((i) => [String(i.path[0]), i.message])));
       return;

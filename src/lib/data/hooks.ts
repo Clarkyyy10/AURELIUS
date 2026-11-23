@@ -67,7 +67,7 @@ export function useCurrentUser(): { user: UserProfile | null; ready: boolean } {
 export function useAction() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const run = useCallback(async <T,>(fn: () => Promise<T>): Promise<T | undefined> => {
+  const run = useCallback(async <T>(fn: () => Promise<T>): Promise<T | undefined> => {
     setPending(true);
     setError(null);
     try {

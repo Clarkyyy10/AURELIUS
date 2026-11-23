@@ -123,10 +123,27 @@ export interface DesignOption {
 }
 
 export const CHAIN_PATTERNS = [
-  "cable", "rolo", "paperclip", "mariner", "figaro", "satellite", "bead",
-  "curb", "cuban", "herringbone", "omega",
-  "rope", "singapore", "wheat", "franco", "byzantine", "bismarck",
-  "box", "venetian", "snake", "popcorn",
+  "cable",
+  "rolo",
+  "paperclip",
+  "mariner",
+  "figaro",
+  "satellite",
+  "bead",
+  "curb",
+  "cuban",
+  "herringbone",
+  "omega",
+  "rope",
+  "singapore",
+  "wheat",
+  "franco",
+  "byzantine",
+  "bismarck",
+  "box",
+  "venetian",
+  "snake",
+  "popcorn",
 ] as const;
 export type ChainPattern = (typeof CHAIN_PATTERNS)[number];
 export type ChainFamily = "rings" | "flat" | "woven" | "tube";
@@ -223,16 +240,7 @@ export interface ServiceCatalogItem {
 
 // ---------- Status ----------
 export type OrderStatus =
-  | "pending"
-  | "quoted"
-  | "awaiting_payment"
-  | "confirmed"
-  | "in_production"
-  | "ready_for_claiming"
-  | "completed"
-  | "declined"
-  | "rejected"
-  | "cancelled";
+  "pending" | "quoted" | "awaiting_payment" | "confirmed" | "in_production" | "ready_for_claiming" | "completed" | "declined" | "rejected" | "cancelled";
 
 export type CustomOrderStatus =
   | "submitted"
@@ -483,9 +491,7 @@ export interface CustomOrderDraft {
 export interface ServiceRequestDraft {
   id: ID;
   kind: "service_request";
-  fields: Partial<
-    Pick<ServiceRequest, "itemType" | "itemDescription" | "brandModel" | "material" | "serviceIds" | "details">
-  >;
+  fields: Partial<Pick<ServiceRequest, "itemType" | "itemDescription" | "brandModel" | "material" | "serviceIds" | "details">>;
   createdAt: ISODate;
 }
 

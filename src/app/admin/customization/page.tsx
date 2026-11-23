@@ -65,9 +65,20 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
   };
 
   const num = (value: number, onChange: (n: number) => void, label: string, step = "0.01") => (
-    <Input type="number" inputMode="decimal" step={step} min={0} value={Number.isFinite(value) ? value : ""} onChange={(e) => onChange(e.target.value === "" ? Number.NaN : Number(e.target.value))} aria-label={label} className="h-9 w-28" />
+    <Input
+      type="number"
+      inputMode="decimal"
+      step={step}
+      min={0}
+      value={Number.isFinite(value) ? value : ""}
+      onChange={(e) => onChange(e.target.value === "" ? Number.NaN : Number(e.target.value))}
+      aria-label={label}
+      className="h-9 w-28"
+    />
   );
-  const text = (value: string, onChange: (s: string) => void, label: string) => <Input value={value} onChange={(e) => onChange(e.target.value)} aria-label={label} className="h-9 min-w-36" />;
+  const text = (value: string, onChange: (s: string) => void, label: string) => (
+    <Input value={value} onChange={(e) => onChange(e.target.value)} aria-label={label} className="h-9 min-w-36" />
+  );
   const active = (value: boolean, onChange: (b: boolean) => void, label: string) => <Switch checked={value} onCheckedChange={onChange} aria-label={label} />;
   const del = (key: Key, id: ID, label: string) =>
     used.has(id) ? (
@@ -134,7 +145,9 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                 </tr>
               ))}
             </OptionTable>
-            <p className="mt-2 text-xs text-muted-foreground">Piece types are fixed (each has its own 3D model). You can rename them, change their rates, or turn them off.</p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Piece types are fixed (each has its own 3D model). You can rename them, change their rates, or turn them off.
+            </p>
           </TabsContent>
 
           <TabsContent value="materials" className="mt-4">
@@ -150,7 +163,9 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                         <label key={f.id} className="flex items-center gap-1.5 text-sm">
                           <Checkbox
                             checked={m.finishIds.includes(f.id)}
-                            onCheckedChange={(v) => update("materials", m.id, { finishIds: v ? [...m.finishIds, f.id] : m.finishIds.filter((x) => x !== f.id) })}
+                            onCheckedChange={(v) =>
+                              update("materials", m.id, { finishIds: v ? [...m.finishIds, f.id] : m.finishIds.filter((x) => x !== f.id) })
+                            }
                           />
                           {f.label}
                         </label>
@@ -162,7 +177,10 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                 </tr>
               ))}
             </OptionTable>
-            <AddButton onClick={() => add("materials", { id: uid("mat"), label: "New material", ratePerGram: 0, densityRatio: 1, finishIds: [], active: false })} label="Add material" />
+            <AddButton
+              onClick={() => add("materials", { id: uid("mat"), label: "New material", ratePerGram: 0, densityRatio: 1, finishIds: [], active: false })}
+              label="Add material"
+            />
             <p className="mt-2 text-xs text-muted-foreground">Density ratio is the weight compared with sterling silver 925 (silver = 1.00).</p>
           </TabsContent>
 
@@ -172,7 +190,13 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                 <tr key={f.id} className="border-t border-line">
                   <td className="p-2">{text(f.label, (v) => update("finishes", f.id, { label: v }), "Finish name")}</td>
                   <td className="p-2">
-                    <input type="color" value={f.colorHex} onChange={(e) => update("finishes", f.id, { colorHex: e.target.value })} aria-label={`${f.label} color`} className="h-9 w-14 cursor-pointer rounded border border-line" />
+                    <input
+                      type="color"
+                      value={f.colorHex}
+                      onChange={(e) => update("finishes", f.id, { colorHex: e.target.value })}
+                      aria-label={`${f.label} color`}
+                      className="h-9 w-14 cursor-pointer rounded border border-line"
+                    />
                   </td>
                   <td className="p-2">{num(f.roughness, (v) => update("finishes", f.id, { roughness: Math.min(1, v) }), `${f.label} roughness`)}</td>
                   <td className="p-2">{num(f.fee, (v) => update("finishes", f.id, { fee: v }), `${f.label} fee`, "1")}</td>
@@ -181,23 +205,41 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                 </tr>
               ))}
             </OptionTable>
-            <AddButton onClick={() => add("finishes", { id: uid("fin"), label: "New finish", colorHex: "#cccccc", roughness: 0.2, fee: 0, active: false })} label="Add finish" />
+            <AddButton
+              onClick={() => add("finishes", { id: uid("fin"), label: "New finish", colorHex: "#cccccc", roughness: 0.2, fee: 0, active: false })}
+              label="Add finish"
+            />
           </TabsContent>
 
           <TabsContent value="gems" className="mt-4">
             <OptionTable headers={["Name", "Price per stone (₱)", "Color", "Refraction (IOR)", "Active", ""]}>
               {draft.gemstones.map((g) => (
                 <tr key={g.id} className="border-t border-line">
-                  <td className="p-2">{g.isNone ? <span className="px-2">None</span> : text(g.label, (v) => update("gemstones", g.id, { label: v }), "Gemstone name")}</td>
+                  <td className="p-2">
+                    {g.isNone ? <span className="px-2">None</span> : text(g.label, (v) => update("gemstones", g.id, { label: v }), "Gemstone name")}
+                  </td>
                   <td className="p-2">{g.isNone ? "—" : num(g.basePrice, (v) => update("gemstones", g.id, { basePrice: v }), `${g.label} price`, "1")}</td>
-                  <td className="p-2">{!g.isNone && <input type="color" value={g.colorHex} onChange={(e) => update("gemstones", g.id, { colorHex: e.target.value })} aria-label={`${g.label} color`} className="h-9 w-14 cursor-pointer rounded border border-line" />}</td>
+                  <td className="p-2">
+                    {!g.isNone && (
+                      <input
+                        type="color"
+                        value={g.colorHex}
+                        onChange={(e) => update("gemstones", g.id, { colorHex: e.target.value })}
+                        aria-label={`${g.label} color`}
+                        className="h-9 w-14 cursor-pointer rounded border border-line"
+                      />
+                    )}
+                  </td>
                   <td className="p-2">{g.isNone ? "—" : num(g.ior, (v) => update("gemstones", g.id, { ior: v }), `${g.label} IOR`)}</td>
                   <td className="p-2">{active(g.active, (v) => update("gemstones", g.id, { active: v }), `${g.label} active`)}</td>
                   <td className="p-2">{!g.isNone && del("gemstones", g.id, g.label)}</td>
                 </tr>
               ))}
             </OptionTable>
-            <AddButton onClick={() => add("gemstones", { id: uid("gem"), label: "New gemstone", basePrice: 0, colorHex: "#ffffff", ior: 1.7, active: false })} label="Add gemstone" />
+            <AddButton
+              onClick={() => add("gemstones", { id: uid("gem"), label: "New gemstone", basePrice: 0, colorHex: "#ffffff", ior: 1.7, active: false })}
+              label="Add gemstone"
+            />
             <p className="mt-2 text-xs text-muted-foreground">Price is per stone in round cut; the cut multiplier is applied on top.</p>
           </TabsContent>
 
@@ -206,17 +248,25 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
               {(draft.chainStyles ?? []).map((c) => (
                 <tr key={c.id} className="border-t border-line align-top">
                   <td className="p-2">{text(c.label, (v) => update("chainStyles", c.id, { label: v }), "Chain style name")}</td>
-                  <td className="p-2 text-sm whitespace-nowrap text-muted-foreground">{{ rings: "Linked rings", flat: "Flat links", woven: "Woven", tube: "Tube" }[c.family]}</td>
+                  <td className="p-2 text-sm whitespace-nowrap text-muted-foreground">
+                    {{ rings: "Linked rings", flat: "Flat links", woven: "Woven", tube: "Tube" }[c.family]}
+                  </td>
                   <td className="p-2">{num(c.weightFactor, (v) => update("chainStyles", c.id, { weightFactor: v }), `${c.label} weight factor`)}</td>
                   <td className="p-2">
-                    <Input value={c.description} onChange={(e) => update("chainStyles", c.id, { description: e.target.value })} aria-label={`${c.label} description`} className="h-9 min-w-64" />
+                    <Input
+                      value={c.description}
+                      onChange={(e) => update("chainStyles", c.id, { description: e.target.value })}
+                      aria-label={`${c.label} description`}
+                      className="h-9 min-w-64"
+                    />
                   </td>
                   <td className="p-2">{active(c.active, (v) => update("chainStyles", c.id, { active: v }), `${c.label} active`)}</td>
                 </tr>
               ))}
             </OptionTable>
             <p className="mt-2 text-xs text-muted-foreground">
-              Weight factor = metal used compared with a plain cable chain (cable = 1.00). It multiplies the estimated weight of necklaces. Chain styles are tied to their 3D models, so they can be renamed, re-rated or turned off but not added.
+              Weight factor = metal used compared with a plain cable chain (cable = 1.00). It multiplies the estimated weight of necklaces. Chain styles are
+              tied to their 3D models, so they can be renamed, re-rated or turned off but not added.
             </p>
           </TabsContent>
 
@@ -227,7 +277,12 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                   <td className="p-2">{text(c.label, (v) => update("clasps", c.id, { label: v }), "Clasp name")}</td>
                   <td className="p-2">{num(c.fee, (v) => update("clasps", c.id, { fee: v }), `${c.label} fee`, "1")}</td>
                   <td className="p-2">
-                    <Input value={c.description} onChange={(e) => update("clasps", c.id, { description: e.target.value })} aria-label={`${c.label} description`} className="h-9 min-w-64" />
+                    <Input
+                      value={c.description}
+                      onChange={(e) => update("clasps", c.id, { description: e.target.value })}
+                      aria-label={`${c.label} description`}
+                      className="h-9 min-w-64"
+                    />
                   </td>
                   <td className="p-2">{active(c.active, (v) => update("clasps", c.id, { active: v }), `${c.label} active`)}</td>
                 </tr>
@@ -268,7 +323,12 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                         <td className="p-2">{num(d.weightFactor, (v) => update("designOptions", d.id, { weightFactor: v }), `${d.label} weight factor`)}</td>
                         <td className="p-2">{num(d.fee, (v) => update("designOptions", d.id, { fee: v }), `${d.label} fee`, "1")}</td>
                         <td className="p-2">
-                          <Input value={d.description} onChange={(e) => update("designOptions", d.id, { description: e.target.value })} aria-label={`${d.label} description`} className="h-9 min-w-64" />
+                          <Input
+                            value={d.description}
+                            onChange={(e) => update("designOptions", d.id, { description: e.target.value })}
+                            aria-label={`${d.label} description`}
+                            className="h-9 min-w-64"
+                          />
                         </td>
                         <td className="p-2">{active(d.active, (v) => update("designOptions", d.id, { active: v }), `${d.label} active`)}</td>
                       </tr>
@@ -278,7 +338,9 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
               );
             })}
             <p className="text-xs text-muted-foreground">
-              Weight factor = metal used compared with the simplest version (1.00); it multiplies the estimated weight. The fee is added to the estimate for the extra work (settings only when the design has stones). Each option is tied to its 3D model, so options can be renamed, re-rated or turned off but not added. Keep at least one option active in each group.
+              Weight factor = metal used compared with the simplest version (1.00); it multiplies the estimated weight. The fee is added to the estimate for the
+              extra work (settings only when the design has stones). Each option is tied to its 3D model, so options can be renamed, re-rated or turned off but
+              not added. Keep at least one option active in each group.
             </p>
           </TabsContent>
 
@@ -294,7 +356,9 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                 </tr>
               ))}
             </OptionTable>
-            <p className="mt-2 text-xs text-muted-foreground">Fonts for name pendants. Each font ships with the app as a 3D letter set, so fonts can be renamed or turned off but not added here.</p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Fonts for name pendants. Each font ships with the app as a 3D letter set, so fonts can be renamed or turned off but not added here.
+            </p>
           </TabsContent>
 
           <TabsContent value="cuts" className="mt-4">
@@ -307,7 +371,9 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                 </tr>
               ))}
             </OptionTable>
-            <p className="mt-2 text-xs text-muted-foreground">Cuts match the 3D stone shapes (round, oval, princess, pear), so they can be renamed or turned off but not added.</p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Cuts match the 3D stone shapes (round, oval, princess, pear), so they can be renamed or turned off but not added.
+            </p>
           </TabsContent>
 
           <TabsContent value="sizes" className="mt-4 space-y-6">
@@ -327,7 +393,9 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                             type="radio"
                             name={`default-${t}`}
                             checked={s.isDefault}
-                            onChange={() => setDraft((d) => ({ ...d, sizes: d.sizes.map((x) => (x.productType === t ? { ...x, isDefault: x.id === s.id } : x)) }))}
+                            onChange={() =>
+                              setDraft((d) => ({ ...d, sizes: d.sizes.map((x) => (x.productType === t ? { ...x, isDefault: x.id === s.id } : x)) }))
+                            }
                             aria-label={`Make ${s.label} the default size`}
                             className="size-4 accent-[var(--emerald)]"
                           />
@@ -337,7 +405,20 @@ function Editor({ saved, used }: { saved: CustomizationOptions; used: Set<ID> })
                       </tr>
                     ))}
                   </OptionTable>
-                  <AddButton onClick={() => add("sizes", { id: uid(`size-${t}`), productType: t, label: "New size", factor: 1, sortOrder: list.length, isDefault: false, active: false })} label={`Add ${pt.label.toLowerCase()} size`} />
+                  <AddButton
+                    onClick={() =>
+                      add("sizes", {
+                        id: uid(`size-${t}`),
+                        productType: t,
+                        label: "New size",
+                        factor: 1,
+                        sortOrder: list.length,
+                        isDefault: false,
+                        active: false,
+                      })
+                    }
+                    label={`Add ${pt.label.toLowerCase()} size`}
+                  />
                 </div>
               );
             })}
@@ -380,9 +461,20 @@ function AddButton({ onClick, label }: { onClick: () => void; label: string }) {
 /** Shows each step of the formula with the rates on this page, to check against a manual computation. */
 function FormulaPreview({ options }: { options: CustomizationOptions }) {
   const activeOpts = useMemo(() => activeOptions(options), [options]);
-  const [sample, setSample] = useState<Partial<DesignConfig>>({ productType: "ring", materialId: "mat-18k", finishId: "fin-yellow", gemstoneId: "gem-diamond", cutId: "cut-round", stoneQuantity: 1, sizeId: "size-ring-us7" });
+  const [sample, setSample] = useState<Partial<DesignConfig>>({
+    productType: "ring",
+    materialId: "mat-18k",
+    finishId: "fin-yellow",
+    gemstoneId: "gem-diamond",
+    cutId: "cut-round",
+    stoneQuantity: 1,
+    sizeId: "size-ring-us7",
+  });
   // Name pendants need a name to estimate, so the preview uses a sample name.
-  const cfg = useMemo(() => (activeOpts.productTypes.length ? normalizeConfig({ ...sample, nameText: sample.nameText || "Maria" }, activeOpts).config : null), [sample, activeOpts]);
+  const cfg = useMemo(
+    () => (activeOpts.productTypes.length ? normalizeConfig({ ...sample, nameText: sample.nameText || "Maria" }, activeOpts).config : null),
+    [sample, activeOpts],
+  );
   const est = cfg ? tryEstimate(cfg, activeOpts) : null;
 
   if (!cfg) return null;
@@ -414,12 +506,18 @@ function FormulaPreview({ options }: { options: CustomizationOptions }) {
   const chain = hasChain ? activeOpts.chainStyles.find((x) => x.id === cfg.chainStyleId) : undefined;
   const clasp = hasChain ? activeOpts.clasps.find((x) => x.id === cfg.claspId) : undefined;
   const hasStone = Boolean(g && !g.isNone);
-  const picked = OPTION_GROUPS.map((grp) => chosenOption(cfg, activeOpts, grp)).filter((o): o is NonNullable<typeof o> => Boolean(o) && (o!.group !== "setting" || hasStone));
+  const picked = OPTION_GROUPS.map((grp) => chosenOption(cfg, activeOpts, grp)).filter(
+    (o): o is NonNullable<typeof o> => Boolean(o) && (o!.group !== "setting" || hasStone),
+  );
   const rawWeight = picked.reduce((w, o) => w * o.weightFactor, pt.baseWeightG * (s?.factor ?? 0) * (m?.densityRatio ?? 0) * (chain?.weightFactor ?? 1));
   const groupPick = (grp: (typeof OPTION_GROUPS)[number]) => {
     const list = optionsFor(activeOpts, cfg.productType, grp);
     if (!list.length || (grp === "setting" && !hasStone)) return null;
-    return <div key={grp}>{pick(GROUP_LABEL[grp], cfg.choices?.[grp] ?? "", list, (v) => setSample(applyChange(cfg, { choices: { ...cfg.choices, [grp]: v } }, activeOpts)))}</div>;
+    return (
+      <div key={grp}>
+        {pick(GROUP_LABEL[grp], cfg.choices?.[grp] ?? "", list, (v) => setSample(applyChange(cfg, { choices: { ...cfg.choices, [grp]: v } }, activeOpts)))}
+      </div>
+    );
   };
 
   return (
@@ -431,12 +529,28 @@ function FormulaPreview({ options }: { options: CustomizationOptions }) {
         <p className="text-xs text-muted-foreground">Uses the rates on this page, including unsaved changes.</p>
       </div>
       <div className="grid grid-cols-2 gap-2">
-        {pick("Piece", pt.type, activeOpts.productTypes.map((p) => ({ id: p.type, label: p.label })), (v) => setSample(applyChange(cfg, { productType: v as ProductType }, activeOpts)))}
+        {pick(
+          "Piece",
+          pt.type,
+          activeOpts.productTypes.map((p) => ({ id: p.type, label: p.label })),
+          (v) => setSample(applyChange(cfg, { productType: v as ProductType }, activeOpts)),
+        )}
         {pick("Material", cfg.materialId, activeOpts.materials, (v) => set({ materialId: v }))}
-        {pick("Finish", cfg.finishId, activeOpts.finishes.filter((x) => m?.finishIds.includes(x.id)), (v) => set({ finishId: v }))}
-        {pick("Size", cfg.sizeId, activeOpts.sizes.filter((x) => x.productType === cfg.productType), (v) => set({ sizeId: v }))}
+        {pick(
+          "Finish",
+          cfg.finishId,
+          activeOpts.finishes.filter((x) => m?.finishIds.includes(x.id)),
+          (v) => set({ finishId: v }),
+        )}
+        {pick(
+          "Size",
+          cfg.sizeId,
+          activeOpts.sizes.filter((x) => x.productType === cfg.productType),
+          (v) => set({ sizeId: v }),
+        )}
         {OPTION_GROUPS.map(groupPick)}
-        {(pt.maxStones > 0 || optionsFor(activeOpts, cfg.productType, "style").some((o) => (o.stones?.max ?? 0) > 0)) && pick("Gemstone", cfg.gemstoneId, activeOpts.gemstones, (v) => setSample(applyChange(cfg, { gemstoneId: v }, activeOpts)))}
+        {(pt.maxStones > 0 || optionsFor(activeOpts, cfg.productType, "style").some((o) => (o.stones?.max ?? 0) > 0)) &&
+          pick("Gemstone", cfg.gemstoneId, activeOpts.gemstones, (v) => setSample(applyChange(cfg, { gemstoneId: v }, activeOpts)))}
         {hasStone && pick("Cut", cfg.cutId ?? "", activeOpts.cuts, (v) => set({ cutId: v }))}
         {hasChain && pick("Chain", cfg.chainStyleId ?? "", activeOpts.chainStyles, (v) => set({ chainStyleId: v }))}
         {hasChain && pick("Clasp", cfg.claspId ?? "", activeOpts.clasps, (v) => set({ claspId: v }))}
@@ -445,26 +559,62 @@ function FormulaPreview({ options }: { options: CustomizationOptions }) {
             <Label className="text-xs" htmlFor="pv-qty">
               Stones
             </Label>
-            <Input id="pv-qty" type="number" min={1} max={stoneRule(cfg, activeOpts).max} value={cfg.stoneQuantity} onChange={(e) => set({ stoneQuantity: Number(e.target.value) })} className="h-9" />
+            <Input
+              id="pv-qty"
+              type="number"
+              min={1}
+              max={stoneRule(cfg, activeOpts).max}
+              value={cfg.stoneQuantity}
+              onChange={(e) => set({ stoneQuantity: Number(e.target.value) })}
+              className="h-9"
+            />
           </div>
         )}
       </div>
       <ol className="space-y-2 rounded-xl bg-muted/50 p-3 font-mono text-xs leading-relaxed">
         <li>
-          weight = {pt.baseWeightG} g × {s?.factor} × {m?.densityRatio}{chain ? ` × ${chain.weightFactor} (${chain.label})` : ""}{picked.map((o) => ` × ${o.weightFactor} (${o.label})`).join("")} = {rawWeight.toFixed(4)} → <strong>{est?.weightG.toFixed(2)} g</strong>
+          weight = {pt.baseWeightG} g × {s?.factor} × {m?.densityRatio}
+          {chain ? ` × ${chain.weightFactor} (${chain.label})` : ""}
+          {picked.map((o) => ` × ${o.weightFactor} (${o.label})`).join("")} = {rawWeight.toFixed(4)} → <strong>{est?.weightG.toFixed(2)} g</strong>
         </li>
         <li>
           metal = {est?.weightG.toFixed(2)} × {formatPesoExact(m?.ratePerGram ?? 0)} = <strong>{formatPesoExact(est?.breakdown.metal ?? 0)}</strong>
         </li>
         <li>
-          stones = {hasStone ? `${formatPesoExact(g!.basePrice)} × ${c?.multiplier} × ${cfg.stoneQuantity}` : "none"} = <strong>{formatPesoExact(est?.breakdown.stones ?? 0)}</strong>
+          stones = {hasStone ? `${formatPesoExact(g!.basePrice)} × ${c?.multiplier} × ${cfg.stoneQuantity}` : "none"} ={" "}
+          <strong>{formatPesoExact(est?.breakdown.stones ?? 0)}</strong>
         </li>
         <li>
-          labor = <strong>{formatPesoExact(pt.laborFee)}</strong> · finish fee = <strong>{formatPesoExact(f?.fee ?? 0)}</strong>{clasp ? <> · clasp ({clasp.label}) = <strong>{formatPesoExact(clasp.fee)}</strong></> : null}
-          {picked.some((o) => o.fee > 0) ? <> · design ({picked.filter((o) => o.fee > 0).map((o) => o.label).join(" + ")}) = <strong>{formatPesoExact(est?.breakdown.design ?? 0)}</strong></> : null}
+          labor = <strong>{formatPesoExact(pt.laborFee)}</strong> · finish fee = <strong>{formatPesoExact(f?.fee ?? 0)}</strong>
+          {clasp ? (
+            <>
+              {" "}
+              · clasp ({clasp.label}) = <strong>{formatPesoExact(clasp.fee)}</strong>
+            </>
+          ) : null}
+          {picked.some((o) => o.fee > 0) ? (
+            <>
+              {" "}
+              · design (
+              {picked
+                .filter((o) => o.fee > 0)
+                .map((o) => o.label)
+                .join(" + ")}
+              ) = <strong>{formatPesoExact(est?.breakdown.design ?? 0)}</strong>
+            </>
+          ) : null}
         </li>
         <li>
-          price = {formatPesoExact((est?.breakdown.metal ?? 0) + (est?.breakdown.stones ?? 0) + (est?.breakdown.labor ?? 0) + (est?.breakdown.finish ?? 0) + (est?.breakdown.clasp ?? 0) + (est?.breakdown.design ?? 0))} → rounded to the nearest peso
+          price ={" "}
+          {formatPesoExact(
+            (est?.breakdown.metal ?? 0) +
+              (est?.breakdown.stones ?? 0) +
+              (est?.breakdown.labor ?? 0) +
+              (est?.breakdown.finish ?? 0) +
+              (est?.breakdown.clasp ?? 0) +
+              (est?.breakdown.design ?? 0),
+          )}{" "}
+          → rounded to the nearest peso
         </li>
       </ol>
       <p className="text-center">

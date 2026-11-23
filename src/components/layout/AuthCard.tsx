@@ -1,6 +1,16 @@
 import { RingGlyph } from "./Logo";
 
-export function AuthCard({ title, description, children, footer }: { title: string; description?: React.ReactNode; children: React.ReactNode; footer?: React.ReactNode }) {
+export function AuthCard({
+  title,
+  description,
+  children,
+  footer,
+}: {
+  title: string;
+  description?: React.ReactNode;
+  children: React.ReactNode;
+  footer?: React.ReactNode;
+}) {
   return (
     <div className="mx-auto w-full max-w-md px-4 py-10 sm:py-16">
       <div className="rounded-2xl border border-line bg-paper p-6 shadow-sm sm:p-8">

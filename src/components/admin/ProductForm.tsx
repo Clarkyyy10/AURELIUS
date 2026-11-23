@@ -25,7 +25,14 @@ import { slugify } from "@/lib/utils/format";
 import { PHOTO_TYPES, productSchema, type ProductInput } from "@/lib/validation/schemas";
 import { PRODUCT_TYPES, type CustomizationOptions, type DesignConfig, type Product } from "@/types";
 
-const CATEGORY: Record<string, string> = { ring: "Ring", pendant: "Pendant", name_pendant: "Name pendant", necklace: "Necklace", bracelet: "Bracelet", earrings: "Earrings" };
+const CATEGORY: Record<string, string> = {
+  ring: "Ring",
+  pendant: "Pendant",
+  name_pendant: "Name pendant",
+  necklace: "Necklace",
+  bracelet: "Bracelet",
+  earrings: "Earrings",
+};
 
 /** FR-24 — add or edit a product. */
 export function ProductForm({ product }: { product?: Product }) {
@@ -35,7 +42,17 @@ export function ProductForm({ product }: { product?: Product }) {
   const form = useForm<ProductInput>({
     resolver: zodResolver(productSchema),
     defaultValues: product
-      ? { name: product.name, slug: product.slug, category: product.category, material: product.material, price: product.price, description: product.description, availability: product.availability, hidden: product.hidden, photos: product.photos }
+      ? {
+          name: product.name,
+          slug: product.slug,
+          category: product.category,
+          material: product.material,
+          price: product.price,
+          description: product.description,
+          availability: product.availability,
+          hidden: product.hidden,
+          photos: product.photos,
+        }
       : { name: "", slug: "", category: "ring", material: "", price: 0, description: "", availability: "available", hidden: false, photos: [] },
   });
   const { errors } = form.formState;
@@ -46,7 +63,11 @@ export function ProductForm({ product }: { product?: Product }) {
   // The 3D look follows the category; it starts from the saved design (or the material name).
   const appearance = optionsQ.data
     ? normalizeConfig(
-        { ...productDesign({ ...(product ?? ({} as Product)), category: category ?? "ring", material: material ?? "", design: product?.design }, optionsQ.data), ...appearanceEdit, productType: category ?? "ring" },
+        {
+          ...productDesign({ ...(product ?? ({} as Product)), category: category ?? "ring", material: material ?? "", design: product?.design }, optionsQ.data),
+          ...appearanceEdit,
+          productType: category ?? "ring",
+        },
         optionsQ.data,
       ).config
     : null;
@@ -130,7 +151,9 @@ export function ProductForm({ product }: { product?: Product }) {
         <Textarea rows={4} {...form.register("description")} />
       </Field>
 
-      {appearance && optionsQ.data && <AppearanceEditor config={appearance} options={optionsQ.data} onChange={(p) => setAppearance({ ...appearanceEdit, ...p })} />}
+      {appearance && optionsQ.data && (
+        <AppearanceEditor config={appearance} options={optionsQ.data} onChange={(p) => setAppearance({ ...appearanceEdit, ...p })} />
+      )}
 
       <Controller
         control={form.control}
@@ -184,10 +207,23 @@ function PhotoManager({ value, onChange, error }: { value: string[]; onChange: (
                 <Button type="button" variant="ghost" size="icon-xs" onClick={() => move(i, -1)} disabled={i === 0} aria-label={`Move photo ${i + 1} left`}>
                   <ChevronLeft />
                 </Button>
-                <Button type="button" variant="ghost" size="icon-xs" onClick={() => onChange(value.filter((_, j) => j !== i))} aria-label={`Remove photo ${i + 1}`}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  onClick={() => onChange(value.filter((_, j) => j !== i))}
+                  aria-label={`Remove photo ${i + 1}`}
+                >
                   <X />
                 </Button>
-                <Button type="button" variant="ghost" size="icon-xs" onClick={() => move(i, 1)} disabled={i === value.length - 1} aria-label={`Move photo ${i + 1} right`}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  onClick={() => move(i, 1)}
+                  disabled={i === value.length - 1}
+                  aria-label={`Move photo ${i + 1} right`}
+                >
                   <ChevronRight />
                 </Button>
               </div>
@@ -213,7 +249,15 @@ function PhotoManager({ value, onChange, error }: { value: string[]; onChange: (
 }
 
 /** How the product is drawn in 3D in the shop (metal, finish, stones). Piece type comes from the category. */
-function AppearanceEditor({ config, options, onChange }: { config: DesignConfig; options: CustomizationOptions; onChange: (p: Partial<DesignConfig>) => void }) {
+function AppearanceEditor({
+  config,
+  options,
+  onChange,
+}: {
+  config: DesignConfig;
+  options: CustomizationOptions;
+  onChange: (p: Partial<DesignConfig>) => void;
+}) {
   const material = options.materials.find((m) => m.id === config.materialId);
   const pt = options.productTypes.find((p) => p.type === config.productType);
   const gem = options.gemstones.find((g) => g.id === config.gemstoneId);
@@ -241,7 +285,12 @@ function AppearanceEditor({ config, options, onChange }: { config: DesignConfig;
       <div className="grid gap-4 md:grid-cols-[1fr_16rem]">
         <div className="grid content-start gap-3 sm:grid-cols-2">
           {pick("Metal", config.materialId, options.materials, (v) => onChange({ materialId: v }))}
-          {pick("Color / finish", config.finishId, options.finishes.filter((f) => material?.finishIds.includes(f.id)), (v) => onChange({ finishId: v }))}
+          {pick(
+            "Color / finish",
+            config.finishId,
+            options.finishes.filter((f) => material?.finishIds.includes(f.id)),
+            (v) => onChange({ finishId: v }),
+          )}
           {(pt?.maxStones ?? 0) > 0 && pick("Gemstone", config.gemstoneId, options.gemstones, (v) => onChange({ gemstoneId: v }))}
           {hasStone && pick("Cut", config.cutId ?? "", options.cuts, (v) => onChange({ cutId: v }))}
           {hasStone &&
@@ -251,7 +300,9 @@ function AppearanceEditor({ config, options, onChange }: { config: DesignConfig;
               Array.from({ length: pt?.maxStones ?? 1 }, (_, i) => ({ id: String(i + 1), label: String(i + 1) })),
               (v) => onChange({ stoneQuantity: Number(v) }),
             )}
-          <p className="text-xs text-muted-foreground sm:col-span-2">Customers can rotate and zoom this model on the shop page. It doesn&apos;t change the price you set above.</p>
+          <p className="text-xs text-muted-foreground sm:col-span-2">
+            Customers can rotate and zoom this model on the shop page. It doesn&apos;t change the price you set above.
+          </p>
         </div>
         <LazyJewelryViewer config={config} options={options} showControls={false} className="aspect-square w-full" label="3D preview of this product" />
       </div>

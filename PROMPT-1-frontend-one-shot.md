@@ -10,6 +10,7 @@ Goal: a complete, polished, working front end for customers and the owner that r
 mock data, exactly as specified in `docs/frontend-spec.md`, and passes the acceptance checklist in §9.
 
 Work autonomously through these milestones without stopping for approval. Commit after each one.
+
 1. **Scaffold.** Create the Next.js app (TypeScript strict, App Router, `src/`, Tailwind, ESLint)
    in the current folder. Install shadcn/ui, lucide-react, react-hook-form, zod, zustand, date-fns,
    three, @react-three/fiber, @react-three/drei, vitest, @testing-library/react. Set up the design
@@ -35,6 +36,7 @@ Work autonomously through these milestones without stopping for approval. Commit
     768 px, and 1280 px widths.
 
 Rules while working:
+
 - Follow the specs exactly; where they are silent, choose the simplest option that a first-time user
   would understand, and note the decision in `docs/decisions.md`.
 - Keep each module's code in its own folder. No hard-coded rates or options in components.
@@ -42,6 +44,7 @@ Rules while working:
 - Do not skip loading, empty, and error states.
 
 When everything passes, reply with:
+
 1. what was built (by module, with FR numbers),
 2. how to run it (`npm install`, `npm run dev`, demo accounts),
 3. a short demo script for the panel (custom order flow and service flow),

@@ -66,7 +66,10 @@ function AccountDashboard() {
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {actions.map(({ t, action }) => (
               <li key={t.id}>
-                <Link href={detailHref(t.kind, t.id, "customer")} className={`flex h-full flex-col gap-2 rounded-xl border p-4 hover:shadow-sm ${t.status === "ready_for_claiming" ? "border-success/40 bg-success/5" : "border-warning/40 bg-warning/5"}`}>
+                <Link
+                  href={detailHref(t.kind, t.id, "customer")}
+                  className={`flex h-full flex-col gap-2 rounded-xl border p-4 hover:shadow-sm ${t.status === "ready_for_claiming" ? "border-success/40 bg-success/5" : "border-warning/40 bg-warning/5"}`}
+                >
                   <span className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
                     {KIND_LABEL[t.kind]} · {t.code} <StatusBadge status={t.status} />
                   </span>
@@ -94,17 +97,52 @@ function AccountDashboard() {
         {q.data && (
           <>
             <TabsContent value="orders" className="mt-4">
-              <TransactionTable rows={byKind("order")} kind="order" role="customer" serviceNames={serviceNames} empty={{ title: "No orders yet", description: "Browse the shop to find a ready-made piece." }} extraToolbar={<Link href="/shop" className="text-sm text-gold-dark underline">Go to the shop</Link>} />
+              <TransactionTable
+                rows={byKind("order")}
+                kind="order"
+                role="customer"
+                serviceNames={serviceNames}
+                empty={{ title: "No orders yet", description: "Browse the shop to find a ready-made piece." }}
+                extraToolbar={
+                  <Link href="/shop" className="text-sm text-gold-dark underline">
+                    Go to the shop
+                  </Link>
+                }
+              />
             </TabsContent>
             <TabsContent value="custom" className="mt-4">
-              <TransactionTable rows={byKind("custom")} kind="custom" role="customer" serviceNames={serviceNames} empty={{ title: "No custom designs yet", description: "Design your own piece in 3D." }} extraToolbar={<Link href="/customize" className="text-sm text-gold-dark underline">Design a piece</Link>} />
+              <TransactionTable
+                rows={byKind("custom")}
+                kind="custom"
+                role="customer"
+                serviceNames={serviceNames}
+                empty={{ title: "No custom designs yet", description: "Design your own piece in 3D." }}
+                extraToolbar={
+                  <Link href="/customize" className="text-sm text-gold-dark underline">
+                    Design a piece
+                  </Link>
+                }
+              />
             </TabsContent>
             <TabsContent value="services" className="mt-4">
-              <TransactionTable rows={byKind("service")} kind="service" role="customer" serviceNames={serviceNames} empty={{ title: "No service requests yet", description: "Book a cleaning, repair, or resizing." }} extraToolbar={<Link href="/services" className="text-sm text-gold-dark underline">Book a service</Link>} />
+              <TransactionTable
+                rows={byKind("service")}
+                kind="service"
+                role="customer"
+                serviceNames={serviceNames}
+                empty={{ title: "No service requests yet", description: "Book a cleaning, repair, or resizing." }}
+                extraToolbar={
+                  <Link href="/services" className="text-sm text-gold-dark underline">
+                    Book a service
+                  </Link>
+                }
+              />
             </TabsContent>
             <TabsContent value="payments" className="mt-4 space-y-3">
               {payments.length === 0 ? (
-                <p className="rounded-xl border border-dashed border-line p-6 text-center text-muted-foreground">No payments yet. Payments appear here after you submit them.</p>
+                <p className="rounded-xl border border-dashed border-line p-6 text-center text-muted-foreground">
+                  No payments yet. Payments appear here after you submit them.
+                </p>
               ) : (
                 Object.values(Object.groupBy(payments, (p) => p.tx.id)).map((group) => {
                   const tx = group![0].tx;

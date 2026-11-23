@@ -45,7 +45,9 @@ export function Forbidden() {
       <ShieldAlert className="mb-4 size-10 text-gold-dark" aria-hidden />
       <p className="text-sm font-medium text-muted-foreground">Error 403</p>
       <h1 className="mt-1 text-3xl">This page is for the store owner.</h1>
-      <p className="mt-2 text-muted-foreground">You&apos;re signed in as a customer, so you can&apos;t open owner pages. Go to your account to see your orders and requests.</p>
+      <p className="mt-2 text-muted-foreground">
+        You&apos;re signed in as a customer, so you can&apos;t open owner pages. Go to your account to see your orders and requests.
+      </p>
       <div className="mt-6 flex gap-2">
         <Button asChild>
           <Link href="/account">Go to my account</Link>
@@ -68,7 +70,8 @@ export function VerifyEmailBanner({ user, action = "place orders or submit reque
       <div className="min-w-0 flex-1">
         <p className="font-medium">Please verify your email address</p>
         <p className="text-muted-foreground">
-          We sent a confirmation link to <strong>{user.email}</strong>. You need to verify it before you can {action}. (Demo: open “Simulated emails” in the bar at the top.)
+          We sent a confirmation link to <strong>{user.email}</strong>. You need to verify it before you can {action}. (Demo: open “Simulated emails” in the bar
+          at the top.)
         </p>
       </div>
       <Button

@@ -10,7 +10,11 @@ export default function NotificationsPage() {
   if (!user) return null;
   return (
     <div>
-      <PageHeader title="Notifications" back={{ href: "/account", label: "Back to my account" }} description="Updates about your orders, designs, and service requests. Important ones are also sent by email." />
+      <PageHeader
+        title="Notifications"
+        back={{ href: "/account", label: "Back to my account" }}
+        description="Updates about your orders, designs, and service requests. Important ones are also sent by email."
+      />
       <NotificationList user={user} />
     </div>
   );

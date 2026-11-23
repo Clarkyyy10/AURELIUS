@@ -29,10 +29,18 @@ export function SiteFooter() {
           <Clock className="mt-0.5 size-4 shrink-0 text-gold-dark" aria-hidden /> {settings.openingHours}
         </p>
         <nav className="flex flex-col gap-2 text-sm" aria-label="Footer">
-          <Link href="/shop" className="hover:underline">Shop</Link>
-          <Link href="/customize" className="hover:underline">Design your piece</Link>
-          <Link href="/services" className="hover:underline">Services</Link>
-          <Link href="/privacy" className="text-gold-dark hover:underline">Privacy Notice</Link>
+          <Link href="/shop" className="hover:underline">
+            Shop
+          </Link>
+          <Link href="/customize" className="hover:underline">
+            Design your piece
+          </Link>
+          <Link href="/services" className="hover:underline">
+            Services
+          </Link>
+          <Link href="/privacy" className="text-gold-dark hover:underline">
+            Privacy Notice
+          </Link>
         </nav>
       </div>
       <p className="border-t border-line py-4 text-center text-xs text-muted-foreground">

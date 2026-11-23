@@ -88,7 +88,9 @@ export function PaymentList({ payments, renderActions }: { payments: Payment[]; 
               {PAYMENT_METHOD_LABEL[p.method]} · Paid {formatDate(p.paidOn)} · Ref. {p.referenceNumber}
               {p.recordedBy === "owner" && " · Recorded by the store"}
             </p>
-            {p.status === "rejected" && p.rejectionReason && <p className="mt-1 rounded-md bg-danger/5 px-2 py-1 text-sm text-danger">Reason: {p.rejectionReason}</p>}
+            {p.status === "rejected" && p.rejectionReason && (
+              <p className="mt-1 rounded-md bg-danger/5 px-2 py-1 text-sm text-danger">Reason: {p.rejectionReason}</p>
+            )}
           </div>
           {renderActions?.(p)}
         </li>
@@ -136,7 +138,15 @@ export function PaymentForm({ tx, onDone }: { tx: Transaction; onDone?: () => vo
     setError(null);
     try {
       const v = customerPaymentSchema.parse({ ...values, proofFile: files[0] });
-      await repos.payments.submit(tx.kind, tx.id, { kind: v.kind, amount: v.amount, paidOn: v.paidOn, method: v.method, referenceNumber: v.referenceNumber, proofFile: files[0], clientRequestId: requestId });
+      await repos.payments.submit(tx.kind, tx.id, {
+        kind: v.kind,
+        amount: v.amount,
+        paidOn: v.paidOn,
+        method: v.method,
+        referenceNumber: v.referenceNumber,
+        proofFile: files[0],
+        clientRequestId: requestId,
+      });
       toast.success("Payment submitted. The owner will verify it soon.");
       onDone?.();
     } catch (e) {

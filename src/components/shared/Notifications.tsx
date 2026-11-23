@@ -4,13 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bell, CheckCheck, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { repos } from "@/lib/data";
 import { useQuery } from "@/lib/data/hooks";
 import { cn } from "@/lib/utils";
@@ -117,7 +111,10 @@ export function NotificationList({ user }: { user: UserProfile }) {
           <CheckCheck className="size-4" /> Mark all as read
         </Button>
       )}
-      <QueryView query={q} empty={(d) => (d.length === 0 ? <EmptyState title="No notifications yet" description="We'll let you know here when something changes." /> : null)}>
+      <QueryView
+        query={q}
+        empty={(d) => (d.length === 0 ? <EmptyState title="No notifications yet" description="We'll let you know here when something changes." /> : null)}
+      >
         {(list) => (
           <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-paper">
             {list.map((n) => (

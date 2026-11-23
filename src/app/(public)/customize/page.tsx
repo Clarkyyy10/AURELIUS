@@ -47,7 +47,9 @@ function CustomizerLoader() {
   const draft = draftQ.data?.kind === "custom_order" ? draftQ.data : null;
   const product = productQ.data ?? null;
 
-  let start: Partial<DesignConfig> = { productType: PRODUCT_TYPES.includes(typeParam as ProductType) ? (typeParam as ProductType) : (product?.category ?? "ring") };
+  let start: Partial<DesignConfig> = {
+    productType: PRODUCT_TYPES.includes(typeParam as ProductType) ? (typeParam as ProductType) : (product?.category ?? "ring"),
+  };
   if (request) start = request.versions[request.versions.length - 1].config;
   else if (draft) start = { ...start, ...draft.config, notes: draft.notes ?? draft.config.notes };
   // A design a guest started before logging in is restored (frontend-spec §5.4).
@@ -190,7 +192,9 @@ function Customizer({
                 </p>
               </div>
             )}
-            {!canRevise && <p className="rounded-lg bg-muted px-3 py-2 text-sm">This design isn&apos;t waiting for changes right now, so it can&apos;t be resubmitted.</p>}
+            {!canRevise && (
+              <p className="rounded-lg bg-muted px-3 py-2 text-sm">This design isn&apos;t waiting for changes right now, so it can&apos;t be resubmitted.</p>
+            )}
           </div>
         )}
         {draft && (
@@ -207,7 +211,13 @@ function Customizer({
 
       <div className="mt-4 grid gap-6 lg:grid-cols-[3fr_2fr]">
         <div className="min-w-0 lg:sticky lg:top-20 lg:self-start">
-          <LazyJewelryViewer config={config} options={options} captureRef={captureRef} className="h-[45vh] min-h-72 w-full rounded-none sm:rounded-2xl lg:h-[calc(100vh-8rem)] lg:max-h-[720px]" label={`3D preview: ${labels.finish} ${labels.material} ${labels.productType.toLowerCase()}, ${labels.gemstone}, size ${labels.size}`} />
+          <LazyJewelryViewer
+            config={config}
+            options={options}
+            captureRef={captureRef}
+            className="h-[45vh] min-h-72 w-full rounded-none sm:rounded-2xl lg:h-[calc(100vh-8rem)] lg:max-h-[720px]"
+            label={`3D preview: ${labels.finish} ${labels.material} ${labels.productType.toLowerCase()}, ${labels.gemstone}, size ${labels.size}`}
+          />
         </div>
 
         <div className="min-w-0 px-4 sm:px-0">

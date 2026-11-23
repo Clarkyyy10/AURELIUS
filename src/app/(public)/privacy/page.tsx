@@ -15,19 +15,22 @@ const sections: [string, React.ReactNode][] = [
   [
     "Why we collect it",
     <p key="b">
-      Only to process your orders and requests: to review your design, send quotations, verify your payments, update you on progress, and contact you when your item is ready. We do not use your data for advertising, and we do not sell it.
+      Only to process your orders and requests: to review your design, send quotations, verify your payments, update you on progress, and contact you when your
+      item is ready. We do not use your data for advertising, and we do not sell it.
     </p>,
   ],
   [
     "Who can see it",
     <p key="c">
-      Only you and the store owner. The AURELIUS assistant (chatbot) does not receive your name, email, or mobile number. Our hosting providers store the data securely on our behalf.
+      Only you and the store owner. The AURELIUS assistant (chatbot) does not receive your name, email, or mobile number. Our hosting providers store the data
+      securely on our behalf.
     </p>,
   ],
   [
     "How long we keep it",
     <p key="d">
-      While your account is active, and afterwards only as long as needed for our business records or as required by law (for example, tax rules). After that we delete it.
+      While your account is active, and afterwards only as long as needed for our business records or as required by law (for example, tax rules). After that we
+      delete it.
     </p>,
   ],
   [
@@ -42,14 +45,13 @@ const sections: [string, React.ReactNode][] = [
   ],
   [
     "Consent",
-    <p key="f">
-      When you register, we ask you to agree to this notice before we collect any personal data. We record the date and time you agreed.
-    </p>,
+    <p key="f">When you register, we ask you to agree to this notice before we collect any personal data. We record the date and time you agreed.</p>,
   ],
   [
     "Contact us",
     <p key="g">
-      Afable&apos;s Jewelry Store, Montalban Public Market, Rodriguez, Rizal · 0917 123 4500 · hello@afables.ph. Visit the store or message us to use any of your rights.
+      Afable&apos;s Jewelry Store, Montalban Public Market, Rodriguez, Rizal · 0917 123 4500 · hello@afables.ph. Visit the store or message us to use any of
+      your rights.
     </p>,
   ],
 ];

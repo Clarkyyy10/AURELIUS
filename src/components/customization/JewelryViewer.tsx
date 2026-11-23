@@ -56,7 +56,15 @@ export interface JewelryViewerProps {
   label?: string;
 }
 
-export function JewelryViewer({ config, options, captureRef, autoRotate = true, showControls = true, className, label = "3D preview of your design" }: JewelryViewerProps) {
+export function JewelryViewer({
+  config,
+  options,
+  captureRef,
+  autoRotate = true,
+  showControls = true,
+  className,
+  label = "3D preview of your design",
+}: JewelryViewerProps) {
   const webgl = useWebGL();
   const reduced = usePrefersReducedMotion();
   const fitRef = useRef<(() => void) | null>(null);
@@ -73,14 +81,21 @@ export function JewelryViewer({ config, options, captureRef, autoRotate = true, 
   if (webgl === false) return <NoWebGL className={className} />;
 
   return (
-    <div ref={wrap} className={cn("relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#FFFDF9] to-[#EFE7DA]", className)} role="img" aria-label={label}>
+    <div
+      ref={wrap}
+      className={cn("relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#FFFDF9] to-[#EFE7DA]", className)}
+      role="img"
+      aria-label={label}
+    >
       {webgl && (
-        <Canvas
-          dpr={[1, 2]}
-          gl={{ preserveDrawingBuffer: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping }}
-          shadows={false}
-        >
-          <JewelryScene config={config} options={options} autoRotate={autoRotate && !reduced && !interacted} onInteract={() => setInteracted(true)} fitRef={fitRef} />
+        <Canvas dpr={[1, 2]} gl={{ preserveDrawingBuffer: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping }} shadows={false}>
+          <JewelryScene
+            config={config}
+            options={options}
+            autoRotate={autoRotate && !reduced && !interacted}
+            onInteract={() => setInteracted(true)}
+            fitRef={fitRef}
+          />
           <SnapshotBridge captureRef={captureRef} />
         </Canvas>
       )}
@@ -110,7 +125,11 @@ export function JewelryViewer({ config, options, captureRef, autoRotate = true, 
           </Button>
         </div>
       )}
-      {showControls && webgl && <p className="pointer-events-none absolute top-3 left-3 rounded-full bg-paper/80 px-2.5 py-1 text-xs text-muted-foreground">Drag to rotate · scroll or pinch to zoom</p>}
+      {showControls && webgl && (
+        <p className="pointer-events-none absolute top-3 left-3 rounded-full bg-paper/80 px-2.5 py-1 text-xs text-muted-foreground">
+          Drag to rotate · scroll or pinch to zoom
+        </p>
+      )}
     </div>
   );
 }
@@ -127,4 +146,3 @@ export function NoWebGL({ className }: { className?: string }) {
     </div>
   );
 }
-

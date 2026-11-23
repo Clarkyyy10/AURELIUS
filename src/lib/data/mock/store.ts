@@ -94,9 +94,26 @@ export function createSeedState(now = new Date()): DbState {
 }
 
 const DB_KEYS: (keyof DbState)[] = [
-  "users", "sessionUserId", "failedLogins", "verifyTokens", "resetTokens", "options", "products", "services", "faqs",
-  "policies", "settings", "customOrders", "orders", "serviceRequests", "notifications", "emails", "drafts", "processed",
-  "counters", "pendingDesign",
+  "users",
+  "sessionUserId",
+  "failedLogins",
+  "verifyTokens",
+  "resetTokens",
+  "options",
+  "products",
+  "services",
+  "faqs",
+  "policies",
+  "settings",
+  "customOrders",
+  "orders",
+  "serviceRequests",
+  "notifications",
+  "emails",
+  "drafts",
+  "processed",
+  "counters",
+  "pendingDesign",
 ];
 
 function pickDb(s: DemoState | DbState): DbState {
@@ -159,7 +176,8 @@ export const useDemoStore = create<DemoState>()(
           const seedProductsNow = seedProducts(new Date());
           for (const p of state.products ?? []) {
             const sp = seedProductsNow.find((x) => x.id === p.id);
-            if (p.category === "necklace" && sp?.design?.chainStyleId && !p.design?.chainStyleId) p.design = { ...p.design, chainStyleId: sp.design.chainStyleId, claspId: sp.design.claspId };
+            if (p.category === "necklace" && sp?.design?.chainStyleId && !p.design?.chainStyleId)
+              p.design = { ...p.design, chainStyleId: sp.design.chainStyleId, claspId: sp.design.claspId };
           }
         }
         // v6: design options (styles, settings, band shapes, shanks, textures), more cuts and

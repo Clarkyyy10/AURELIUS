@@ -25,8 +25,7 @@ const cormorant = Cormorant_Garamond({
 
 export const metadata: Metadata = {
   title: { default: "AURELIUS by Afable's Jewelry Store", template: "%s · AURELIUS" },
-  description:
-    "Design your piece in 3D, order from our collection, or book a repair at Afable's Jewelry Store in Montalban.",
+  description: "Design your piece in 3D, order from our collection, or book a repair at Afable's Jewelry Store in Montalban.",
 };
 
 export const viewport: Viewport = { themeColor: "#FAF7F2" };

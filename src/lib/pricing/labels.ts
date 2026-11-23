@@ -14,7 +14,10 @@ export function designLabels(config: DesignConfig, options: CustomizationOptions
     cut: hasStone ? (options.cuts.find((c) => c.id === config.cutId)?.label ?? null) : null,
     size: options.sizes.find((s) => s.id === config.sizeId)?.label ?? "—",
     name: config.productType === "name_pendant" ? (config.nameText ?? "").trim() || null : null,
-    font: config.productType === "name_pendant" || (config.styleText?.trim() && chosenOption(config, options, "style")?.key !== "zodiac") ? ((options.fonts ?? []).find((x) => x.id === config.fontId)?.label ?? null) : null,
+    font:
+      config.productType === "name_pendant" || (config.styleText?.trim() && chosenOption(config, options, "style")?.key !== "zodiac")
+        ? ((options.fonts ?? []).find((x) => x.id === config.fontId)?.label ?? null)
+        : null,
     chain: usesChain(config, options) ? ((options.chainStyles ?? []).find((x) => x.id === config.chainStyleId)?.label ?? null) : null,
     clasp: usesChain(config, options) ? ((options.clasps ?? []).find((x) => x.id === config.claspId)?.label ?? null) : null,
     style: chosenOption(config, options, "style")?.label ?? null,

@@ -74,7 +74,11 @@ export function QuotationCard({ tx, canRespond }: { tx: Transaction; canRespond:
                 ) : (
                   "."
                 )}{" "}
-                {isService ? "Bring your item to the store so we can start." : q.downPaymentRequired > 0 ? "Next, pay the down payment and upload your receipt." : "Your order will be confirmed."}
+                {isService
+                  ? "Bring your item to the store so we can start."
+                  : q.downPaymentRequired > 0
+                    ? "Next, pay the down payment and upload your receipt."
+                    : "Your order will be confirmed."}
               </>
             }
             confirmLabel="Accept"

@@ -43,8 +43,22 @@ export const seedFinishes: FinishOption[] = [
 export const seedMaterials: MaterialOption[] = [
   { id: "mat-18k", label: "18K Gold", ratePerGram: 4200, densityRatio: 1.51, finishIds: ["fin-yellow", "fin-white", "fin-rose"], active: true },
   { id: "mat-14k", label: "14K Gold", ratePerGram: 3300, densityRatio: 1.26, finishIds: ["fin-yellow", "fin-white", "fin-rose"], active: true },
-  { id: "mat-silver", label: "Sterling Silver 925", ratePerGram: 95, densityRatio: 1.0, finishIds: ["fin-polished", "fin-oxidized", "fin-gold-plated"], active: true },
-  { id: "mat-steel", label: "Stainless Steel", ratePerGram: 40, densityRatio: 0.77, finishIds: ["fin-silver-tone", "fin-black", "fin-gold-tone"], active: true },
+  {
+    id: "mat-silver",
+    label: "Sterling Silver 925",
+    ratePerGram: 95,
+    densityRatio: 1.0,
+    finishIds: ["fin-polished", "fin-oxidized", "fin-gold-plated"],
+    active: true,
+  },
+  {
+    id: "mat-steel",
+    label: "Stainless Steel",
+    ratePerGram: 40,
+    densityRatio: 0.77,
+    finishIds: ["fin-silver-tone", "fin-black", "fin-gold-tone"],
+    active: true,
+  },
 ];
 
 export const seedGemstones: GemstoneOption[] = [
@@ -81,7 +95,11 @@ export const seedCuts: CutOption[] = [
 
 function sizes(type: ProductType, list: [label: string, factor: number, isDefault?: boolean][]): SizeOption[] {
   return list.map(([label, factor, isDefault], i) => ({
-    id: `size-${type}-${label.split(" · ")[0].toLowerCase().replace(/[^a-z0-9.]+/g, "").replace(/\./g, "_")}`,
+    id: `size-${type}-${label
+      .split(" · ")[0]
+      .toLowerCase()
+      .replace(/[^a-z0-9.]+/g, "")
+      .replace(/\./g, "_")}`,
     productType: type,
     label,
     factor,
@@ -92,7 +110,14 @@ function sizes(type: ProductType, list: [label: string, factor: number, isDefaul
 }
 
 export const seedSizes: SizeOption[] = [
-  ...sizes("ring", [["US 5", 0.9], ["US 6", 0.95], ["US 7", 1.0, true], ["US 8", 1.05], ["US 9", 1.1], ["US 10", 1.15]]),
+  ...sizes("ring", [
+    ["US 5", 0.9],
+    ["US 6", 0.95],
+    ["US 7", 1.0, true],
+    ["US 8", 1.05],
+    ["US 9", 1.1],
+    ["US 10", 1.15],
+  ]),
   // Necklace lengths with their common names; factor = length ÷ 18 in.
   ...sizes("necklace", [
     ["14 in · Choker", 0.78],
@@ -103,12 +128,36 @@ export const seedSizes: SizeOption[] = [
     ["24 in · Matinee", 1.33],
     ["30 in · Opera", 1.67],
   ]),
-  ...sizes("bracelet", [["6.5 in", 0.93], ["7 in", 1.0, true], ["7.5 in", 1.07]]),
-  ...sizes("pendant", [["Small", 0.8], ["Medium", 1.0, true], ["Large", 1.25]]),
-  ...sizes("name_pendant", [["Small (10 mm letters)", 0.8], ["Medium (13 mm letters)", 1.0, true], ["Large (16 mm letters)", 1.3]]),
-  ...sizes("earrings", [["Small", 0.8], ["Medium", 1.0, true], ["Large", 1.25]]),
-  ...sizes("anklet", [["9 in", 0.9], ["10 in", 1.0, true], ["11 in", 1.1]]),
-  ...sizes("toe_ring", [["Small", 0.9], ["Medium", 1.0, true], ["Large", 1.1]]),
+  ...sizes("bracelet", [
+    ["6.5 in", 0.93],
+    ["7 in", 1.0, true],
+    ["7.5 in", 1.07],
+  ]),
+  ...sizes("pendant", [
+    ["Small", 0.8],
+    ["Medium", 1.0, true],
+    ["Large", 1.25],
+  ]),
+  ...sizes("name_pendant", [
+    ["Small (10 mm letters)", 0.8],
+    ["Medium (13 mm letters)", 1.0, true],
+    ["Large (16 mm letters)", 1.3],
+  ]),
+  ...sizes("earrings", [
+    ["Small", 0.8],
+    ["Medium", 1.0, true],
+    ["Large", 1.25],
+  ]),
+  ...sizes("anklet", [
+    ["9 in", 0.9],
+    ["10 in", 1.0, true],
+    ["11 in", 1.1],
+  ]),
+  ...sizes("toe_ring", [
+    ["Small", 0.9],
+    ["Medium", 1.0, true],
+    ["Large", 1.1],
+  ]),
 ];
 
 type C = [pattern: ChainStyleOption["pattern"], family: ChainStyleOption["family"], label: string, weightFactor: number, description: string];
@@ -153,8 +202,22 @@ export const seedChainStyles: ChainStyleOption[] = chains.map(([pattern, family,
 
 export const seedClasps: ClaspOption[] = [
   { id: "clasp-lobster", kind: "lobster", label: "Lobster claw", description: "Spring-loaded hook. Secure and the most popular choice.", fee: 0, active: true },
-  { id: "clasp-spring-ring", kind: "spring_ring", label: "Spring ring", description: "Small round clasp with a tiny lever. Best for light chains.", fee: 0, active: true },
-  { id: "clasp-toggle", kind: "toggle", label: "Toggle", description: "A bar slips through a ring. Easy to put on by yourself; decorative.", fee: 450, active: true },
+  {
+    id: "clasp-spring-ring",
+    kind: "spring_ring",
+    label: "Spring ring",
+    description: "Small round clasp with a tiny lever. Best for light chains.",
+    fee: 0,
+    active: true,
+  },
+  {
+    id: "clasp-toggle",
+    kind: "toggle",
+    label: "Toggle",
+    description: "A bar slips through a ring. Easy to put on by yourself; decorative.",
+    fee: 450,
+    active: true,
+  },
   { id: "clasp-box", kind: "box", label: "Box clasp", description: "A tab clicks into a small box. Very secure for heavier chains.", fee: 650, active: true },
 ];
 

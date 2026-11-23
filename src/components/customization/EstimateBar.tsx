@@ -8,7 +8,17 @@ import { formatPeso, formatPesoExact, formatWeight } from "@/lib/utils/format";
 import type { Estimate } from "@/types";
 
 /** FR-06 — estimated weight and price, labelled as an estimate, with an expandable breakdown. */
-export function EstimateBar({ estimate, error, className, action }: { estimate: Estimate | null; error?: string | null; className?: string; action?: React.ReactNode }) {
+export function EstimateBar({
+  estimate,
+  error,
+  className,
+  action,
+}: {
+  estimate: Estimate | null;
+  error?: string | null;
+  className?: string;
+  action?: React.ReactNode;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <div className={cn("@container rounded-2xl border border-line bg-paper p-3 shadow-[0_-6px_20px_-12px_rgba(28,27,25,0.25)] sm:p-4", className)}>
@@ -34,7 +44,12 @@ export function EstimateBar({ estimate, error, className, action }: { estimate: 
       </div>
       {estimate && (
         <div className="mt-2">
-          <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="inline-flex min-h-8 items-center gap-1 text-sm text-gold-dark hover:underline">
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            className="inline-flex min-h-8 items-center gap-1 text-sm text-gold-dark hover:underline"
+          >
             How this estimate is computed <ChevronDown className={cn("size-4 transition-transform", open && "rotate-180")} aria-hidden />
           </button>
           {open && (

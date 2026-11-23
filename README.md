@@ -28,11 +28,11 @@ npm run build && npm start
 Use the **Demo mode** bar at the top to switch between Guest, Customer (Maria Santos) and Owner, read
 **Simulated emails** (verification and reset links), turn on **Simulate errors**, or **Reset demo data**.
 
-| Role | Email | Password |
-|---|---|---|
-| Customer | `maria@demo.ph` | any 8+ characters |
-| Customer (unverified) | `ana@demo.ph` | any 8+ characters |
-| Owner | `owner@afables.ph` | any 8+ characters |
+| Role                  | Email              | Password          |
+| --------------------- | ------------------ | ----------------- |
+| Customer              | `maria@demo.ph`    | any 8+ characters |
+| Customer (unverified) | `ana@demo.ph`      | any 8+ characters |
+| Owner                 | `owner@afables.ph` | any 8+ characters |
 
 Data is saved in your browser (localStorage + IndexedDB). Reset it from the Demo bar.
 

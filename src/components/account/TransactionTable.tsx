@@ -32,11 +32,25 @@ export function TransactionTable({
 }) {
   const [status, setStatus] = useState(initialStatus ?? "all");
   const statuses = useMemo(() => (kind ? allStatuses(kind) : [...new Set(rows.map((r) => r.status))]), [kind, rows]);
-  const filtered = status === "all" ? rows : status === "__open" ? rows.filter((r) => !["completed", "claimed", "cancelled", "declined", "rejected"].includes(r.status)) : rows.filter((r) => r.status === status);
+  const filtered =
+    status === "all"
+      ? rows
+      : status === "__open"
+        ? rows.filter((r) => !["completed", "claimed", "cancelled", "declined", "rejected"].includes(r.status))
+        : rows.filter((r) => r.status === status);
 
   const columns: Column<Transaction>[] = [
     { key: "code", header: "Code", primary: true, cell: (t) => <span className="font-mono text-sm">{t.code}</span>, sortValue: (t) => t.code },
-    ...(customers ? [{ key: "customer", header: "Customer", cell: (t: Transaction) => customers[t.customerId]?.fullName ?? "—", sortValue: (t: Transaction) => customers[t.customerId]?.fullName ?? "" }] : []),
+    ...(customers
+      ? [
+          {
+            key: "customer",
+            header: "Customer",
+            cell: (t: Transaction) => customers[t.customerId]?.fullName ?? "—",
+            sortValue: (t: Transaction) => customers[t.customerId]?.fullName ?? "",
+          },
+        ]
+      : []),
     { key: "item", header: "Item", cell: (t) => <span className="line-clamp-2">{txTitle(t, serviceNames)}</span> },
     { key: "date", header: "Date", cell: (t) => <DateText value={t.createdAt} />, sortValue: (t) => t.createdAt },
     { key: "status", header: "Status", primary: true, cell: (t) => <StatusBadge status={t.status} />, sortValue: (t) => statusLabel(t.status) },

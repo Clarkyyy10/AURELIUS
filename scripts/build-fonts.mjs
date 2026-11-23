@@ -23,7 +23,8 @@ const FONTS = [
 ];
 
 const pkgDir = (file) => join(process.cwd(), "node_modules", file.split("/").slice(0, 2).join("/"));
-const licenseOf = (file) => (readFileSync(join(pkgDir(file), "LICENSE"), "utf8").includes("Apache License") ? "Apache License 2.0" : "SIL Open Font License 1.1");
+const licenseOf = (file) =>
+  readFileSync(join(pkgDir(file), "LICENSE"), "utf8").includes("Apache License") ? "Apache License 2.0" : "SIL Open Font License 1.1";
 
 const out = join(process.cwd(), "public", "fonts");
 mkdirSync(out, { recursive: true });

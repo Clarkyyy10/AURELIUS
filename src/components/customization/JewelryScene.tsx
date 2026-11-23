@@ -76,7 +76,15 @@ export function useResolved(config: DesignConfig, options: CustomizationOptions)
  * whole sphere fits the view (so it stays in frame while it turns), aimed at its center.
  * Runs when the shape changes and when "Reset view" is pressed.
  */
-function AutoFit({ target, fitRef, shapeKey }: { target: React.RefObject<THREE.Object3D | null>; fitRef?: React.RefObject<(() => void) | null>; shapeKey: string }) {
+function AutoFit({
+  target,
+  fitRef,
+  shapeKey,
+}: {
+  target: React.RefObject<THREE.Object3D | null>;
+  fitRef?: React.RefObject<(() => void) | null>;
+  shapeKey: string;
+}) {
   const get = useThree((s) => s.get);
   // Re-run the fit once the orbit controls are registered or the view is resized.
   const controlsReady = useThree((s) => Boolean(s.controls));
@@ -155,7 +163,16 @@ export interface JewelrySceneProps {
   background?: string;
 }
 
-export function JewelryScene({ config, options, autoRotate, enableRotate = true, enableZoom = true, onInteract, fitRef, background = "#F6F1E9" }: JewelrySceneProps) {
+export function JewelryScene({
+  config,
+  options,
+  autoRotate,
+  enableRotate = true,
+  enableZoom = true,
+  onInteract,
+  fitRef,
+  background = "#F6F1E9",
+}: JewelrySceneProps) {
   const resolved = useResolved(config, options);
   const [shadowY, setShadowY] = useState(-1.2);
   const fitKey = `${config.productType}|${config.sizeId}|${config.gemstoneId === "gem-none" ? 0 : config.stoneQuantity}|${config.nameText ?? ""}|${config.fontId ?? ""}|${config.chainStyleId ?? ""}|${config.claspId ?? ""}|${JSON.stringify(config.choices ?? {})}|${config.styleText ?? ""}`;
@@ -171,7 +188,9 @@ export function JewelryScene({ config, options, autoRotate, enableRotate = true,
       <Suspense fallback={null}>
         <group ref={piece}>
           <TextureContext.Provider value={resolved.design.texture}>
-            <Center onCentered={({ height }) => setShadowY(-height / 2 - 0.02)}>{resolved.modelUrl ? <GlbModel url={resolved.modelUrl} {...resolved} /> : <Model {...resolved} />}</Center>
+            <Center onCentered={({ height }) => setShadowY(-height / 2 - 0.02)}>
+              {resolved.modelUrl ? <GlbModel url={resolved.modelUrl} {...resolved} /> : <Model {...resolved} />}
+            </Center>
           </TextureContext.Provider>
         </group>
       </Suspense>
