@@ -4,6 +4,8 @@ import { useId, useRef, useState } from "react";
 import { FileText, ImagePlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { compressImage, putFile } from "@/lib/data/mock/fileStore";
+import { uploadFile } from "@/lib/data/api/files";
+import { IS_API } from "@/lib/data/source";
 import { checkFile } from "@/lib/validation/schemas";
 import { cn } from "@/lib/utils";
 import type { ProofFile } from "@/types";
@@ -13,7 +15,8 @@ export type StoredFile = ProofFile & { dataUrl: string };
 
 /**
  * File picker with drag-and-drop, type/size checks (JPG/PNG/PDF ≤ 5 MB), and previews.
- * Files are saved to the browser (IndexedDB) in Phase 1; Supabase Storage in Phase 2.
+ * Files are saved to the browser (IndexedDB) in Phase 1; in Phase 2 they are uploaded to the server,
+ * which checks each file again and stores it in Supabase Storage.
  */
 export function FileDropzone({
   value,
@@ -53,11 +56,16 @@ export function FileDropzone({
           continue;
         }
         const blob = await compressImage(f);
-        const ref = await putFile(blob);
-        saved.push({ name: f.name, type: f.type as ProofFile["type"], sizeBytes: f.size, dataUrl: ref });
+        if (IS_API) {
+          const up = await uploadFile(blob, f.name, accept.includes("application/pdf") ? "proof" : "photo");
+          saved.push({ name: up.name, type: up.type, sizeBytes: up.sizeBytes, dataUrl: up.ref });
+        } else {
+          const ref = await putFile(blob);
+          saved.push({ name: f.name, type: f.type as ProofFile["type"], sizeBytes: f.size, dataUrl: ref });
+        }
       }
-    } catch {
-      setLocalError("We couldn't save that file in your browser. Try a smaller file.");
+    } catch (e) {
+      setLocalError(IS_API && e instanceof Error ? e.message : "We couldn't save that file in your browser. Try a smaller file.");
     } finally {
       setBusy(false);
     }

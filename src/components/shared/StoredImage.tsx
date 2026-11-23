@@ -3,14 +3,16 @@
 import { useEffect, useState } from "react";
 import { FileText } from "lucide-react";
 import { getFile, isFileRef } from "@/lib/data/mock/fileStore";
+import { isServerFileRef, serverFileUrl } from "@/lib/data/api/files";
 import { cn } from "@/lib/utils";
 
-/** Resolves a stored file reference ("idb:…", data URL, or /public path) to a URL. */
+/** Resolves a stored file reference ("idb:…", "file:…" on the server, data URL, or /public path) to a URL. */
 export function useFileUrl(ref?: string): { url: string | null; type: string | null } {
+  const server = ref ? isServerFileRef(ref) : false;
   const [resolved, setResolved] = useState<{ ref?: string; url: string | null; type: string | null }>({ url: null, type: null });
 
   useEffect(() => {
-    if (!ref || !isFileRef(ref)) return;
+    if (!ref || server || !isFileRef(ref)) return;
     let objectUrl: string | null = null;
     let cancelled = false;
     getFile(ref).then((blob) => {
@@ -22,9 +24,11 @@ export function useFileUrl(ref?: string): { url: string | null; type: string | n
       cancelled = true;
       if (objectUrl) URL.revokeObjectURL(objectUrl);
     };
-  }, [ref]);
+  }, [ref, server]);
 
   if (!ref) return { url: null, type: null };
+  // Phase 2: private files open through a short-lived signed link after an access check.
+  if (server) return { url: serverFileUrl(ref), type: ref.endsWith(".pdf") ? "application/pdf" : "image/*" };
   if (!isFileRef(ref)) return { url: ref, type: ref.endsWith(".pdf") || ref.startsWith("data:application/pdf") ? "application/pdf" : "image/*" };
   return resolved.ref === ref ? { url: resolved.url, type: resolved.type } : { url: null, type: null };
 }

@@ -218,6 +218,19 @@ describe("accounts", () => {
   });
 });
 
+describe("links to Supabase Auth", () => {
+  it("copies email confirmation from Supabase Auth to the profile (FR-41)", async () => {
+    await db.query("UPDATE auth.users SET email_confirmed_at = now() WHERE id = $1", [ANA]);
+    const rows = await asApp(db, ANA, (q) => q<{ ok: boolean }>("SELECT email_confirmed_at IS NOT NULL AS ok FROM users WHERE id = $1", [ANA]));
+    expect(rows[0].ok).toBe(true);
+  });
+
+  it("a customer can find the owner to notify without reading the owner's profile (FR-50)", async () => {
+    expect(await asApp(db, ANA, (q) => q("SELECT public.owner_id() AS id"))).toEqual([{ id: OWNER }]);
+    expect(await asApp(db, ANA, (q) => q("SELECT id FROM users WHERE role = 'owner'"))).toEqual([]);
+  });
+});
+
 describe("integrity", () => {
   it("codes count up per prefix and year", async () => {
     const year = new Date().getFullYear();

@@ -34,6 +34,7 @@ model User {
   contactNumber    String    @map("contact_number") @db.VarChar(16)
   privacyConsentAt DateTime  @map("privacy_consent_at") @db.Timestamptz // FR-45: required at sign-up
   privacyNoticeVer String    @map("privacy_notice_version") @db.VarChar(20)
+  emailConfirmedAt DateTime? @map("email_confirmed_at") @db.Timestamptz // copied from auth.users by a trigger
   createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
   updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
@@ -146,7 +147,7 @@ enum Actor {
 /// ERD: orders — product orders and custom-order requests (one record each, FR-07).
 model Order {
   id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  code              String    @unique @db.VarChar(20) // ORD-2026-0001 / CO-2026-0001
+  code              String    @unique @db.VarChar(20) // OR-2026-0001 / CO-2026-0001
   kind              OrderKind
   customerId        String    @map("customer_id") @db.Uuid
   status            String    @db.VarChar(30) // changed only through src/lib/status machines
@@ -198,6 +199,7 @@ model CustomDesign {
   estimateWeightG Decimal  @map("estimate_weight_g") @db.Decimal(10, 2) // recomputed on the server
   estimatePrice   Decimal  @map("estimate_price") @db.Decimal(12, 2)
   snapshotPath    String?  @map("snapshot_path") // private bucket "design-snapshots"
+  clientRequestId String?  @unique @map("client_request_id") @db.VarChar(64) // a repeated resubmit is saved once
   submittedAt     DateTime @default(now()) @map("submitted_at") @db.Timestamptz
 
   order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
@@ -355,7 +357,7 @@ model StatusHistory {
   @@map("status_history")
 }
 
-/// Support: yearly counters for readable codes (ORD-, CO-, SR-). Server-only.
+/// Support: yearly counters for readable codes (OR-, CO-, SR-). Server-only.
 model CodeCounter {
   prefix String @db.VarChar(4)
   year   Int

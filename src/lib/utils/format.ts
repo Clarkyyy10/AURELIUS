@@ -38,8 +38,10 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
-export function todayISODate(): string {
-  const d = new Date();
-  const tz = d.getTimezoneOffset() * 60_000;
-  return new Date(d.getTime() - tz).toISOString().slice(0, 10);
+/**
+ * Today's date in the Philippines (YYYY-MM-DD). The store, its customers and its deadlines are in
+ * Asia/Manila; servers run in UTC, which is a day behind every morning before 8 AM (D-14).
+ */
+export function todayISODate(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Manila", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
 }

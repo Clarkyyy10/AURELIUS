@@ -37,6 +37,7 @@ CREATE TABLE "users" (
     "contact_number" VARCHAR(16) NOT NULL,
     "privacy_consent_at" TIMESTAMPTZ NOT NULL,
     "privacy_notice_version" VARCHAR(20) NOT NULL,
+    "email_confirmed_at" TIMESTAMPTZ,
     "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ NOT NULL,
 
@@ -140,6 +141,7 @@ CREATE TABLE "custom_designs" (
     "estimate_weight_g" DECIMAL(10,2) NOT NULL,
     "estimate_price" DECIMAL(12,2) NOT NULL,
     "snapshot_path" TEXT,
+    "client_request_id" VARCHAR(64),
     "submitted_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "custom_designs_pkey" PRIMARY KEY ("id")
@@ -355,6 +357,9 @@ CREATE INDEX "orders_customer_id_created_at_idx" ON "orders"("customer_id", "cre
 
 -- CreateIndex
 CREATE INDEX "orders_kind_status_idx" ON "orders"("kind", "status");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "custom_designs_client_request_id_key" ON "custom_designs"("client_request_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "custom_designs_order_id_version_key" ON "custom_designs"("order_id", "version");

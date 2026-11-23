@@ -13,17 +13,17 @@
 ALTER TABLE public.users
   ADD CONSTRAINT users_id_fkey FOREIGN KEY (id) REFERENCES auth.users (id) ON DELETE CASCADE;
 
--- Keep users.email in step when a user changes their sign-in email.
+-- Keep users.email and users.email_confirmed_at in step with Supabase Auth (FR-41).
 CREATE OR REPLACE FUNCTION public.sync_user_email() RETURNS trigger
   LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
 BEGIN
-  UPDATE public.users SET email = NEW.email WHERE id = NEW.id;
+  UPDATE public.users SET email = NEW.email, email_confirmed_at = NEW.email_confirmed_at WHERE id = NEW.id;
   RETURN NEW;
 END;
 $$;
 CREATE TRIGGER on_auth_user_email_changed
-  AFTER UPDATE OF email ON auth.users
-  FOR EACH ROW WHEN (OLD.email IS DISTINCT FROM NEW.email)
+  AFTER UPDATE OF email, email_confirmed_at ON auth.users
+  FOR EACH ROW WHEN (OLD.email IS DISTINCT FROM NEW.email OR OLD.email_confirmed_at IS DISTINCT FROM NEW.email_confirmed_at)
   EXECUTE FUNCTION public.sync_user_email();
 
 -- ------------------------------------------------------------------ data integrity
@@ -51,14 +51,14 @@ CREATE INDEX payments_service_idx ON public.payments (service_request_id);
 CREATE INDEX status_history_order_idx ON public.status_history (order_id, at);
 CREATE INDEX status_history_service_idx ON public.status_history (service_request_id, at);
 
--- Readable codes (ORD-2026-0001, CO-…, SR-…), allocated inside the same transaction as the record.
+-- Readable codes (OR-2026-0001, CO-…, SR-…), allocated inside the same transaction as the record.
 CREATE OR REPLACE FUNCTION public.next_code(p_prefix text) RETURNS text
   LANGUAGE plpgsql SECURITY DEFINER SET search_path = '' AS $$
 DECLARE
   y int := extract(year FROM (now() AT TIME ZONE 'Asia/Manila'))::int;
   n int;
 BEGIN
-  IF p_prefix NOT IN ('ORD', 'CO', 'SR') THEN
+  IF p_prefix NOT IN ('OR', 'CO', 'SR') THEN
     RAISE EXCEPTION 'unknown code prefix %', p_prefix;
   END IF;
   INSERT INTO public.code_counters (prefix, year, last) VALUES (p_prefix, y, 1)
@@ -95,6 +95,15 @@ CREATE OR REPLACE FUNCTION public.is_owner() RETURNS boolean
   SELECT EXISTS (SELECT 1 FROM public.users WHERE id = public.app_uid() AND role = 'owner');
 $$;
 REVOKE ALL ON FUNCTION public.is_owner() FROM PUBLIC;
+
+-- The store owner's user id, so a customer's action can notify the owner (FR-50) without the
+-- customer being able to read the owner's profile.
+CREATE OR REPLACE FUNCTION public.owner_id() RETURNS uuid
+  LANGUAGE sql STABLE SECURITY DEFINER SET search_path = '' AS $fn$
+  SELECT id FROM public.users WHERE role = 'owner' ORDER BY created_at LIMIT 1;
+$fn$;
+REVOKE ALL ON FUNCTION public.owner_id() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.owner_id() TO aurelius_app;
 REVOKE ALL ON FUNCTION public.next_code(text) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.sync_user_email() FROM PUBLIC;
 GRANT EXECUTE ON FUNCTION public.is_owner() TO aurelius_app, authenticated;

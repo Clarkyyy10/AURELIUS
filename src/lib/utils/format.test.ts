@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatPeso, formatPesoExact, formatWeight, slugify } from "./format";
+import { formatPeso, formatPesoExact, formatWeight, slugify, todayISODate } from "./format";
 
 describe("format", () => {
   it("formats pesos without decimals", () => {
@@ -15,5 +15,14 @@ describe("format", () => {
   });
   it("slugifies names", () => {
     expect(slugify("Classic Solitaire Ring!")).toBe("classic-solitaire-ring");
+  });
+});
+
+describe("todayISODate (Philippine calendar day, D-14)", () => {
+  it("uses Manila time, not the server's UTC clock", () => {
+    // 23:30 UTC on Nov 24 is already 07:30 on Nov 25 in Manila
+    expect(todayISODate(new Date("2026-11-24T23:30:00Z"))).toBe("2026-11-25");
+    expect(todayISODate(new Date("2026-11-24T15:59:00Z"))).toBe("2026-11-24");
+    expect(todayISODate(new Date("2026-11-24T16:00:00Z"))).toBe("2026-11-25");
   });
 });

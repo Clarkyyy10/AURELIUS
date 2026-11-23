@@ -21,7 +21,7 @@ import type { Payment, Transaction } from "@/types";
 import { Field, FormError } from "./Field";
 import { FileDropzone, type StoredFile } from "./FileDropzone";
 import { PaymentStatusBadge } from "./StatusBadge";
-import { StoredImage } from "./StoredImage";
+import { StoredImage, useFileUrl } from "./StoredImage";
 import { MoneyText } from "./Text";
 import { Spinner } from "./States";
 
@@ -114,6 +114,7 @@ export function ProofThumb({ src, name }: { src: string; name: string }) {
           <DialogDescription>{name}</DialogDescription>
         </DialogHeader>
         <StoredImage src={src} alt={`Proof of payment: ${name}`} className="max-h-[70vh] w-full rounded-lg object-contain" />
+        <OpenFileLink src={src} />
       </DialogContent>
     </Dialog>
   );
@@ -223,5 +224,16 @@ export function PaymentForm({ tx, onDone }: { tx: Transaction; onDone?: () => vo
         {form.formState.isSubmitting && <Spinner />} Submit payment
       </Button>
     </form>
+  );
+}
+
+/** Opens the full file (needed for PDF receipts, which can't be previewed as an image). */
+function OpenFileLink({ src }: { src: string }) {
+  const { url } = useFileUrl(src);
+  if (!url) return null;
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-gold-dark underline">
+      Open the file in a new tab
+    </a>
   );
 }
