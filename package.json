@@ -18,7 +18,8 @@
     "db:seed": "tsx --env-file=.env.local prisma/seed.ts",
     "db:owner": "tsx --env-file=.env.local prisma/set-owner.ts",
     "db:reset-test": "tsx --env-file=.env.local prisma/reset-test.ts",
-    "db:status": "node --env-file=.env.local ./node_modules/prisma/build/index.js migrate status"
+    "db:status": "node --env-file=.env.local ./node_modules/prisma/build/index.js migrate status",
+    "chat:score": "tsx scripts/score-chatbot.ts"
   },
   "dependencies": {
     "@fontsource/alex-brush": "^5.3.0",
@@ -29,6 +30,7 @@
     "@fontsource/pacifico": "^5.3.0",
     "@fontsource/parisienne": "^5.3.0",
     "@fontsource/satisfy": "^5.3.0",
+    "@google/genai": "3.6.1",
     "@hookform/resolvers": "^7.0.8",
     "@prisma/client": "6.19.3",
     "@react-three/drei": "^10.7.9",

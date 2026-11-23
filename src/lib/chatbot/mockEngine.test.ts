@@ -174,3 +174,15 @@ describe("name pendant flow", () => {
     expect(last("I want a name pendant", "14K Gold", "Rose", "Medium (13 mm letters)", "Maximiliano Jr").reply).toMatch(/up to 10 characters/);
   });
 });
+
+describe("out-of-scope items (FR-39)", () => {
+  it("refers repairs of things the store doesn't service to the owner", () => {
+    expect(last("How do I fix my laptop?").referToOwner).toBe(true);
+    expect(last("my phone screen is broken").referToOwner).toBe(true);
+  });
+  it("still helps with jewelry and watches, and doesn't confuse similar words", () => {
+    expect(last("my watch strap is broken").reply).toMatch(/watch/i);
+    expect(last("Can I pay by card?").reply).not.toMatch(/I can only help with/);
+    expect(last("The chain of my necklace broke").reply).toMatch(/service request|jewelry or a watch|describe/i);
+  });
+});

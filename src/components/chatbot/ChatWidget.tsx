@@ -12,6 +12,7 @@ import type { ChatDraft, ChatTurn } from "@/lib/chatbot/types";
 import { cn } from "@/lib/utils";
 import { formatDateTime } from "@/lib/utils/format";
 import { DraftCard, type SentInfo } from "./DraftCard";
+import { IS_API } from "@/lib/data/source";
 
 interface Message extends ChatTurn {
   at: string;
@@ -265,7 +266,10 @@ export function ChatWidget() {
           <p className="flex items-start gap-1.5 border-t border-line bg-paper px-3 pt-2 text-[11px] leading-snug text-muted-foreground">
             <ShieldAlert className="mt-px size-3.5 shrink-0" aria-hidden />
             <span>
-              In the live system, chat text is processed by Google Gemini. Please don&apos;t type passwords, bank or card details, or government ID numbers.
+              {IS_API
+                ? "Chat text is processed by Google Gemini, and Google may use it to improve its services."
+                : "In the live system, chat text is processed by Google Gemini."}{" "}
+              Please don&apos;t type passwords, bank or card details, or government ID numbers.
             </span>
           </p>
           <form
