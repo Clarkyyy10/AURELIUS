@@ -14,6 +14,7 @@ import { Field, FormError } from "@/components/shared/Field";
 import { Spinner } from "@/components/shared/States";
 import { repos } from "@/lib/data";
 import { errorMessage } from "@/lib/data/hooks";
+import { Turnstile } from "@/components/shared/Turnstile";
 import { registerSchema, type RegisterInput } from "@/lib/validation/schemas";
 
 function strength(pw: string): { label: string; score: number } {
@@ -30,6 +31,8 @@ function RegisterForm() {
   const router = useRouter();
   const next = useSearchParams().get("next");
   const [error, setError] = useState<string | null>(null);
+  const [captcha, setCaptcha] = useState<string | null>(null);
+  const [captchaReset, setCaptchaReset] = useState(0);
   const form = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     defaultValues: { fullName: "", email: "", contactNumber: "", password: "", confirmPassword: "", privacyConsent: false },
@@ -42,11 +45,12 @@ function RegisterForm() {
     setError(null);
     try {
       const parsed = registerSchema.parse(values);
-      await repos.auth.register(parsed);
+      await repos.auth.register({ ...parsed, captchaToken: captcha ?? undefined });
       const qs = new URLSearchParams({ email: parsed.email, ...(next ? { next } : {}) });
       router.push(`/verify-email?${qs}`);
     } catch (e) {
       setError(errorMessage(e));
+      setCaptchaReset((n) => n + 1);
     }
   });
 
@@ -140,6 +144,7 @@ function RegisterForm() {
           )}
         </div>
 
+        <Turnstile onToken={setCaptcha} resetKey={captchaReset} />
         <Button type="submit" className="w-full" size="lg" disabled={!consent || form.formState.isSubmitting}>
           {form.formState.isSubmitting && <Spinner />} Create account
         </Button>

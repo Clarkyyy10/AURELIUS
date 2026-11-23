@@ -28,7 +28,7 @@ export const email = z.string().trim().min(1, "Enter your email address.").toLow
 
 export const password = z.string().min(8, "Use at least 8 characters for your password.").max(72, "Use 72 characters or fewer for your password.");
 
-const fullName = z.string().trim().min(2, "Enter your full name.").max(80, "Use 80 characters or fewer for your name.");
+export const fullName = z.string().trim().min(2, "Enter your full name.").max(80, "Use 80 characters or fewer for your name.");
 
 export const fileMeta = (allowed: readonly string[], label: string) =>
   z.object({
@@ -84,6 +84,21 @@ export const loginSchema = z.object({
 export type LoginInput = z.input<typeof loginSchema>;
 
 export const forgotPasswordSchema = z.object({ email });
+
+// What the server accepts (Phase 2). Same rules as the forms; the browser sends no confirmation field.
+const captchaToken = z.string().max(2048).optional();
+export const registerRequestSchema = z.object({
+  fullName,
+  email,
+  contactNumber: phPhone,
+  password,
+  privacyConsent: z.literal(true, { error: "Please read and agree to the Privacy Notice to create an account." }),
+  captchaToken,
+});
+export const loginRequestSchema = loginSchema.extend({ captchaToken });
+export const forgotPasswordRequestSchema = forgotPasswordSchema.extend({ captchaToken });
+export const resetPasswordRequestSchema = z.object({ password });
+export const changePasswordRequestSchema = z.object({ currentPassword: z.string().min(1, "Enter your current password."), newPassword: password });
 
 export const resetPasswordSchema = z
   .object({ password, confirmPassword: z.string().min(1, "Type your new password again.") })

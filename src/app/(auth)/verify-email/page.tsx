@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 import { AuthCard } from "@/components/layout/AuthCard";
 import { Spinner } from "@/components/shared/States";
 import { repos } from "@/lib/data";
-import { errorMessage, useCurrentUser } from "@/lib/data/hooks";
-import { useDemoStore } from "@/lib/data/mock/store";
+import { errorMessage, useCurrentUser, useDataSync } from "@/lib/data/hooks";
+import { IS_API } from "@/lib/data/source";
 import { toast } from "sonner";
 
 /** FR-41 — "check your inbox" screen, and the page the confirmation link opens. */
@@ -19,7 +19,7 @@ function VerifyEmail() {
   const token = params.get("token");
   const next = params.get("next");
   const { user } = useCurrentUser();
-  const hydrated = useDemoStore((s) => s.hydrated);
+  const { hydrated } = useDataSync();
   const [result, setResult] = useState<{ ok: boolean; message?: string } | null>(null);
 
   useEffect(() => {
@@ -85,10 +85,12 @@ function VerifyEmail() {
       <p className="text-muted-foreground">
         Open the email and click the link to confirm your address. You need to do this before you can place orders or submit requests.
       </p>
-      <p className="mt-3 rounded-lg bg-gold/10 p-3 text-sm">
-        <strong>Demo mode:</strong> no real email is sent. Open <strong>“Simulated emails”</strong> in the dark bar at the top of the page and click{" "}
-        <strong>Verify my email</strong>.
-      </p>
+      {!IS_API && (
+        <p className="mt-3 rounded-lg bg-gold/10 p-3 text-sm">
+          <strong>Demo mode:</strong> no real email is sent. Open <strong>“Simulated emails”</strong> in the dark bar at the top of the page and click{" "}
+          <strong>Verify my email</strong>.
+        </p>
+      )}
       <div className="mt-6 flex flex-wrap gap-2">
         {user && !user.emailVerified && (
           <Button

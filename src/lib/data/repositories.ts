@@ -36,12 +36,20 @@ export interface Session {
 
 export interface AuthRepo {
   getSession(): Promise<Session>;
-  register(input: { fullName: string; email: string; contactNumber: string; password: string; privacyConsent: boolean }): Promise<UserProfile>;
-  login(email: string, password: string): Promise<UserProfile>;
+  /** captchaToken: Cloudflare Turnstile (Phase 2; the mock ignores it). */
+  register(input: {
+    fullName: string;
+    email: string;
+    contactNumber: string;
+    password: string;
+    privacyConsent: boolean;
+    captchaToken?: string;
+  }): Promise<UserProfile>;
+  login(email: string, password: string, captchaToken?: string): Promise<UserProfile>;
   logout(): Promise<void>;
   resendVerification(): Promise<void>;
   verifyEmail(token: string): Promise<UserProfile>;
-  requestPasswordReset(email: string): Promise<void>;
+  requestPasswordReset(email: string, captchaToken?: string): Promise<void>;
   resetPassword(token: string, newPassword: string): Promise<void>;
   updateProfile(input: { fullName: string; contactNumber: string }): Promise<UserProfile>;
   changePassword(currentPassword: string, newPassword: string): Promise<void>;

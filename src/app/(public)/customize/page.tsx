@@ -15,8 +15,7 @@ import { SubmitDesignDialog } from "@/components/customization/SubmitDesignDialo
 import { ErrorState, LoadingState } from "@/components/shared/States";
 import { DateText } from "@/components/shared/Text";
 import { repos } from "@/lib/data";
-import { errorMessage, newRequestId, useCurrentUser, useQuery } from "@/lib/data/hooks";
-import { useDemoStore } from "@/lib/data/mock/store";
+import { errorMessage, newRequestId, setPendingDesign, useCurrentUser, usePendingDesign, useQuery } from "@/lib/data/hooks";
 import { EstimateError, estimate as computeEstimate } from "@/lib/pricing/estimate";
 import { designLabels, placeholderFor, productDesign } from "@/lib/pricing/labels";
 import { normalizeConfig } from "@/lib/pricing/normalize";
@@ -35,7 +34,7 @@ function CustomizerLoader() {
   const requestQ = useQuery(`co:${requestId}`, async () => (requestId ? repos.customOrders.get(requestId) : null));
   const draftQ = useQuery(`draft:${draftId}`, async () => (draftId ? repos.drafts.get(draftId) : null));
   const productQ = useQuery(`product:${fromId}`, async () => (fromId ? repos.catalog.getProduct(fromId) : null));
-  const pending = useDemoStore((s) => s.pendingDesign);
+  const pending = usePendingDesign();
 
   const queries = [optionsQ, requestQ, draftQ, productQ];
   const failed = queries.find((q) => q.error);
@@ -120,7 +119,7 @@ function Customizer({
   const startSubmit = () => {
     if (!est) return;
     if (!user) {
-      useDemoStore.setState({ pendingDesign: { ...config, fromProductId } });
+      setPendingDesign({ ...config, fromProductId });
       setLoginOpen(true);
       return;
     }

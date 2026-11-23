@@ -16,25 +16,31 @@ import { repos } from "@/lib/data";
 import { errorMessage } from "@/lib/data/hooks";
 import { loginSchema, type LoginInput } from "@/lib/validation/schemas";
 import { toast } from "sonner";
+import { Turnstile } from "@/components/shared/Turnstile";
+import { IS_API } from "@/lib/data/source";
 
-/** FR-42 — log in. Demo: any password of 8+ characters. */
+/** FR-42 — log in. Phase 1 demo: any password of 8+ characters. Phase 2: Supabase Auth + Turnstile + lockout. */
 function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next");
   const [error, setError] = useState<string | null>(null);
   const [show, setShow] = useState(false);
+  const [captcha, setCaptcha] = useState<string | null>(null);
+  const [captchaReset, setCaptchaReset] = useState(0);
+  const idle = params.get("reason") === "idle";
   const form = useForm<LoginInput>({ resolver: zodResolver(loginSchema), defaultValues: { email: "", password: "" } });
 
   const onSubmit = form.handleSubmit(async (values) => {
     setError(null);
     try {
-      const user = await repos.auth.login(values.email, values.password);
+      const user = await repos.auth.login(values.email, values.password, captcha ?? undefined);
       toast.success(`Welcome back, ${user.fullName.split(" ")[0]}.`);
       const safeNext = next && next.startsWith("/") && !next.startsWith("//") ? next : null;
       router.push(safeNext ?? (user.role === "owner" ? "/admin" : "/account"));
     } catch (e) {
       setError(errorMessage(e));
+      setCaptchaReset((n) => n + 1); // each security-check token works once
     }
   });
 
@@ -52,6 +58,11 @@ function LoginForm() {
       }
     >
       <form onSubmit={onSubmit} noValidate className="space-y-4">
+        {idle && !error && (
+          <p className="rounded-lg border border-info/30 bg-info/10 px-3 py-2 text-sm" role="status">
+            You were logged out after 30 minutes without activity. Please log in again.
+          </p>
+        )}
         <FormError message={error} />
         <Field label="Email address" error={form.formState.errors.email?.message}>
           <Input type="email" autoComplete="email" {...form.register("email")} />
@@ -74,26 +85,29 @@ function LoginForm() {
             Forgot password?
           </Link>
         </div>
+        <Turnstile onToken={setCaptcha} resetKey={captchaReset} />
         <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
           {form.formState.isSubmitting && <Spinner />} Log in
         </Button>
       </form>
 
-      <div className="mt-6 rounded-xl border border-dashed border-gold/50 bg-gold/5 p-4 text-sm">
-        <p className="font-medium">Demo accounts</p>
-        <p className="mt-1 text-muted-foreground">Use any password with 8 or more characters.</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {[
-            ["Customer", "maria@demo.ph"],
-            ["Owner", "owner@afables.ph"],
-            ["Unverified customer", "ana@demo.ph"],
-          ].map(([label, email]) => (
-            <Button key={email} type="button" variant="outline" size="sm" onClick={() => form.reset({ email, password: "demo1234" })}>
-              {label}: {email}
-            </Button>
-          ))}
+      {!IS_API && (
+        <div className="mt-6 rounded-xl border border-dashed border-gold/50 bg-gold/5 p-4 text-sm">
+          <p className="font-medium">Demo accounts</p>
+          <p className="mt-1 text-muted-foreground">Use any password with 8 or more characters.</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {[
+              ["Customer", "maria@demo.ph"],
+              ["Owner", "owner@afables.ph"],
+              ["Unverified customer", "ana@demo.ph"],
+            ].map(([label, email]) => (
+              <Button key={email} type="button" variant="outline" size="sm" onClick={() => form.reset({ email, password: "demo1234" })}>
+                {label}: {email}
+              </Button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </AuthCard>
   );
 }

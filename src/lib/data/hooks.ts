@@ -5,6 +5,8 @@ import { EstimateError } from "@/lib/pricing/estimate";
 import { InvalidTransitionError } from "@/lib/status/machines";
 import { UserFacingError } from "./repositories";
 import { useDemoStore } from "./mock/store";
+import { useClientState } from "./client-state";
+import { IS_API } from "./source";
 import type { UserProfile } from "@/types";
 import { repos } from "./index";
 import { seedSettings } from "./seed/catalog";
@@ -25,9 +27,13 @@ interface QueryState<T> {
  * Load data from a repository with loading / error states. Refetches when `key` changes or when
  * the mock database changes (Phase 2: Supabase Realtime triggers the refetch instead).
  */
+/** "Something changed" counter and readiness, from the mock store (Phase 1) or the client state (Phase 2). */
+const useMockSync = () => ({ version: useDemoStore((s) => s.version), hydrated: useDemoStore((s) => s.hydrated) });
+const useApiSync = () => ({ version: useClientState((s) => s.version), hydrated: useClientState((s) => s.hydrated) });
+export const useDataSync: () => { version: number; hydrated: boolean } = IS_API ? useApiSync : useMockSync;
+
 export function useQuery<T>(key: string, fetcher: () => Promise<T>) {
-  const version = useDemoStore((s) => s.version);
-  const hydrated = useDemoStore((s) => s.hydrated);
+  const { version, hydrated } = useDataSync();
   const [state, setState] = useState<QueryState<T>>({ key: "" });
   const [reloadCount, setReloadCount] = useState(0);
 
@@ -56,11 +62,28 @@ export function useQuery<T>(key: string, fetcher: () => Promise<T>) {
   };
 }
 
-/** The signed-in user (mock session). Phase 2: Supabase auth session. */
-export function useCurrentUser(): { user: UserProfile | null; ready: boolean } {
+function useMockUser(): { user: UserProfile | null; ready: boolean } {
   const ready = useDemoStore((s) => s.hydrated);
   const user = useDemoStore((s) => s.users.find((u) => u.id === s.sessionUserId) ?? null);
   return { user, ready };
+}
+function useApiUser(): { user: UserProfile | null; ready: boolean } {
+  const ready = useClientState((s) => s.hydrated);
+  const user = useClientState((s) => s.user);
+  return { user, ready };
+}
+/** The signed-in user: the mock session (Phase 1) or the Supabase session from the server (Phase 2). */
+export const useCurrentUser: () => { user: UserProfile | null; ready: boolean } = IS_API ? useApiUser : useMockUser;
+
+/** A design kept while the customer logs in or registers, so it is waiting for them afterwards. */
+export function usePendingDesign() {
+  const mock = useDemoStore((s) => s.pendingDesign);
+  const api = useClientState((s) => s.pendingDesign);
+  return IS_API ? api : mock;
+}
+export function setPendingDesign(d: (import("@/types").DesignConfig & { fromProductId?: string }) | null) {
+  if (IS_API) useClientState.getState().setPendingDesign(d);
+  else useDemoStore.setState({ pendingDesign: d });
 }
 
 /** Run a mutation with a pending flag and a user-facing error message. */
