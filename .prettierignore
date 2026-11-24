@@ -1,0 +1,6 @@
+pnpm-lock.yaml
+skills-lock.json
+.agents
+.next
+node_modules
+next-env.d.ts
