@@ -1,0 +1,41 @@
+{
+  "name": "aurelius",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AURELIUS: 3D ring customization, e-commerce, and service management platform with an AI chatbot for Afable's Jewelry Store",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "next": "16.4.6",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/turbopack": "4.3.5",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.6",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.2",
+    "prettier": "^3.10.1",
+    "tailwindcss": "4.3.5",
+    "typescript": "^5",
+    "vitest": "^5.1.1"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@12.22.0",
+  "lint-staged": {
+    "*.{ts,tsx,js,mjs,json,css,md,yml}": "prettier --write"
+  }
+}
