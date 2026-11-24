@@ -3,14 +3,14 @@
 // Procedural jewelry models (frontend-spec §5.4) — no external files needed in Phase 1.
 // Every model reads only the resolved options, so the viewer always matches the selection (NFR).
 
-import { useEffect, useMemo } from "react";
+import { Suspense, useEffect, useMemo } from "react";
 import { useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 import type { ChainPattern, ClaspKind, CutOption, FinishOption, GemstoneOption } from "@/types";
 import { MetalMaterial } from "./metal";
-import { safeText } from "./parts";
+import { EngravedTag, safeText } from "./parts";
 
 export interface ModelProps {
   finish: FinishOption;
@@ -30,6 +30,8 @@ export interface ModelProps {
   design?: DesignKeys;
   /** Font for style text (initial, signet, bar, ID plate). */
   textFontFile?: string;
+  /** The customer's engraving (FR-07 design details), drawn where a jeweler would engrave this piece. */
+  engraving?: string;
 }
 
 export interface DesignKeys {
@@ -73,7 +75,7 @@ export function Prongs({ r, finish, count = 4, height }: { r: number; finish: Fi
  * The customer's name as solid 3D metal in the chosen font, with jump rings at both ends and the
  * chain rising to the neck. Size changes the letter height. An empty name shows a faint "Your name".
  */
-export function NamePendantModel({ finish, sizeFactor, nameText, fontFile, scriptFont }: ModelProps) {
+export function NamePendantModel({ finish, sizeFactor, nameText, fontFile, scriptFont, engraving }: ModelProps) {
   const font = useLoader(FontLoader, fontFile ?? "/fonts/great-vibes.typeface.json");
   const typed = (nameText ?? "").trim();
   const text = typed || "Your name";
@@ -162,6 +164,12 @@ export function NamePendantModel({ finish, sizeFactor, nameText, fontFile, scrip
           <MetalMaterial finish={finish} />
         </mesh>
       ))}
+      {/* the engraving goes on a small tag by the clasp, at the top of the right-hand chain */}
+      {engraving && (
+        <Suspense fallback={null}>
+          <EngravedTag text={engraving} at={[width * 0.18, Math.max(rings[0][1], rings[1][1]) + width * 0.55, -0.05]} finish={finish} />
+        </Suspense>
+      )}
     </group>
   );
 }

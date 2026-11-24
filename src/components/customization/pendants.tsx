@@ -4,12 +4,13 @@
 // bar, medallion, zodiac, locket and charm disc — each hanging from a bail on a fine chain.
 // The pendant faces the viewer (+Z) with the bail at the top.
 
-import { Suspense, useEffect, useMemo } from "react";
+import { Suspense, useEffect, useMemo, useRef } from "react";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { CutOption, FinishOption, GemstoneOption } from "@/types";
 import type { ModelProps } from "./models";
 import { MetalMaterial } from "./metal";
-import { Accents, Beads, Head, RaisedText, TAU, perimeterPoints, type Spot } from "./parts";
+import { Accents, Beads, FlatEngraving, Head, RaisedText, TAU, perimeterPoints, type Spot } from "./parts";
 import { cutKeyOf } from "./stones";
 
 const V = (x: number, y: number, z = 0) => new THREE.Vector3(x, y, z);
@@ -373,7 +374,39 @@ function CharmP({ finish, s, text, fontFile }: P) {
   );
 }
 
-export function PendantModel({ finish, gem, cut, stones, sizeFactor, design, textFontFile }: ModelProps) {
+/**
+ * The customer's engraving on the back of the pendant. The pendant's shape differs by style, so its
+ * back is measured once the model has loaded and the text is centred there, reading correctly from behind.
+ */
+function BackEngraving({ body, text, finish }: { body: React.RefObject<THREE.Group | null>; text: string; finish: FinishOption }) {
+  const holder = useRef<THREE.Group>(null);
+  const frames = useRef(0);
+  useFrame(() => {
+    // Re-measure a few times while letters and stones finish loading, then stop.
+    if (frames.current > 90 || frames.current++ % 15 !== 0) return;
+    const b = body.current;
+    const h = holder.current;
+    if (!b || !h?.parent) return;
+    b.updateWorldMatrix(true, true);
+    const box = new THREE.Box3().setFromObject(b).applyMatrix4(h.parent.matrixWorld.clone().invert());
+    if (box.isEmpty()) return;
+    const width = box.max.x - box.min.x;
+    const height = box.max.y - box.min.y;
+    h.position.set((box.min.x + box.max.x) / 2, box.min.y + height * 0.42, box.min.z - 0.002);
+    h.scale.setScalar(Math.min(width * 0.62, height * 1.2));
+    h.visible = true;
+  });
+  return (
+    <group ref={holder} rotation={[0, Math.PI, 0]} visible={false}>
+      <Suspense fallback={null}>
+        <FlatEngraving text={text} size={0.16} maxWidth={1} finish={finish} />
+      </Suspense>
+    </group>
+  );
+}
+
+export function PendantModel({ finish, gem, cut, stones, sizeFactor, design, textFontFile, engraving }: ModelProps) {
+  const body = useRef<THREE.Group>(null);
   const { node, ends } = Body({
     style: design?.style,
     finish,
@@ -387,7 +420,8 @@ export function PendantModel({ finish, gem, cut, stones, sizeFactor, design, tex
   });
   return (
     <group name="pendant" scale={[1.6, 1.6, 1.6]}>
-      {node}
+      <group ref={body}>{node}</group>
+      {engraving && <BackEngraving key={`${design?.style}|${sizeFactor}|${engraving}`} body={body} text={engraving} finish={finish} />}
       <Chain ends={ends} finish={finish} />
     </group>
   );

@@ -67,6 +67,7 @@ export function useResolved(config: DesignConfig, options: CustomizationOptions)
       claspKind: (options.clasps ?? []).find((c) => c.id === config.claspId)?.kind,
       design: { style: key("style"), setting: key("setting"), profile: key("profile"), shank: key("shank"), texture: key("texture"), text: config.styleText },
       textFontFile: textFont?.file,
+      engraving: config.engravingText?.trim() || undefined,
     };
   }, [config, options]);
 }
@@ -80,10 +81,13 @@ function AutoFit({
   target,
   fitRef,
   shapeKey,
+  elevation = 0.18,
 }: {
   target: React.RefObject<THREE.Object3D | null>;
   fitRef?: React.RefObject<(() => void) | null>;
   shapeKey: string;
+  /** How far above the piece the camera looks from (0.18 ≈ 10°; 0.9 ≈ 42°, used to look into an engraved ring). */
+  elevation?: number;
 }) {
   const get = useThree((s) => s.get);
   // Re-run the fit once the orbit controls are registered or the view is resized.
@@ -102,7 +106,7 @@ function AutoFit({
     const vFov = THREE.MathUtils.degToRad(camera.fov);
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * (size.width / size.height));
     const dist = (sphere.radius * 1.4) / Math.sin(Math.min(vFov, hFov) / 2);
-    const dir = new THREE.Vector3(0, 0.18, 1).normalize();
+    const dir = new THREE.Vector3(0, elevation, 1).normalize();
     camera.position.copy(sphere.center).addScaledVector(dir, dist);
     camera.near = dist / 100;
     camera.far = dist * 20;
@@ -114,7 +118,7 @@ function AutoFit({
       controls.maxDistance = dist * 2.5;
       controls.update();
     }
-  }, [target, get]);
+  }, [target, get, elevation]);
 
   useEffect(() => {
     if (fitRef) fitRef.current = fit;
@@ -175,7 +179,7 @@ export function JewelryScene({
 }: JewelrySceneProps) {
   const resolved = useResolved(config, options);
   const [shadowY, setShadowY] = useState(-1.2);
-  const fitKey = `${config.productType}|${config.sizeId}|${config.gemstoneId === "gem-none" ? 0 : config.stoneQuantity}|${config.nameText ?? ""}|${config.fontId ?? ""}|${config.chainStyleId ?? ""}|${config.claspId ?? ""}|${JSON.stringify(config.choices ?? {})}|${config.styleText ?? ""}`;
+  const fitKey = `${config.productType}|${config.sizeId}|${config.gemstoneId === "gem-none" ? 0 : config.stoneQuantity}|${config.nameText ?? ""}|${config.fontId ?? ""}|${config.chainStyleId ?? ""}|${config.claspId ?? ""}|${JSON.stringify(config.choices ?? {})}|${config.styleText ?? ""}|${config.engravingText?.trim() ? 1 : 0}`;
   const Model = MODELS[config.productType];
   const piece = useRef<THREE.Group>(null);
 
@@ -194,7 +198,13 @@ export function JewelryScene({
           </TextureContext.Provider>
         </group>
       </Suspense>
-      <AutoFit target={piece} fitRef={fitRef} shapeKey={fitKey} />
+      {/* An engraved ring is seen from above, looking into the band where the text is (FR-05 shows every choice). */}
+      <AutoFit
+        target={piece}
+        fitRef={fitRef}
+        shapeKey={fitKey}
+        elevation={(config.productType === "ring" || config.productType === "toe_ring") && config.engravingText?.trim() ? 0.95 : 0.18}
+      />
       <ContactShadows key={shadowY} position={[0, shadowY, 0]} opacity={0.32} scale={8} blur={2.4} far={4} resolution={256} frames={1} />
       {/* Studio reflections: a darker room with bright light strips gives metal and stones contrast. */}
       <Environment resolution={128} frames={1}>

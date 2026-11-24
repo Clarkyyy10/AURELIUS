@@ -418,3 +418,126 @@ export function RaisedText({
     </mesh>
   );
 }
+
+// ---------------------------------------------------------------- engraving (FR-07 design notes)
+
+/** Engraving font: a clear serif that reads well when small. */
+export const ENGRAVING_FONT = "/fonts/playfair-display.typeface.json";
+
+/** Cut-in letters look darker and less shiny than the polished metal around them. */
+export function EngravedMaterial({ finish }: { finish: FinishOption }) {
+  const color = useMemo(() => new THREE.Color(finish.colorHex).multiplyScalar(0.42), [finish.colorHex]);
+  return <meshStandardMaterial color={color} metalness={0.65} roughness={0.6} />;
+}
+
+/**
+ * Engraving around the inside of a band (rings, toe rings, bangles, cuffs). The band lies in the
+ * x–y plane (θ = 0 at +Y, clockwise); `radius` is the inner surface. Letters stand along the band's
+ * width and read left to right for someone looking into the band.
+ */
+export function CurvedEngraving({
+  text,
+  radius,
+  size,
+  finish,
+  centerAngle = Math.PI,
+  maxArc = Math.PI * 1.4,
+  farSide = false,
+}: {
+  text: string;
+  radius: number;
+  size: number;
+  finish: FinishOption;
+  centerAngle?: number;
+  maxArc?: number;
+  /** The text is on the far side of the band from the viewer (bracelets): turn it the other way up. */
+  farSide?: boolean;
+}) {
+  const font = useLoader(FontLoader, ENGRAVING_FONT);
+  const glyphs = useMemo(() => {
+    const chars = [...safeText(font, text)];
+    const res = (font.data as { resolution?: number }).resolution ?? 1000;
+    const glyphTable = font.data.glyphs as Record<string, { ha: number }>;
+    const advance = (ch: string) => (((glyphTable[ch]?.ha ?? res * 0.3) * size) / res) * 1.08;
+    let total = chars.reduce((s, ch) => s + advance(ch), 0);
+    // Long text shrinks to fit the arc instead of overlapping itself.
+    const k = total / radius > maxArc ? (maxArc * radius) / total : 1;
+    total *= k;
+    const depth = size * 0.08;
+    let s = 0;
+    return chars.flatMap((ch) => {
+      const w = advance(ch) * k;
+      const mid = s + w / 2;
+      s += w;
+      if (ch === " ") return [];
+      const g = new TextGeometry(ch, { font, size: size * k, depth, curveSegments: 4, bevelEnabled: false });
+      g.computeBoundingBox();
+      const b = g.boundingBox!;
+      g.translate(-(b.min.x + b.max.x) / 2, -size * k * 0.36, 0);
+      // Letters run against θ with their tops toward −z, so the text reads upright when you look
+      // down into the band from the front (how the viewer shows an engraved ring).
+      const dir = farSide ? 1 : -1;
+      const theta = centerAngle + dir * ((mid - total / 2) / radius);
+      const right = new THREE.Vector3(dir * Math.cos(theta), -dir * Math.sin(theta), 0);
+      const up = new THREE.Vector3(0, 0, dir);
+      const inward = new THREE.Vector3(-Math.sin(theta), -Math.cos(theta), 0);
+      const m = new THREE.Matrix4()
+        .makeBasis(right, up, inward)
+        .setPosition(Math.sin(theta) * (radius + depth * 0.4), Math.cos(theta) * (radius + depth * 0.4), 0);
+      g.applyMatrix4(m);
+      return [g];
+    });
+  }, [font, text, size, radius, centerAngle, maxArc, farSide]);
+  useEffect(() => () => glyphs.forEach((g) => g.dispose()), [glyphs]);
+  return (
+    <group name="engraving">
+      {glyphs.map((g, i) => (
+        <mesh key={i} geometry={g}>
+          <EngravedMaterial finish={finish} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** Flat engraving facing +Z, centred on the origin (pendant backs, tags). */
+export function FlatEngraving({ text, size, maxWidth, finish }: { text: string; size: number; maxWidth: number; finish: FinishOption }) {
+  const font = useLoader(FontLoader, ENGRAVING_FONT);
+  const geometry = useMemo(() => {
+    const g = new TextGeometry(safeText(font, text) || " ", { font, size, depth: size * 0.08, curveSegments: 4, bevelEnabled: false });
+    g.center();
+    g.computeBoundingBox();
+    const w = g.boundingBox!.max.x - g.boundingBox!.min.x;
+    if (w > maxWidth) g.scale(maxWidth / w, maxWidth / w, 1);
+    return g;
+  }, [font, text, size, maxWidth]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return (
+    <mesh geometry={geometry} name="engraving">
+      <EngravedMaterial finish={finish} />
+    </mesh>
+  );
+}
+
+/** A small oval tag on a jump ring, engraved — how jewelers add text to chains. `at` is where it hangs from. */
+export function EngravedTag({ text, at, finish }: { text: string; at: THREE.Vector3 | [number, number, number]; finish: FinishOption }) {
+  const p = Array.isArray(at) ? new THREE.Vector3(...at) : at;
+  return (
+    <group position={p} name="engraved-tag">
+      <mesh position={[0, -0.03, 0]} rotation={[0, Math.PI / 2, 0]}>
+        <torusGeometry args={[0.035, 0.009, 8, 20]} />
+        <MetalMaterial finish={finish} />
+      </mesh>
+      <group position={[0, -0.16, 0]}>
+        <mesh rotation={[Math.PI / 2, 0, 0]} scale={[1.7, 1, 1]}>
+          <cylinderGeometry args={[0.1, 0.1, 0.02, 40]} />
+          {/* a satin face, so the flat tag doesn't mirror the dark studio and the letters stay readable */}
+          <meshStandardMaterial color={finish.colorHex} metalness={0.75} roughness={0.38} envMapIntensity={1.4} />
+        </mesh>
+        <group position={[0, 0, 0.011]}>
+          <FlatEngraving text={text} size={0.05} maxWidth={0.28} finish={finish} />
+        </group>
+      </group>
+    </group>
+  );
+}

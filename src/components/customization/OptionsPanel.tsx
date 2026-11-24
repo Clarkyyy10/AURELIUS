@@ -154,6 +154,16 @@ function GroupPicker({ group, list, value, onPick }: { group: OptionGroup; list:
   );
 }
 
+/** Where the 3D preview shows the engraving (matches the models in this folder). */
+function engravingSpot(type: ProductType, style?: string): string {
+  if (type === "ring" || type === "toe_ring") return "It is shown inside the band.";
+  if (type === "pendant") return "It is shown on the back. Drag the piece to turn it.";
+  if (type === "earrings") return "Earrings are too small to show it in 3D; the owner engraves it as you wrote it.";
+  if (type === "bracelet" && style === "id_bar") return "It is shown inside the ID plate.";
+  if (type === "bracelet" && !["chain_bracelet", "station", "charm"].includes(style ?? "")) return "It is shown inside the band.";
+  return "It is shown on a small tag by the clasp.";
+}
+
 /** Options panel for FR-01 to FR-04 (only active, owner-set options are shown — FR-47). */
 export function OptionsPanel({
   config,
@@ -593,7 +603,7 @@ export function OptionsPanel({
               aria-describedby="engraving-hint"
             />
             <p id="engraving-hint" className="text-xs text-muted-foreground">
-              Up to 20 characters ({20 - (config.engravingText?.length ?? 0)} left).
+              Up to 20 characters ({20 - (config.engravingText?.length ?? 0)} left). {engravingSpot(config.productType, style?.key)}
             </p>
           </div>
           <div className="space-y-1.5">

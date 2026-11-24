@@ -4,13 +4,13 @@
 // strand, collar (torc) and bib. Chains use the chosen chain style; the necklace lies in the chest
 // (x–y) plane facing the viewer, with the clasp at the back of the neck (the two top ends).
 
-import { useEffect, useMemo } from "react";
+import { Suspense, useEffect, useMemo } from "react";
 import * as THREE from "three";
 import type { ChainPattern, ClaspKind, CutOption, FinishOption, GemstoneOption } from "@/types";
 import type { ModelProps } from "./models";
 import { MetalMaterial } from "./metal";
 import { ChainAlong, Clasp } from "./chains";
-import { Accents, Beads, Head, type Spot } from "./parts";
+import { Accents, Beads, EngravedTag, Head, type Spot } from "./parts";
 
 const V = (x: number, y: number, z = 0) => new THREE.Vector3(x, y, z);
 const facing = V(0, 0, 1);
@@ -242,7 +242,14 @@ function Bib({ sizeFactor, pattern, clasp, finish }: { sizeFactor: number; patte
   );
 }
 
-export function NecklaceModel({ finish, gem, cut, stones, sizeFactor, chainPattern, claspKind, design }: ModelProps) {
+/** Where the clasp end of each necklace design is, so an engraved tag can hang there. */
+function claspEnd(style: string | undefined, sizeFactor: number): THREE.Vector3 {
+  if (style === "collar") return V(1.05 * Math.sqrt(sizeFactor) * 0.45, 0.85, -0.2);
+  const f = style === "layered" ? sizeFactor * 1.12 : style === "bib" ? sizeFactor * 0.85 : sizeFactor;
+  return necklaceCurve(f).curve.getPointAt(1);
+}
+
+export function NecklaceModel({ finish, gem, cut, stones, sizeFactor, chainPattern, claspKind, design, engraving }: ModelProps) {
   const pattern = chainPattern ?? "cable";
   const clasp = claspKind ?? "lobster";
   const stone = gem && stones > 0 ? gem : null;
@@ -280,6 +287,12 @@ export function NecklaceModel({ finish, gem, cut, stones, sizeFactor, chainPatte
   return (
     <group name="necklace" position={[0, 0.3, 0]}>
       {body}
+      {/* the engraving goes on a small tag by the clasp */}
+      {engraving && (
+        <Suspense fallback={null}>
+          <EngravedTag text={engraving} at={claspEnd(design?.style, sizeFactor).add(V(0.17, -0.1, 0.04))} finish={finish} />
+        </Suspense>
+      )}
     </group>
   );
 }

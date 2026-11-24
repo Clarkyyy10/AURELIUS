@@ -10,7 +10,7 @@ import type { ChainPattern, ClaspKind, CutOption, FinishOption, GemstoneOption }
 import type { ModelProps } from "./models";
 import { MetalMaterial } from "./metal";
 import { ChainAlong, Clasp } from "./chains";
-import { Accents, Beads, Head, RaisedText, TAU, circleSection, profileSection, sweepBand, type Spot } from "./parts";
+import { Accents, Beads, CurvedEngraving, EngravedTag, Head, RaisedText, TAU, circleSection, profileSection, sweepBand, type Spot } from "./parts";
 
 const out = (t: number) => new THREE.Vector3(Math.sin(t), Math.cos(t), 0);
 const at = (t: number, r: number, z = 0) => out(t).multiplyScalar(r).setZ(z);
@@ -183,7 +183,24 @@ function Piece({ style, finish, gem, cut, stones, R, pattern, clasp, setting, te
   }
 }
 
-export function BraceletModel({ finish, gem, cut, stones, sizeFactor, design, chainPattern, claspKind, textFontFile }: ModelProps) {
+const CHAIN_STYLES = new Set(["chain", "chain_bracelet", "station", "charm"]);
+
+/**
+ * The customer's engraving: inside the band for bangles, cuffs and tennis bracelets, inside the plate
+ * of an ID bracelet, and on a small tag by the clasp for chains and anklets.
+ */
+function Engraving({ style, R, text, finish }: { style?: string; R: number; text: string; finish: FinishOption }) {
+  let node: React.ReactNode;
+  if (CHAIN_STYLES.has(style ?? "")) node = <EngravedTag text={text} at={at(Math.PI + 0.32, R)} finish={finish} />;
+  else if (style === "id_bar") node = <CurvedEngraving text={text} radius={R + 0.02} size={0.09} finish={finish} centerAngle={0} maxArc={0.75} farSide />;
+  else
+    node = (
+      <CurvedEngraving text={text} radius={R} size={style === "cuff" ? 0.14 : 0.085} finish={finish} centerAngle={style === "cuff" ? 0 : Math.PI} farSide />
+    );
+  return <Suspense fallback={null}>{node}</Suspense>;
+}
+
+export function BraceletModel({ finish, gem, cut, stones, sizeFactor, design, chainPattern, claspKind, textFontFile, engraving }: ModelProps) {
   return (
     <group name="bracelet" rotation={[-0.85, 0, Math.PI + 0.1]}>
       <Piece
@@ -199,11 +216,12 @@ export function BraceletModel({ finish, gem, cut, stones, sizeFactor, design, ch
         text={design?.text}
         fontFile={textFontFile}
       />
+      {engraving && <Engraving style={design?.style} R={1.0 * sizeFactor} text={engraving} finish={finish} />}
     </group>
   );
 }
 
-export function AnkletModel({ finish, gem, cut, stones, sizeFactor, design, chainPattern, claspKind }: ModelProps) {
+export function AnkletModel({ finish, gem, cut, stones, sizeFactor, design, chainPattern, claspKind, engraving }: ModelProps) {
   return (
     <group name="anklet" rotation={[-0.85, 0, Math.PI + 0.1]}>
       <Piece
@@ -217,6 +235,7 @@ export function AnkletModel({ finish, gem, cut, stones, sizeFactor, design, chai
         clasp={claspKind ?? "lobster"}
         setting={design?.setting}
       />
+      {engraving && <Engraving style={design?.style ?? "chain"} R={1.3 * sizeFactor} text={engraving} finish={finish} />}
     </group>
   );
 }

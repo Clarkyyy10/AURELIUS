@@ -9,7 +9,21 @@ import type { CutOption, FinishOption, GemstoneOption } from "@/types";
 import type { ModelProps } from "./models";
 import { MetalMaterial } from "./metal";
 import { cutKeyOf } from "./stones";
-import { Accents, Beads, Head, RaisedText, TAU, circleSection, halfLength, liftFor, perimeterPoints, profileSection, sweepBand, type Spot } from "./parts";
+import {
+  Accents,
+  Beads,
+  CurvedEngraving,
+  Head,
+  RaisedText,
+  TAU,
+  circleSection,
+  halfLength,
+  liftFor,
+  perimeterPoints,
+  profileSection,
+  sweepBand,
+  type Spot,
+} from "./parts";
 
 interface HeadSpec {
   /** angle around the band (0 = top) */
@@ -123,7 +137,7 @@ function layout(style: string | undefined, stones: number, cut: CutOption | null
   }
 }
 
-function RingBody({ finish, gem, cut, stones, sizeFactor, design, textFontFile, toe }: ModelProps & { toe?: boolean }) {
+function RingBody({ finish, gem, cut, stones, sizeFactor, design, textFontFile, engraving, toe }: ModelProps & { toe?: boolean }) {
   const style = design?.style;
   const setting = stones > 0 ? (design?.setting ?? "prong") : undefined;
   const R = toe ? 0.62 + 0.08 * sizeFactor : 0.9 + 0.1 * sizeFactor;
@@ -227,13 +241,21 @@ function RingBody({ finish, gem, cut, stones, sizeFactor, design, textFontFile, 
   const metal = <MetalMaterial finish={finish} />;
 
   return (
-    <group name={toe ? "toe_ring" : "ring"} rotation={[0.4, 0.6, 0]}>
+    // With an engraving the ring stands upright and the camera looks down into it (JewelryScene), so the text shows.
+    <group name={toe ? "toe_ring" : "ring"} rotation={engraving ? [0.15, 0.35, 0] : [0.4, 0.6, 0]}>
       {openGap ? (
         <group rotation={[0, 0, Math.PI]}>
           <Band R={R} T={T} W={W} profile={design?.profile} gap={openGap} finish={finish} />
         </group>
       ) : (
         <Band R={R} T={T} W={W} profile={design?.profile} shank={toe ? undefined : design?.shank} gap={gap} finish={finish} />
+      )}
+
+      {/* the customer's engraving, inside the band (opposite an open toe ring's gap) */}
+      {engraving && (
+        <Suspense fallback={null}>
+          <CurvedEngraving text={engraving} radius={R} size={Math.min(W * 0.45, 0.13)} finish={finish} centerAngle={openGap ? 0 : Math.PI} />
+        </Suspense>
       )}
 
       {/* channel-set eternity: rails on both edges of the band */}
