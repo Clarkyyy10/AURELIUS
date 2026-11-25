@@ -119,7 +119,7 @@ Typefaces are **not chosen**. The options below are provisional and are listed a
 
 Technical rules (apply to every option):
 
-- Peso amounts use the body sans with `font-variant-numeric: tabular-nums` and the `₱` sign. Confirm the chosen face contains U+20B1 (peso sign) for the `latin` subset before choosing it. If a display serif lacks it, never set prices in that face. Not yet verified for any option.
+- Peso amounts use the body sans with `font-variant-numeric: tabular-nums` and the `₱` sign. Confirm the chosen face contains U+20B1 (peso sign) for the `latin` subset before choosing it. If a display serif lacks it, never set prices in that face. Checked for option A on the Google Fonts files: Inter and Cormorant Garamond both contain U+20B1, but only in the `latin-ext` subset, not in `latin`, so the font setup loads both subsets (D-54 in `docs/08-decisions.md`). Not yet checked for options B to D, and not seen rendered in a browser.
 - Load at most two families and only the weights used (display 500; body 400, 500, 600). Use `display: "swap"` and the `variable` option of `next/font`.
 - The scaffold's current Geist fonts and the Arial fallback in `src/app/globals.css` are placeholders, replaced when the group picks an option.
 - Type is English only in the interface. Filipino and Taglish appear only in chatbot replies and customer-typed text, so the chosen faces must cover the Latin set including `ñ`.
@@ -387,16 +387,16 @@ Rules for the skill:
 
 Each is open and must not be resolved silently.
 
-| Open item                                                       | Provisional state                                                                                                          | Who decides                             |
-| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
-| Typefaces                                                       | Option A (Cormorant Garamond with Inter) as a starting point; options B to D listed in section 5. Check peso sign support. | Group, then owner                       |
-| Logo and wordmark treatment                                     | Plain text wordmark                                                                                                        | Owner interview                         |
-| Owner brand colors and fonts                                    | None known. Any color would reopen the black and white decision                                                            | Group and owner                         |
-| Swatch color                                                    | Recommended: color inside swatch chips and 3D scene only                                                                   | User                                    |
-| Short name on small screens                                     | Full name                                                                                                                  | Owner interview                         |
-| Which jewelry sells most (drives homepage and product emphasis) | Unknown                                                                                                                    | Owner interview                         |
-| Stand-in photo sources                                          | None chosen. No files added                                                                                                | Group                                   |
-| shadcn preset geometry                                          | `lyra` or `vega` with overrides, unconfirmed                                                                               | Implementer, confirmed on first install |
+| Open item                                                       | Provisional state                                                                                                          | Who decides                          |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| Typefaces                                                       | Option A (Cormorant Garamond with Inter) as a starting point; options B to D listed in section 5. Check peso sign support. | Group, then owner                    |
+| Logo and wordmark treatment                                     | Plain text wordmark                                                                                                        | Owner interview                      |
+| Owner brand colors and fonts                                    | None known. Any color would reopen the black and white decision                                                            | Group and owner                      |
+| Swatch color                                                    | Recommended: color inside swatch chips and 3D scene only                                                                   | User                                 |
+| Short name on small screens                                     | Full name                                                                                                                  | Owner interview                      |
+| Which jewelry sells most (drives homepage and product emphasis) | Unknown                                                                                                                    | Owner interview                      |
+| Stand-in photo sources                                          | None chosen. No files added                                                                                                | Group                                |
+| shadcn preset geometry                                          | `base-lyra` (Base UI) with the radius, height and state overrides in `globals.css`. Provisional, see D-54                  | Group, confirmed in a browser review |
 
 ## 15. Motion
 

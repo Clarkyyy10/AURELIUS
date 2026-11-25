@@ -1,30 +1,20 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+﻿import type { Metadata } from "next";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { brand } from "@/config/brand";
+import { fontVariables } from "@/config/fonts";
+import { SiteShell } from "@/components/store/site-shell";
 
 export const metadata: Metadata = {
-  title: "Afable's Jewelry Store",
-  description:
-    "3D ring customization, online ordering, and jewelry and watch service tracking for Afable's Jewelry Store.",
+  title: { default: brand.name, template: `%s | ${brand.name}` },
+  description: brand.description,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`${fontVariables} h-full`}>
+      <body className="flex min-h-full flex-col">
+        <SiteShell>{children}</SiteShell>
+      </body>
     </html>
   );
 }

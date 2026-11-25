@@ -1,13 +1,13 @@
+﻿import { brand } from "@/config/brand";
+
 export default function Home() {
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-3 px-6 text-center">
-      <h1 className="text-4xl font-semibold tracking-tight">
-        Afable&apos;s Jewelry Store
-      </h1>
-      <p className="max-w-md text-lg text-zinc-600 dark:text-zinc-400">
-        Scaffold ready. See the docs folder for requirements and the sprint
-        plan.
+    <div className="flex max-w-2xl flex-col gap-4">
+      <h1 className="type-display">{brand.name}</h1>
+      <p className="type-body text-muted-foreground">
+        The store is being built. See the docs folder for requirements and the
+        sprint plan.
       </p>
-    </main>
+    </div>
   );
 }
