@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AURELIUS | Afable's Jewelry Store",
+  title: "Afable's Jewelry Store",
   description:
     "3D ring customization, online ordering, and jewelry and watch service tracking for Afable's Jewelry Store.",
 };
