@@ -285,7 +285,7 @@ export function DraftCard({
   const options = optionsQ.data;
   const services = servicesQ.data ?? [];
   const shown = editing ?? draft;
-  if (!options) return <div className="mt-2 w-[85%] rounded-2xl border border-gold/50 bg-paper p-3 text-sm">{optionsQ.error ?? "Loading your draft…"}</div>;
+  if (!options) return <div className="mt-2 w-[85%] rounded-lg border border-gold/50 bg-paper p-3 text-sm">{optionsQ.error ?? "Loading your draft…"}</div>;
 
   const custom = shown.kind === "custom_order";
   const rows = custom ? summarizeCustomDraft(shown, options) : summarizeServiceDraft(shown, services);
@@ -333,7 +333,7 @@ export function DraftCard({
   }
 
   return (
-    <div className={cn("mt-2 w-[92%] rounded-2xl border bg-paper p-3 text-sm shadow-sm", sent ? "border-success/50" : "border-gold/50")}>
+    <div className={cn("mt-2 w-[92%] rounded-lg border bg-paper p-3 text-sm shadow-sm", sent ? "border-success/50" : "border-gold/50")}>
       <p className="flex items-center gap-2 font-semibold">
         {sent ? <CheckCircle2 className="size-4 text-success" aria-hidden /> : <FileText className="size-4 text-gold-dark" aria-hidden />}
         {custom ? "Custom order draft" : "Service request draft"}

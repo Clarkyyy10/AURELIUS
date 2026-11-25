@@ -22,7 +22,7 @@ const sections: [string, React.ReactNode][] = [
   [
     "Who can see it",
     <p key="c">
-      Only you and the store owner. The AURELIUS assistant (chatbot) does not receive your name, email, or mobile number. Our hosting providers store the data
+      Only you and the store owner. The store assistant (chatbot) does not receive your name, email, or mobile number. Our hosting providers store the data
       securely on our behalf.
     </p>,
   ],
@@ -60,20 +60,20 @@ const sections: [string, React.ReactNode][] = [
 export default function PrivacyPage() {
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">
-      <p className="text-sm font-medium tracking-wide text-gold-dark uppercase">Data privacy</p>
+      <p className="text-sm font-medium text-muted-foreground">Data privacy</p>
       <h1 className="mt-1 text-4xl sm:text-5xl">Privacy Notice</h1>
       <p className="mt-3 text-lg text-muted-foreground">
-        This notice explains, in plain language, what personal data Afable&apos;s Jewelry Store collects through AURELIUS, why, and what your rights are.
+        This notice explains, in plain language, what personal data Afable&apos;s Jewelry Store collects through this website, why, and what your rights are.
       </p>
       <div className="mt-8 space-y-8">
         {sections.map(([title, body]) => (
-          <section key={title} className="rounded-2xl border border-line bg-paper p-6">
+          <section key={title} className="rounded-lg border border-line bg-paper p-6">
             <h2 className="text-2xl">{title}</h2>
             <div className="mt-2 text-ink/85">{body}</div>
           </section>
         ))}
       </div>
-      <p className="mt-8 text-sm text-muted-foreground">Last updated for the AURELIUS demo (Phase 1).</p>
+      <p className="mt-8 text-sm text-muted-foreground">Last updated November 2026.</p>
     </article>
   );
 }

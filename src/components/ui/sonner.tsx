@@ -19,10 +19,12 @@ const Toaster = ({ ...props }: ToasterProps) => {
         {
           "--normal-bg": "var(--popover)",
           "--normal-text": "var(--popover-foreground)",
-          "--normal-border": "var(--border)",
+          "--normal-border": "var(--grey-500)",
           "--border-radius": "var(--radius)",
         } as React.CSSProperties
       }
+      // DESIGN.md §11: toasts stay 8 s so people have time to read them; monochrome, overlay shadow only.
+      duration={8000}
       toastOptions={{
         classNames: {
           toast: "cn-toast",

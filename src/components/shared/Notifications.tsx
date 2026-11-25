@@ -35,7 +35,7 @@ export function NotificationBell({ user, tone = "dark" }: { user: UserProfile; t
         >
           <Bell className="size-5" />
           {unread > 0 && (
-            <span className="absolute top-1 right-1 flex min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] leading-4 font-semibold text-white">
+            <span className="absolute top-1 right-1 flex min-w-4 items-center justify-center rounded-sm bg-danger px-1 text-[10px] leading-4 font-semibold text-white">
               {unread > 9 ? "9+" : unread}
             </span>
           )}

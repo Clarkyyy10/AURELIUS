@@ -10,17 +10,25 @@ const escape = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<":
 
 export function renderNotificationEmail(p: { name?: string; title: string; body: string; link: string }) {
   const url = `${siteUrl()}${p.link.startsWith("/") ? p.link : "/"}`;
-  const text = `Hi ${p.name ?? "there"},\n\n${p.body}\n\nOpen it in AURELIUS: ${url}\n\nAfable's Jewelry Store · Montalban Public Market, Rizal\nThis is an automatic message about your request. The owner confirms all final prices and dates.`;
-  const html = `<!doctype html><html><body style="margin:0;background:#f6f1e9;font-family:Arial,Helvetica,sans-serif;color:#1f2a24">
+  // Monochrome like the site (docs/design/DESIGN.md); only the store name, never AURELIUS (DESIGN.md §2).
+  const text = `Hi ${p.name ?? "there"},
+
+${p.body}
+
+Open your request: ${url}
+
+Afable's Jewelry Store · Montalban Public Market, Rizal
+This is an automatic message about your request. The owner confirms all final prices and dates.`;
+  const html = `<!doctype html><html><body style="margin:0;background:#ffffff;font-family:Arial,Helvetica,sans-serif;color:#000000">
 <div style="max-width:560px;margin:0 auto;padding:24px">
-<p style="font-size:18px;letter-spacing:4px;color:#8a6d2c;margin:0 0 16px">AURELIUS</p>
-<div style="background:#fffdf9;border:1px solid #e6dccb;border-radius:12px;padding:24px">
+<p style="font-family:Georgia,serif;font-size:22px;color:#000000;margin:0 0 16px">Afable's Jewelry Store</p>
+<div style="background:#ffffff;border:1px solid #8c8c8c;border-radius:4px;padding:24px">
 <p style="margin:0 0 12px">Hi ${escape(p.name ?? "there")},</p>
 <p style="margin:0 0 8px;font-weight:bold">${escape(p.title)}</p>
 <p style="margin:0 0 20px;line-height:1.5">${escape(p.body)}</p>
-<a href="${escape(url)}" style="display:inline-block;background:#1f4d3a;color:#fffdf9;text-decoration:none;padding:12px 20px;border-radius:8px">Open in AURELIUS</a>
+<a href="${escape(url)}" style="display:inline-block;background:#000000;color:#ffffff;text-decoration:none;padding:12px 20px;border-radius:2px">Open your request</a>
 </div>
-<p style="font-size:12px;color:#6b6b6b;margin-top:16px">Afable's Jewelry Store · Montalban Public Market, Rizal. This is an automatic message about your request. The owner confirms all final prices and dates.</p>
+<p style="font-size:12px;color:#525252;margin-top:16px">Afable's Jewelry Store · Montalban Public Market, Rizal. This is an automatic message about your request. The owner confirms all final prices and dates.</p>
 </div></body></html>`;
   return { text, html };
 }

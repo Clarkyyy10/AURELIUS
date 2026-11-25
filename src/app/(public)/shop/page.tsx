@@ -61,7 +61,7 @@ function Shop() {
       <SharedViewCanvas />
       <PageHeader title="Shop the collection" description="Ready-made pieces and made-to-order designs from Afable's Jewelry Store." />
 
-      <div className="mb-6 grid gap-3 rounded-2xl border border-line bg-paper p-4 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1.2fr]">
+      <div className="mb-6 grid gap-3 rounded-lg border border-line bg-paper p-4 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1.2fr]">
         <div className="space-y-1.5 sm:col-span-2 lg:col-span-1">
           <Label htmlFor="shop-search">Search</Label>
           <div className="relative">
@@ -173,7 +173,7 @@ function Shop() {
 
 function DesignYourOwnCard() {
   return (
-    <Link href="/customize" className="flex h-full min-h-56 flex-col justify-between gap-4 rounded-2xl bg-emerald p-6 text-ivory hover:opacity-95">
+    <Link href="/customize" className="flex h-full min-h-56 flex-col justify-between gap-4 rounded-lg bg-emerald p-6 text-ivory hover:opacity-95">
       <Sparkles className="size-7 text-gold" aria-hidden />
       <div>
         <p className="font-heading text-2xl">Can&apos;t find it?</p>

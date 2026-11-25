@@ -132,7 +132,7 @@ function ProductDetail({ product }: { product: Product }) {
               label={`3D model of ${product.name}. Drag to rotate, scroll or pinch to zoom.`}
             />
           ) : (
-            <StoredImage src={product.photos[Math.max(0, photo)]} alt={product.name} className="aspect-square w-full rounded-2xl border border-line" />
+            <StoredImage src={product.photos[Math.max(0, photo)]} alt={product.name} className="aspect-square w-full rounded-lg border border-line" />
           )}
           {(product.photos.length > 0 || optionsQ.data) && (
             <div className="mt-3 flex gap-2">
@@ -192,7 +192,7 @@ function ProductDetail({ product }: { product: Product }) {
               </Button>
             </div>
           ) : (
-            <div className="space-y-4 rounded-2xl border border-line bg-paper p-5">
+            <div className="space-y-4 rounded-lg border border-line bg-paper p-5">
               {product.availability === "available" && (
                 <div>
                   <p className="mb-2 text-sm font-medium" id="qty">

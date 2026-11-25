@@ -110,7 +110,7 @@ function RequestForm({
 
   if (done)
     return (
-      <div className="rounded-2xl border border-line bg-paper p-6 sm:p-10">
+      <div className="rounded-lg border border-line bg-paper p-6 sm:p-10">
         <CheckCircle2 className="size-12 text-success" aria-hidden />
         <h1 className="mt-3 text-4xl">Your service request was sent</h1>
         <p className="mt-2 flex flex-wrap items-center gap-2 text-muted-foreground">
@@ -159,7 +159,7 @@ function RequestForm({
             key={s}
             aria-current={(i === 0 && step === "form") || (i === 1 && step === "review") ? "step" : undefined}
             className={cn(
-              "rounded-full px-3 py-1",
+              "rounded-sm px-3 py-1",
               (i === 0 && step === "form") || (i === 1 && step === "review") ? "bg-emerald text-ivory" : "bg-muted text-muted-foreground",
             )}
           >
@@ -169,7 +169,7 @@ function RequestForm({
       </ol>
 
       {step === "form" ? (
-        <form onSubmit={toReview} noValidate className="space-y-5 rounded-2xl border border-line bg-paper p-5 sm:p-6">
+        <form onSubmit={toReview} noValidate className="space-y-5 rounded-lg border border-line bg-paper p-5 sm:p-6">
           <fieldset>
             <legend className="mb-2 text-sm font-medium">What kind of item is it?</legend>
             <Controller
@@ -189,8 +189,8 @@ function RequestForm({
                         form.setValue("serviceIds", keep);
                       }}
                       className={cn(
-                        "rounded-xl border px-4 py-3 text-left font-medium",
-                        field.value === t ? "border-gold-dark bg-gold/10 ring-2 ring-gold/40" : "border-line",
+                        "rounded-sm border bg-white px-4 py-3 text-left font-medium hover:bg-grey-50",
+                        field.value === t ? "border-2 border-black" : "border-grey-500",
                       )}
                     >
                       {t === "jewelry" ? "Jewelry" : "Watch"}
@@ -232,8 +232,8 @@ function RequestForm({
                       <label
                         key={s.id}
                         className={cn(
-                          "flex cursor-pointer items-center gap-3 rounded-xl border p-3 text-sm",
-                          checked ? "border-gold-dark bg-gold/10" : "border-line",
+                          "flex cursor-pointer items-center gap-3 rounded-sm border bg-white p-3 text-sm hover:bg-grey-50",
+                          checked ? "border-2 border-black" : "border-grey-500",
                         )}
                       >
                         <Checkbox
@@ -281,7 +281,7 @@ function RequestForm({
           </Button>
         </form>
       ) : (
-        <div className="space-y-5 rounded-2xl border border-line bg-paper p-5 sm:p-6">
+        <div className="space-y-5 rounded-lg border border-line bg-paper p-5 sm:p-6">
           <h2 className="text-2xl">Check your request</h2>
           <dl className="grid grid-cols-[minmax(8rem,auto)_1fr] gap-x-4 gap-y-2 text-sm">
             <dt className="text-muted-foreground">Item type</dt>

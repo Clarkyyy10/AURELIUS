@@ -521,7 +521,7 @@ function FormulaPreview({ options }: { options: CustomizationOptions }) {
   };
 
   return (
-    <aside className="h-fit space-y-4 rounded-2xl border border-gold/40 bg-paper p-5 xl:sticky xl:top-20" aria-labelledby="preview-title">
+    <aside className="h-fit space-y-4 rounded-lg border border-gold/40 bg-paper p-5 xl:sticky xl:top-20" aria-labelledby="preview-title">
       <div>
         <h2 id="preview-title" className="text-2xl">
           Formula preview

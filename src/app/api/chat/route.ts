@@ -11,7 +11,7 @@ const chatSchema = z.object({
   sessionId: z.uuid(),
 });
 
-/** FR-35 to FR-40: the AURELIUS Assistant (Gemini 2.5 Flash, scripted fallback). */
+/** FR-35 to FR-40: the store assistant (Gemini 2.5 Flash, scripted fallback). */
 export const POST = route(async (req) => {
   const { messages, sessionId } = await readJson(req, chatSchema);
   return chat(await currentUser(), messages, sessionId, clientIp(req));

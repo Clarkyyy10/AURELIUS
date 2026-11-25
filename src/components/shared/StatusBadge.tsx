@@ -1,49 +1,122 @@
-import { cn } from "@/lib/utils";
-import { statusLabel, statusTone, type StatusTone } from "@/lib/status/machines";
+// Status badges without colour (docs/design/DESIGN.md §11, D-30). Every status has a text label plus
+// an icon, a border style, a weight and a fill, so states can be told apart without colour and in
+// high-contrast mode. Six classes; "stopped" has three looks (rejected, cancelled, expired).
 
-const toneClass: Record<StatusTone, string> = {
-  info: "bg-info/10 text-info border-info/25",
-  warning: "bg-warning/10 text-[#8a5a10] border-warning/30",
-  success: "bg-success/10 text-success border-success/25",
-  danger: "bg-danger/10 text-danger border-danger/25",
-  muted: "bg-muted text-muted-foreground border-line",
-  highlight: "bg-success text-white border-success",
+import {
+  BadgeCheckIcon,
+  BanIcon,
+  CircleCheckIcon,
+  CircleDotIcon,
+  CircleIcon,
+  ClockIcon,
+  EyeIcon,
+  HammerIcon,
+  InboxIcon,
+  LoaderIcon,
+  OctagonXIcon,
+  PackageCheckIcon,
+  PackageIcon,
+  SearchIcon,
+  SendIcon,
+  TriangleAlertIcon,
+  WrenchIcon,
+  type LucideIcon,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { statusLabel } from "@/lib/status/machines";
+
+export type StatusClass = "neutral" | "progress" | "pending" | "complete" | "attention" | "rejected" | "cancelled" | "expired";
+
+export const STATUS_CLASS: Record<StatusClass, string> = {
+  neutral: "border border-grey-500 bg-white font-medium text-black",
+  progress: "border border-black bg-grey-100 font-medium text-black",
+  pending: "border border-dashed border-black bg-white font-medium text-black",
+  complete: "border border-black bg-black font-semibold text-white",
+  attention: "border-2 border-black bg-white font-semibold text-black",
+  rejected: "status-hatch border-[3px] border-double border-black font-semibold text-black",
+  cancelled: "status-hatch border-2 border-black font-semibold text-black",
+  expired: "border border-dotted border-grey-600 bg-grey-100 font-medium text-grey-600",
 };
 
-/** One badge for every status — frontend-spec §6. */
-export function StatusBadge({ status, label, className }: { status: string; label?: string; className?: string }) {
+/** Each status the app uses → its class and icon. The same status looks the same everywhere. */
+const TREATMENT: Record<string, [StatusClass, LucideIcon]> = {
+  // order, custom order and service lifecycles (src/lib/status/machines.ts)
+  submitted: ["neutral", SendIcon],
+  pending: ["neutral", CircleIcon],
+  under_review: ["neutral", EyeIcon],
+  revision_requested: ["attention", TriangleAlertIcon],
+  approved: ["complete", BadgeCheckIcon],
+  quoted: ["pending", ClockIcon],
+  awaiting_payment: ["pending", ClockIcon],
+  awaiting_drop_off: ["pending", ClockIcon],
+  confirmed: ["progress", CircleDotIcon],
+  received: ["progress", InboxIcon],
+  under_assessment: ["progress", SearchIcon],
+  in_production: ["progress", HammerIcon],
+  in_progress: ["progress", WrenchIcon],
+  completed: ["complete", CircleCheckIcon],
+  ready_for_claiming: ["complete", PackageIcon],
+  claimed: ["complete", PackageCheckIcon],
+  declined: ["attention", TriangleAlertIcon],
+  rejected: ["rejected", OctagonXIcon],
+  cancelled: ["cancelled", BanIcon],
+  // payment proofs
+  pending_verification: ["pending", ClockIcon],
+  verified: ["complete", CircleCheckIcon],
+};
+
+export function statusTreatment(status: string): [StatusClass, LucideIcon] {
+  return TREATMENT[status] ?? ["neutral", LoaderIcon];
+}
+
+const BASE = "inline-flex w-fit shrink-0 items-center gap-1.5 whitespace-nowrap rounded-sm px-2 py-0.5 text-xs leading-snug [&>svg]:size-3.5 [&>svg]:shrink-0";
+
+function Pill({ cls, Icon, children, className }: { cls: StatusClass; Icon: LucideIcon; children: React.ReactNode; className?: string }) {
   return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium",
-        toneClass[statusTone(status)],
-        className,
-      )}
-    >
-      {label ?? statusLabel(status)}
+    <span className={cn(BASE, STATUS_CLASS[cls], className)}>
+      <Icon aria-hidden="true" />
+      {children}
     </span>
   );
 }
 
-const availability: Record<string, [string, string]> = {
-  available: ["Available", "bg-success/10 text-success border-success/25"],
-  made_to_order: ["Made to order", "bg-info/10 text-info border-info/25"],
-  unavailable: ["Unavailable", "bg-muted text-muted-foreground border-line"],
+/** One badge for every status — frontend-spec §6, DESIGN.md §11. */
+export function StatusBadge({ status, label, className }: { status: string; label?: string; className?: string }) {
+  const [cls, Icon] = statusTreatment(status);
+  return (
+    <Pill cls={cls} Icon={Icon} className={className}>
+      {label ?? statusLabel(status)}
+    </Pill>
+  );
+}
+
+const AVAILABILITY: Record<string, [string, StatusClass, LucideIcon]> = {
+  available: ["Available", "neutral", CircleCheckIcon],
+  made_to_order: ["Made to order", "pending", HammerIcon],
+  unavailable: ["Unavailable", "expired", BanIcon],
 };
 
 /** FR-13 availability badge. */
 export function AvailabilityBadge({ value, className }: { value: string; className?: string }) {
-  const [label, cls] = availability[value] ?? [value, ""];
-  return <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium", cls, className)}>{label}</span>;
+  const [label, cls, Icon] = AVAILABILITY[value] ?? [value, "neutral" as StatusClass, CircleIcon];
+  return (
+    <Pill cls={cls} Icon={Icon} className={className}>
+      {label}
+    </Pill>
+  );
 }
 
-const paymentTone: Record<string, [string, string]> = {
-  pending_verification: ["Waiting for verification", "bg-warning/10 text-[#8a5a10] border-warning/30"],
-  verified: ["Verified", "bg-success/10 text-success border-success/25"],
-  rejected: ["Rejected", "bg-danger/10 text-danger border-danger/25"],
+const PAYMENT_LABEL: Record<string, string> = {
+  pending_verification: "Waiting: verification",
+  verified: "Verified",
+  rejected: "Rejected",
 };
 
 export function PaymentStatusBadge({ status }: { status: string }) {
-  const [label, cls] = paymentTone[status] ?? [status, ""];
-  return <span className={cn("inline-flex items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-xs font-medium", cls)}>{label}</span>;
+  const [cls, Icon] = statusTreatment(status);
+  return (
+    <Pill cls={cls} Icon={Icon}>
+      {PAYMENT_LABEL[status] ?? status}
+    </Pill>
+  );
 }

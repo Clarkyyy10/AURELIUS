@@ -79,7 +79,7 @@ function Detail({ tx, serviceNames }: { tx: Transaction; serviceNames: Record<st
       {resubmitted && <p className="rounded-lg bg-success/10 px-3 py-2 text-sm text-success">Your updated design was sent to the owner.</p>}
 
       {tx.status === "ready_for_claiming" && (
-        <div className="flex items-start gap-3 rounded-2xl border border-success/40 bg-success/10 p-5">
+        <div className="flex items-start gap-3 rounded-lg border border-success/40 bg-success/10 p-5">
           <PartyPopper className="mt-0.5 size-6 shrink-0 text-success" aria-hidden />
           <div>
             <p className="text-lg font-semibold">Your item is ready.</p>
@@ -102,7 +102,7 @@ function Detail({ tx, serviceNames }: { tx: Transaction; serviceNames: Record<st
       )}
 
       {tx.kind === "custom" && tx.status === "revision_requested" && tx.revisionRemarks.length > 0 && (
-        <div className="rounded-2xl border border-warning/40 bg-warning/10 p-5" role="note">
+        <div className="rounded-lg border border-warning/40 bg-warning/10 p-5" role="note">
           <p className="flex items-center gap-2 font-semibold">
             <MessageSquareWarning className="size-5 text-warning" aria-hidden /> The owner asked for changes
           </p>
@@ -122,7 +122,7 @@ function Detail({ tx, serviceNames }: { tx: Transaction; serviceNames: Record<st
 
       <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
         <div className="min-w-0 space-y-6">
-          <section className="rounded-2xl border border-line bg-paper p-5">
+          <section className="rounded-lg border border-line bg-paper p-5">
             <h2 className="mb-4 text-2xl">{tx.kind === "service" ? "Your item" : tx.kind === "custom" ? "Your design" : "Your order"}</h2>
             {tx.kind === "order" && <OrderItem tx={tx} />}
             {tx.kind === "custom" && <CustomItem tx={tx} />}
@@ -159,7 +159,7 @@ function Detail({ tx, serviceNames }: { tx: Transaction; serviceNames: Record<st
             </section>
           )}
 
-          <div className="rounded-2xl border border-line bg-paper p-5 text-sm">
+          <div className="rounded-lg border border-line bg-paper p-5 text-sm">
             {cancellable ? (
               <ConfirmDialog
                 trigger={
@@ -192,7 +192,7 @@ function Detail({ tx, serviceNames }: { tx: Transaction; serviceNames: Record<st
         </div>
 
         <aside className="space-y-4">
-          <section className="rounded-2xl border border-line bg-paper p-5" aria-labelledby="timeline-title">
+          <section className="rounded-lg border border-line bg-paper p-5" aria-labelledby="timeline-title">
             <h2 id="timeline-title" className="mb-4 text-2xl">
               Progress
             </h2>

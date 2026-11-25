@@ -19,7 +19,8 @@ Source of truth:
 - **`docs/manuscript-v2.md` — the AURELIUS manuscript, version 2 (Chapters 1–3). Everything built here
   follows it. When any other doc disagrees with the manuscript, the manuscript wins; update the doc.**
 - `docs/requirements.md` — every functional and non-functional requirement (Section 3.9 of the manuscript)
-- `docs/frontend-spec.md` — pages, components, flows, design system, mock data
+- `docs/frontend-spec.md` — pages, components, flows, mock data
+- `docs/design/DESIGN.md` (+ `11-ui-screens.md`, `12-ui-components.md`, `13-ux-content-a11y.md`) — the visual design system and content rules (D-30). It overrides the design-system section of frontend-spec.md: monochrome, Cormorant + Inter, no colour-only states, customer-facing name is "Afable's Jewelry Store" only.
 - `docs/data-model.md` — entities, statuses, and the pricing formula with test cases
 - `docs/backend-plan.md` — Phase 2 (Supabase + Prisma + Gemini API, manuscript §3.10), NOT built in Phase 1
 

@@ -18,7 +18,7 @@ export function QuotationCard({ tx, canRespond }: { tx: Transaction; canRespond:
   const isService = tx.kind === "service";
 
   return (
-    <section aria-labelledby="quote-title" className={`rounded-2xl border p-5 ${waiting ? "border-warning/50 bg-warning/5" : "border-line bg-paper"}`}>
+    <section aria-labelledby="quote-title" className={`rounded-lg border p-5 ${waiting ? "border-warning/50 bg-warning/5" : "border-line bg-paper"}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 id="quote-title" className="flex items-center gap-2 text-2xl">
           <FileText className="size-5 text-gold-dark" aria-hidden /> {isService ? "Service quotation" : "Quotation"}

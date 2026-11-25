@@ -163,10 +163,10 @@ export function ChatWidget() {
           type="button"
           onClick={() => setOpen(true)}
           className={cn(
-            "fixed right-4 z-40 flex h-14 items-center gap-2 rounded-full bg-emerald px-5 text-ivory shadow-lg transition-transform hover:scale-105 focus-visible:outline-gold",
+            "fixed right-4 z-40 flex h-13 items-center gap-2 rounded-sm bg-black px-5 text-white shadow-lg transition-colors hover:bg-grey-800",
             raised ? "bottom-48 lg:right-auto lg:bottom-6 lg:left-4" : "bottom-5",
           )}
-          aria-label="Open the AURELIUS Assistant"
+          aria-label="Open the store assistant"
         >
           <MessageCircle className="size-5" aria-hidden />
           <span className="hidden text-sm font-medium sm:inline">Ask our assistant</span>
@@ -178,44 +178,39 @@ export function ChatWidget() {
           role="dialog"
           aria-modal="false"
           aria-labelledby="chat-title"
-          className="fixed inset-0 z-50 flex flex-col bg-paper sm:inset-auto sm:right-4 sm:bottom-4 sm:h-[560px] sm:max-h-[calc(100vh-2rem)] sm:w-[380px] sm:rounded-2xl sm:border sm:border-line sm:shadow-2xl"
+          className="fixed inset-0 z-50 flex flex-col bg-paper sm:inset-auto sm:right-4 sm:bottom-4 sm:h-[560px] sm:max-h-[calc(100vh-2rem)] sm:w-[380px] sm:rounded-lg sm:border sm:border-grey-500 sm:shadow-lg"
           onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
         >
-          <header className="flex items-start gap-3 border-b border-line bg-emerald px-4 py-3 text-ivory sm:rounded-t-2xl">
-            <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full bg-gold/20">
-              <Bot className="size-5 text-gold" aria-hidden />
+          <header className="flex items-start gap-3 border-b border-grey-200 bg-white px-4 py-3 text-black sm:rounded-t-lg">
+            <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-full border border-grey-500">
+              <Bot className="size-5" aria-hidden />
             </span>
             <div className="min-w-0 flex-1">
               <h2 id="chat-title" className="font-sans text-base font-semibold">
-                AURELIUS Assistant
+                Store assistant
               </h2>
-              <p className="text-xs text-ivory/75">Answers about our products and services. The owner confirms all prices and dates.</p>
+              <p className="text-xs text-grey-600">Answers about our products and services. The owner confirms all prices and dates.</p>
             </div>
-            <Button variant="ghost" size="icon-sm" className="text-ivory hover:bg-white/10 hover:text-ivory" onClick={reset} aria-label="Start over">
+            <Button variant="ghost" size="icon-sm" onClick={reset} aria-label="Start over">
               <RotateCcw className="size-4" />
             </Button>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="text-ivory hover:bg-white/10 hover:text-ivory"
-              onClick={() => setOpen(false)}
-              aria-label="Close the assistant"
-            >
+            <Button variant="ghost" size="icon-sm" onClick={() => setOpen(false)} aria-label="Close the assistant">
               <X className="size-4" />
             </Button>
           </header>
 
-          <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto bg-ivory px-3 py-4" aria-live="polite" aria-relevant="additions">
+          <div ref={listRef} className="flex-1 space-y-3 overflow-y-auto bg-grey-50 px-3 py-4" aria-live="polite" aria-relevant="additions">
             {list.map((m, i) => (
               <div key={i} className={cn("flex flex-col", m.role === "user" ? "items-end" : "items-start")}>
+                {/* visible speaker label (DESIGN.md §13: "You", "Assistant") */}
+                <span className="mb-0.5 px-1 text-xs font-medium text-grey-600">{m.role === "user" ? "You" : "Assistant"}</span>
                 <div
                   className={cn(
                     "max-w-[85%] rounded-2xl px-3.5 py-2 text-sm leading-relaxed",
-                    m.role === "user" ? "rounded-br-sm bg-emerald text-ivory" : "rounded-bl-sm border border-line bg-paper text-ink",
-                    m.referToOwner && "border-warning/40",
+                    m.role === "user" ? "rounded-br-sm bg-black text-white" : "rounded-bl-sm border border-grey-500 bg-white text-black",
+                    m.referToOwner && "border-2 border-black",
                   )}
                 >
-                  <span className="sr-only">{m.role === "user" ? "You said: " : "Assistant: "}</span>
                   <RichText text={m.content} onNavigate={() => setOpen(false)} />
                 </div>
                 {m.draft && (
@@ -236,7 +231,7 @@ export function ChatWidget() {
             ))}
             {typing && (
               <div
-                className="flex items-center gap-1 rounded-2xl rounded-bl-sm border border-line bg-paper px-3 py-2.5"
+                className="flex items-center gap-1 rounded-2xl rounded-bl-sm border border-grey-500 bg-white px-3 py-2.5"
                 role="status"
                 aria-label="The assistant is typing"
               >
@@ -254,7 +249,7 @@ export function ChatWidget() {
                   key={q}
                   type="button"
                   onClick={() => void send(q)}
-                  className="min-h-9 shrink-0 rounded-full border border-gold/50 px-3 text-sm whitespace-nowrap text-gold-dark hover:bg-gold/10"
+                  className="min-h-11 shrink-0 rounded-sm border border-black bg-white px-3 text-sm whitespace-nowrap text-black hover:bg-grey-100"
                 >
                   {q}
                 </button>

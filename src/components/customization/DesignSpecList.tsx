@@ -37,7 +37,7 @@ export function DesignSpecList({
       {ROWS.filter(([k]) => labels[k] != null).map(([k, name]) => (
         <div key={k} className="contents">
           <dt className="text-muted-foreground">{name}</dt>
-          <dd className={cn("font-medium", highlight.includes(k) && "rounded bg-warning/15 px-1 text-[#7a4f0e]")}>
+          <dd className={cn("font-medium", highlight.includes(k) && "rounded-sm border border-dashed border-black px-1")}>
             {labels[k]}
             {highlight.includes(k) && <span className="sr-only"> (changed)</span>}
           </dd>

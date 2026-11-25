@@ -87,7 +87,7 @@ export function ProductForm({ product }: { product?: Product }) {
   });
 
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-5 rounded-2xl border border-line bg-paper p-5 sm:p-6">
+    <form onSubmit={onSubmit} noValidate className="space-y-5 rounded-lg border border-line bg-paper p-5 sm:p-6">
       <FormError message={error} />
       <div className="grid gap-4 sm:grid-cols-2">
         <Field label="Product name" error={errors.name?.message}>

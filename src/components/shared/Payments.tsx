@@ -42,7 +42,7 @@ export function PaymentSummary({ tx }: { tx: Transaction }) {
   const rows: [string, number, string?][] = [
     ["Final price", tx.quotation.finalPrice],
     ["Paid and verified", verifiedTotal(tx), "text-success"],
-    ["Waiting for verification", pendingTotal(tx), "text-[#8a5a10]"],
+    ["Waiting for verification", pendingTotal(tx), "text-black"],
   ];
   return (
     <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">

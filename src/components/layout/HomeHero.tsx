@@ -18,13 +18,13 @@ const HERO: DesignConfig = {
 /** Slowly rotating ring for the home page (falls back to an illustration without WebGL). */
 export function HomeHero() {
   const q = useQuery("options:active", () => repos.customization.getOptions());
-  if (!q.data) return <div className="aspect-square w-full rounded-3xl bg-gradient-to-b from-[#FFFDF9] to-[#EFE7DA]" />;
+  if (!q.data) return <div className="aspect-square w-full bg-grey-100" />;
   return (
     <LazyJewelryViewer
       config={HERO}
       options={q.data}
       showControls={false}
-      className="aspect-square w-full rounded-3xl"
+      className="aspect-square w-full rounded-none"
       label="A rotating 18K gold solitaire ring"
     />
   );

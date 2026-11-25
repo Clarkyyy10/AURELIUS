@@ -94,7 +94,7 @@ function notify(d: DbState, userId: ID, type: NotificationType, title: string, b
   d.notifications.unshift(n);
   // FR-49: customer events are also emailed (simulated in Phase 1).
   if (isCustomer && user) {
-    d.emails.unshift({ id: uid("mail"), to: user.email, subject: title, body, link, linkLabel: "Open in AURELIUS", createdAt: n.createdAt });
+    d.emails.unshift({ id: uid("mail"), to: user.email, subject: title, body, link, linkLabel: "Open your request", createdAt: n.createdAt });
   }
 }
 
@@ -204,7 +204,7 @@ export const mockRepositories: Repositories = {
         d.emails.unshift({
           id: uid("mail"),
           to: email,
-          subject: "Confirm your email for AURELIUS",
+          subject: "Confirm your email for Afable's Jewelry Store",
           body: `Hi ${user.fullName}, please confirm your email address so you can place orders and submit requests.`,
           link: `/verify-email?token=${token}`,
           linkLabel: "Verify my email",
@@ -259,7 +259,7 @@ export const mockRepositories: Repositories = {
         d.emails.unshift({
           id: uid("mail"),
           to: user.email,
-          subject: "Confirm your email for AURELIUS",
+          subject: "Confirm your email for Afable's Jewelry Store",
           body: `Hi ${user.fullName}, here is a new link to confirm your email address.`,
           link: `/verify-email?token=${token}`,
           linkLabel: "Verify my email",
@@ -291,7 +291,7 @@ export const mockRepositories: Repositories = {
         d.emails.unshift({
           id: uid("mail"),
           to: user.email,
-          subject: "Reset your AURELIUS password",
+          subject: "Reset your Afable's Jewelry Store password",
           body: "We received a request to reset your password. This link expires in 1 hour. If you didn't ask for this, you can ignore this email.",
           link: `/reset-password?token=${token}`,
           linkLabel: "Choose a new password",

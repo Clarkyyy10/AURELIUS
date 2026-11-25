@@ -44,7 +44,7 @@ export function SiteFooter() {
         </nav>
       </div>
       <p className="border-t border-line py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} {settings.storeName}. AURELIUS capstone project.
+        © {new Date().getFullYear()} {settings.storeName}.
       </p>
     </footer>
   );

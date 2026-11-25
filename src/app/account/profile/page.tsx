@@ -55,7 +55,7 @@ function ProfileForm({ user }: { user: UserProfile }) {
     }
   });
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-4 rounded-2xl border border-line bg-paper p-6">
+    <form onSubmit={onSubmit} noValidate className="space-y-4 rounded-lg border border-line bg-paper p-6">
       <h2 className="text-2xl">Your details</h2>
       <FormError message={error} />
       <Field label="Full name" error={form.formState.errors.fullName?.message}>
@@ -92,7 +92,7 @@ function PasswordForm() {
   });
   const { errors } = form.formState;
   return (
-    <form onSubmit={onSubmit} noValidate className="space-y-4 rounded-2xl border border-line bg-paper p-6">
+    <form onSubmit={onSubmit} noValidate className="space-y-4 rounded-lg border border-line bg-paper p-6">
       <h2 className="text-2xl">Change password</h2>
       <FormError message={error} />
       <Field label="Current password" error={errors.currentPassword?.message}>

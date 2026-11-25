@@ -40,17 +40,17 @@ export default function ChatbotKnowledgePage() {
           empty={(l) => (l.length === 0 ? <EmptyState title="No answers yet" action={{ label: "Add an answer", onClick: () => setEditing("new") }} /> : null)}
         >
           {(list) => (
-            <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-paper">
+            <ul className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-paper">
               {list.map((f) => (
                 <li key={f.id} className={`flex flex-wrap items-start gap-3 p-4 ${f.active ? "" : "bg-muted/50"}`}>
                   <div className="min-w-0 flex-1">
                     <p className="font-medium">
-                      {f.question} {!f.active && <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">Off</span>}
+                      {f.question} {!f.active && <span className="ml-1 rounded-sm bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">Off</span>}
                     </p>
                     <p className="text-sm text-muted-foreground">{f.answer}</p>
                     <p className="mt-1 flex flex-wrap gap-1">
                       {f.keywords.map((k) => (
-                        <span key={k} className="rounded-full bg-muted px-2 py-0.5 text-xs">
+                        <span key={k} className="rounded-sm bg-muted px-2 py-0.5 text-xs">
                           {k}
                         </span>
                       ))}
@@ -97,7 +97,7 @@ function PoliciesEditor({ initial }: { initial: string }) {
   const [text, setText] = useState(initial);
   const [busy, setBusy] = useState(false);
   return (
-    <section className="h-fit space-y-3 rounded-2xl border border-line bg-paper p-5" aria-labelledby="policies">
+    <section className="h-fit space-y-3 rounded-lg border border-line bg-paper p-5" aria-labelledby="policies">
       <h2 id="policies" className="text-2xl">
         Store policies
       </h2>

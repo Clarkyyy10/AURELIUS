@@ -64,7 +64,7 @@ export function ProductModelView({
   return (
     <div
       ref={wrap}
-      className={cn("relative overflow-hidden bg-[#F6F1E9] select-none", className)}
+      className={cn("relative overflow-hidden bg-grey-100 select-none", className)}
       role="img"
       aria-label={label}
       onPointerDown={() => setActive(true)}
@@ -82,7 +82,7 @@ export function ProductModelView({
           onClick={() => setActive(true)}
         />
       )}
-      <p className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-paper/85 px-2.5 py-0.5 text-[11px] whitespace-nowrap text-muted-foreground">
+      <p className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 rounded-sm bg-paper/85 px-2.5 py-0.5 text-[11px] whitespace-nowrap text-muted-foreground">
         {active ? (
           "Drag to rotate · scroll or pinch to zoom"
         ) : (

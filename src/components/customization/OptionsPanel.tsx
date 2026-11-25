@@ -1,6 +1,6 @@
 "use client";
 
-import { Info, Minus, Plus } from "lucide-react";
+import { Check, Info, Minus, Plus } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -113,12 +113,18 @@ function Choice({
       aria-label={label}
       onClick={onClick}
       className={cn(
-        "rounded-xl border bg-paper text-sm transition-colors hover:border-gold",
-        selected ? "border-gold-dark bg-gold/10 ring-2 ring-gold/40" : "border-line",
+        // DESIGN.md §11: selected = 2 px black border + check icon + aria-checked (never colour alone).
+        "relative rounded-sm border bg-white text-sm transition-colors duration-150 hover:bg-grey-50",
+        selected ? "border-2 border-black" : "border-grey-500",
         className,
       )}
     >
       {children}
+      {selected && (
+        <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-black text-white" aria-hidden>
+          <Check className="size-3.5" strokeWidth={2.5} />
+        </span>
+      )}
     </button>
   );
 }

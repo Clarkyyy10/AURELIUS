@@ -1,6 +1,7 @@
 "use client";
 
 import { cloneElement, isValidElement, useId } from "react";
+import { CircleAlert } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
@@ -38,7 +39,7 @@ export function Field({
     <div className={cn("space-y-1.5", className)}>
       <Label htmlFor={id}>
         {label}
-        {optional && <span className="font-normal text-muted-foreground"> (optional)</span>}
+        {optional && <span className="font-normal text-grey-600"> (optional)</span>}
       </Label>
       {control}
       {hint && !error && (
@@ -47,8 +48,11 @@ export function Field({
         </p>
       )}
       {error && (
-        <p id={errorId} className="text-sm text-danger" role="alert">
-          {error}
+        // DESIGN.md §11: no red. The control gets a 2 px black border; the message starts with an icon
+        // and "Error:" and says how to fix it.
+        <p id={errorId} className="flex items-start gap-1.5 text-sm font-semibold text-black" role="alert">
+          <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+          <span>Error: {error}</span>
         </p>
       )}
     </div>
@@ -59,8 +63,13 @@ export function Field({
 export function FormError({ message }: { message?: string | null }) {
   if (!message) return null;
   return (
-    <div role="alert" aria-live="assertive" className="rounded-lg border border-danger/30 bg-danger/5 px-3 py-2 text-sm text-danger">
-      {message}
+    // DESIGN.md §11: an error box is told apart by a 2 px black border, an icon and a heading — not colour.
+    <div role="alert" aria-live="assertive" className="flex items-start gap-2 rounded-lg border-2 border-black bg-white px-3 py-2.5 text-sm text-black">
+      <CircleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+      <div>
+        <p className="font-semibold">There is a problem</p>
+        <p>{message}</p>
+      </div>
     </div>
   );
 }

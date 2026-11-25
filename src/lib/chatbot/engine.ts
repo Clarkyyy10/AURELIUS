@@ -11,7 +11,7 @@ import type { ChatDraft, ChatResult, ChatTurn, KnowledgeBase } from "./types";
 
 export const QUICK_START = ["Design a custom piece", "Request a repair or service", "Ask about products", "Store hours and location"];
 export const WELCOME =
-  "Hi! I'm the AURELIUS Assistant. I can help you design a custom piece, request a repair or service, or answer questions about our products and services. What would you like to do?";
+  "Hello. I'm the assistant for Afable's Jewelry Store. I can help you design a custom piece, request a repair or service, or answer questions about our products and services. What would you like to do?";
 
 const PRICE_WORDS = /\b(how much|price|prices|cost|costs|magkano|rate|budget|cheap|expensive|discount|final price|quote)\b/i;
 const DATE_WORDS = /\b(when|how long|how many days|ready by|deadline|finish|completion|date|rush|urgent)\b/i;
@@ -484,7 +484,7 @@ function idleStep(text: string, kb: KnowledgeBase): { state: State; result: Chat
   if (/^(hi|hello|hey|good (morning|afternoon|evening)|kumusta|hello po|hi po)\b/.test(t))
     return { state: idle, result: { reply: WELCOME, quickReplies: QUICK_START } };
   if (/^(thanks|thank you|salamat|ok|okay)\b/.test(t))
-    return { state: idle, result: { reply: "You're welcome! Is there anything else I can help with?", quickReplies: QUICK_START } };
+    return { state: idle, result: { reply: "You're welcome. Is there anything else I can help with?", quickReplies: QUICK_START } };
   return { state: idle, result: referToOwner(kb) }; // FR-39
 }
 

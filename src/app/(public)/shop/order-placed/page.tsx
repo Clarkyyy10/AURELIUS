@@ -19,7 +19,7 @@ function OrderPlaced() {
   if (!q.data) return <ErrorState message="We couldn't find that order." />;
   const o = q.data;
   return (
-    <div className="rounded-2xl border border-line bg-paper p-6 sm:p-10">
+    <div className="rounded-lg border border-line bg-paper p-6 sm:p-10">
       <CheckCircle2 className="size-12 text-success" aria-hidden />
       <h1 className="mt-3 text-4xl">Thank you — your order was placed</h1>
       <p className="mt-2 flex flex-wrap items-center gap-2 text-muted-foreground">

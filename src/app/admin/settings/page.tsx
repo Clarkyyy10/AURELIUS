@@ -44,7 +44,7 @@ function SettingsForm({ settings }: { settings: StoreSettings }) {
   return (
     <form onSubmit={onSubmit} noValidate className="max-w-3xl space-y-6">
       <FormError message={error} />
-      <section className="space-y-4 rounded-2xl border border-line bg-paper p-6">
+      <section className="space-y-4 rounded-lg border border-line bg-paper p-6">
         <h2 className="text-2xl">Store information</h2>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Store name" error={errors.storeName?.message}>
@@ -64,7 +64,7 @@ function SettingsForm({ settings }: { settings: StoreSettings }) {
           <Textarea rows={2} {...form.register("openingHours")} />
         </Field>
       </section>
-      <section className="space-y-4 rounded-2xl border border-line bg-paper p-6">
+      <section className="space-y-4 rounded-lg border border-line bg-paper p-6">
         <h2 className="text-2xl">Payments and claiming</h2>
         <Field
           label="Payment instructions"

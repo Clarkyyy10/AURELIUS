@@ -44,7 +44,7 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Good day!"
+        title="Good day"
         description="Here's what needs your attention."
         actions={
           <>
@@ -67,7 +67,7 @@ export default function AdminDashboard() {
           <li key={label}>
             <Link
               href={href}
-              className={cn("flex h-full flex-col gap-2 rounded-2xl border p-4 hover:shadow-sm", n > 0 ? "border-gold/50 bg-gold/5" : "border-line bg-paper")}
+              className={cn("flex h-full flex-col gap-2 rounded-lg border p-4 hover:shadow-sm", n > 0 ? "border-gold/50 bg-gold/5" : "border-line bg-paper")}
             >
               <Icon className="size-5 text-gold-dark" aria-hidden />
               <span className="font-heading text-4xl font-semibold">{n}</span>
@@ -78,7 +78,7 @@ export default function AdminDashboard() {
       </ul>
 
       <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr]">
-        <section className="rounded-2xl border border-line bg-paper p-5" aria-labelledby="activity">
+        <section className="rounded-lg border border-line bg-paper p-5" aria-labelledby="activity">
           <div className="mb-3 flex items-center justify-between">
             <h2 id="activity" className="text-2xl">
               Recent activity
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
           )}
         </section>
 
-        <section className="space-y-3 rounded-2xl border border-line bg-paper p-5" aria-labelledby="stats">
+        <section className="space-y-3 rounded-lg border border-line bg-paper p-5" aria-labelledby="stats">
           <h2 id="stats" className="text-2xl">
             This month
           </h2>

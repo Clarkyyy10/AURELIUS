@@ -29,7 +29,7 @@ export default function HomePage() {
       <SharedViewCanvas />
       <section className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 lg:grid-cols-2 lg:py-20">
         <div>
-          <p className="text-sm font-medium tracking-[0.2em] text-gold-dark uppercase">Afable&apos;s Jewelry Store · Montalban</p>
+          <p className="text-sm font-medium text-muted-foreground">Afable&apos;s Jewelry Store · Montalban</p>
           <h1 className="mt-3 text-5xl leading-[1.05] sm:text-6xl">Jewelry made the way you imagine it.</h1>
           <p className="mt-5 max-w-xl text-lg text-muted-foreground">
             Design your piece in 3D, order from our collection, or book a repair — all from Afable&apos;s Jewelry Store in Montalban.
@@ -76,7 +76,7 @@ export default function HomePage() {
               cta: "See services",
             },
           ].map(({ icon: Icon, title, text, href, cta }) => (
-            <Link key={title} href={href} className="group rounded-2xl border border-line bg-paper p-6 transition-shadow hover:shadow-md">
+            <Link key={title} href={href} className="group rounded-lg border border-line bg-paper p-6 transition-shadow hover:shadow-md">
               <Icon className="size-7 text-gold" aria-hidden />
               <h2 className="mt-3 text-2xl">{title}</h2>
               <p className="mt-1 text-muted-foreground">{text}</p>
@@ -92,7 +92,7 @@ export default function HomePage() {
         </h2>
         <ol className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map(([t, d], i) => (
-            <li key={t} className="rounded-2xl border border-line bg-paper p-5">
+            <li key={t} className="rounded-lg border border-line bg-paper p-5">
               <span className="flex size-9 items-center justify-center rounded-full bg-emerald font-semibold text-ivory">{i + 1}</span>
               <p className="mt-3 font-semibold">{t}</p>
               <p className="mt-1 text-sm text-muted-foreground">{d}</p>
@@ -150,7 +150,7 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-4" aria-labelledby="visit-title">
-        <div className="grid gap-6 rounded-3xl bg-emerald p-8 text-ivory md:grid-cols-[1.4fr_1fr] md:p-12">
+        <div className="grid gap-6 rounded-lg bg-emerald p-8 text-ivory md:grid-cols-[1.4fr_1fr] md:p-12">
           <div>
             <h2 id="visit-title" className="text-4xl">
               Visit the store
@@ -167,7 +167,7 @@ export default function HomePage() {
               </li>
             </ul>
           </div>
-          <div className="flex flex-col justify-center gap-3 rounded-2xl bg-white/5 p-6">
+          <div className="flex flex-col justify-center gap-3 rounded-lg bg-white/5 p-6">
             <p className="font-heading text-2xl">Have a question?</p>
             <p className="text-ivory/80">Our assistant can answer questions and help you prepare a custom order or service request.</p>
             <Button onClick={openChat} className="bg-gold text-ink hover:bg-gold/90">

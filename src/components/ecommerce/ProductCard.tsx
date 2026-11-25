@@ -11,7 +11,7 @@ import type { CustomizationOptions, Product } from "@/types";
 
 const ProductModelView = dynamic(() => import("@/components/customization/SharedViews").then((m) => m.ProductModelView), {
   ssr: false,
-  loading: () => <div className="aspect-square animate-pulse bg-[#F6F1E9]" />,
+  loading: () => <div className="aspect-square animate-pulse bg-grey-100" />,
 });
 
 /** Render once on any page that shows product cards with 3D previews. */
@@ -27,7 +27,7 @@ export function ProductCard({ product, options }: { product: Product; options?: 
   const show3d = Boolean(webgl && options && options.productTypes.some((p) => p.type === product.category));
 
   return (
-    <article className="group overflow-hidden rounded-2xl border border-line bg-paper transition-shadow hover:shadow-md">
+    <article className="group overflow-hidden rounded-lg border border-line bg-paper transition-shadow hover:shadow-md">
       <div className="relative">
         {show3d ? (
           <ProductModelView

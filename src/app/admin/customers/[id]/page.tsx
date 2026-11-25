@@ -150,7 +150,7 @@ export default function CustomerDetailPage() {
         {shown.length === 0 ? (
           <EmptyState title="Nothing to show" description="This customer has no records of this type yet." />
         ) : (
-          <ol className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-paper">
+          <ol className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-paper">
             {shown.map((e, i) => {
               const Icon = ICONS[e.type];
               return (

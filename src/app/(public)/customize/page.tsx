@@ -214,7 +214,7 @@ function Customizer({
             config={config}
             options={options}
             captureRef={captureRef}
-            className="h-[45vh] min-h-72 w-full rounded-none sm:rounded-2xl lg:h-[calc(100vh-8rem)] lg:max-h-[720px]"
+            className="h-[45vh] min-h-72 w-full rounded-none sm:rounded-lg lg:h-[calc(100vh-8rem)] lg:max-h-[720px]"
             label={`3D preview: ${labels.finish} ${labels.material} ${labels.productType.toLowerCase()}, ${labels.gemstone}, size ${labels.size}`}
           />
         </div>
@@ -225,7 +225,7 @@ function Customizer({
               {notice}
             </p>
           )}
-          <div className="rounded-2xl border border-line bg-paper px-4">
+          <div className="rounded-lg border border-line bg-paper px-4">
             <OptionsPanel config={config} options={options} onChange={change} disabledTypes={revising} />
           </div>
           <EstimateBar estimate={est} error={estError} className="sticky bottom-4 mt-4 hidden lg:block" action={submitButton} />

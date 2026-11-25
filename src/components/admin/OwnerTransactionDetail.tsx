@@ -63,9 +63,9 @@ export function OwnerTransactionDetail({ kind, id }: { kind: TransactionKind; id
           <span className="flex flex-wrap items-center gap-2">
             <CodeChip code={tx.code} /> Submitted <DateText value={tx.createdAt} withTime />
             {tx.kind !== "order" && tx.source === "chatbot" && (
-              <span className="rounded-full bg-info/10 px-2 py-0.5 text-xs text-info">Prepared with the assistant</span>
+              <span className="rounded-sm bg-info/10 px-2 py-0.5 text-xs text-info">Prepared with the assistant</span>
             )}
-            {tx.kind === "custom" && tx.source === "catalog" && <span className="rounded-full bg-muted px-2 py-0.5 text-xs">From the shop</span>}
+            {tx.kind === "custom" && tx.source === "catalog" && <span className="rounded-sm bg-muted px-2 py-0.5 text-xs">From the shop</span>}
           </span>
         }
       />
@@ -74,7 +74,7 @@ export function OwnerTransactionDetail({ kind, id }: { kind: TransactionKind; id
         <div className="min-w-0 space-y-6">
           <NextActions tx={tx} />
 
-          <section className="rounded-2xl border border-line bg-paper p-5">
+          <section className="rounded-lg border border-line bg-paper p-5">
             <h2 className="mb-4 text-2xl">{kind === "service" ? "Item and services" : kind === "custom" ? "Design" : "Order"}</h2>
             {tx.kind === "order" && <OrderItem tx={tx} />}
             {tx.kind === "custom" && <OwnerDesign tx={tx} />}
@@ -90,7 +90,7 @@ export function OwnerTransactionDetail({ kind, id }: { kind: TransactionKind; id
         </div>
 
         <aside className="space-y-4">
-          <section className="rounded-2xl border border-line bg-paper p-5" aria-labelledby="customer-title">
+          <section className="rounded-lg border border-line bg-paper p-5" aria-labelledby="customer-title">
             <h2 id="customer-title" className="mb-3 text-xl">
               Customer
             </h2>
@@ -116,7 +116,7 @@ export function OwnerTransactionDetail({ kind, id }: { kind: TransactionKind; id
               <p className="text-sm text-muted-foreground">Loading…</p>
             )}
           </section>
-          <section className="rounded-2xl border border-line bg-paper p-5" aria-labelledby="history-title">
+          <section className="rounded-lg border border-line bg-paper p-5" aria-labelledby="history-title">
             <h2 id="history-title" className="mb-4 text-xl">
               History
             </h2>
@@ -255,7 +255,7 @@ function NextActions({ tx }: { tx: Transaction }) {
   }
 
   if (!content) return null;
-  return <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-gold/40 bg-gold/5 p-4">{content}</div>;
+  return <div className="flex flex-wrap items-center gap-2 rounded-lg border border-gold/40 bg-gold/5 p-4">{content}</div>;
 }
 
 function OwnerDesign({ tx }: { tx: CustomOrderRequest }) {

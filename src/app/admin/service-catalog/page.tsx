@@ -46,7 +46,7 @@ export default function ServiceCatalogPage() {
         empty={(l) => (l.length === 0 ? <EmptyState title="No services yet" action={{ label: "Add a service", onClick: () => setEditing("new") }} /> : null)}
       >
         {(list) => (
-          <ol className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-paper">
+          <ol className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-paper">
             {list.map((s, i) => (
               <li key={s.id} className={`flex flex-wrap items-center gap-3 p-4 ${s.hidden ? "bg-muted/50" : ""}`}>
                 <div className="flex flex-col">
@@ -74,7 +74,7 @@ export default function ServiceCatalogPage() {
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="font-medium">
-                    {s.name} {s.hidden && <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">Hidden</span>}
+                    {s.name} {s.hidden && <span className="ml-1 rounded-sm bg-muted px-2 py-0.5 text-xs font-normal text-muted-foreground">Hidden</span>}
                   </p>
                   <p className="line-clamp-2 text-sm text-muted-foreground">{s.description}</p>
                   <p className="text-xs text-muted-foreground">For {s.appliesTo.map((a) => (a === "jewelry" ? "jewelry" : "watches")).join(" and ")}</p>

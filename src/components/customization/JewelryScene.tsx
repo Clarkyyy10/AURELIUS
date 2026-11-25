@@ -175,7 +175,7 @@ export function JewelryScene({
   enableZoom = true,
   onInteract,
   fitRef,
-  background = "#F6F1E9",
+  background = "#f5f5f5",
 }: JewelrySceneProps) {
   const resolved = useResolved(config, options);
   const [shadowY, setShadowY] = useState(-1.2);
@@ -208,15 +208,15 @@ export function JewelryScene({
       <ContactShadows key={shadowY} position={[0, shadowY, 0]} opacity={0.32} scale={8} blur={2.4} far={4} resolution={256} frames={1} />
       {/* Studio reflections: a darker room with bright light strips gives metal and stones contrast. */}
       <Environment resolution={128} frames={1}>
-        <color attach="background" args={["#2b2622"]} />
-        <Lightformer form="rect" intensity={7} position={[0, 5, 1]} scale={[8, 1.5, 1]} rotation={[Math.PI / 2, 0, 0]} color="#fff7ea" />
+        <color attach="background" args={["#262626"]} />
+        <Lightformer form="rect" intensity={7} position={[0, 5, 1]} scale={[8, 1.5, 1]} rotation={[Math.PI / 2, 0, 0]} color="#ffffff" />
         <Lightformer form="rect" intensity={5} position={[-5, 1.5, 1]} scale={[1.2, 6, 1]} rotation={[0, Math.PI / 2, 0]} />
         <Lightformer form="rect" intensity={5} position={[5, 1.5, 1]} scale={[1.2, 6, 1]} rotation={[0, -Math.PI / 2, 0]} />
         <Lightformer form="rect" intensity={3} position={[0, 1, 6]} scale={[6, 1, 1]} color="#ffffff" />
         {/* soft low front light so flat chains (herringbone, omega) and plates don't turn dark */}
-        <Lightformer form="rect" intensity={2.2} position={[0, -1.5, 6]} scale={[8, 2, 1]} color="#fff6e8" />
-        <Lightformer form="ring" intensity={2.5} position={[0, 2, -6]} scale={4} color="#ffe6bd" />
-        <Lightformer form="rect" intensity={1.2} position={[0, -4, 0]} scale={[10, 10, 1]} rotation={[-Math.PI / 2, 0, 0]} color="#f3e8d8" />
+        <Lightformer form="rect" intensity={2.2} position={[0, -1.5, 6]} scale={[8, 2, 1]} color="#ffffff" />
+        <Lightformer form="ring" intensity={2.5} position={[0, 2, -6]} scale={4} color="#f5f5f5" />
+        <Lightformer form="rect" intensity={1.2} position={[0, -4, 0]} scale={[10, 10, 1]} rotation={[-Math.PI / 2, 0, 0]} color="#f5f5f5" />
       </Environment>
       <OrbitControls
         enablePan={false}

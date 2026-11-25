@@ -169,7 +169,7 @@ export function StatusControl({ tx }: { tx: Transaction }) {
   const needsBalance = (value === "claimed" || value === "completed") && bal > 0;
 
   return (
-    <div className="space-y-3 rounded-2xl border border-line bg-paper p-5">
+    <div className="space-y-3 rounded-lg border border-line bg-paper p-5">
       <h3 className="font-sans text-base font-semibold">Update status</h3>
       <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
         <Select value={value} onValueChange={setTo}>

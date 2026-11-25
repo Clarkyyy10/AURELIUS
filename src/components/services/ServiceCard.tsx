@@ -26,7 +26,7 @@ export function ServiceIcon({ name, className }: { name: string; className?: str
 /** FR-25 service card. */
 export function ServiceCard({ service, compact }: { service: ServiceCatalogItem; compact?: boolean }) {
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-line bg-paper p-5">
+    <article className="flex h-full flex-col rounded-lg border border-line bg-paper p-5">
       <span className="mb-3 flex size-11 items-center justify-center rounded-xl bg-gold/15">
         <ServiceIcon name={service.icon} className="size-5 text-gold-dark" />
       </span>
@@ -34,7 +34,7 @@ export function ServiceCard({ service, compact }: { service: ServiceCatalogItem;
       <p className="mt-1 flex-1 text-sm text-muted-foreground">{service.description}</p>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {service.appliesTo.map((a) => (
-          <span key={a} className="rounded-full bg-muted px-2 py-0.5 text-xs">
+          <span key={a} className="rounded-sm bg-muted px-2 py-0.5 text-xs">
             For {a === "jewelry" ? "jewelry" : "watches"}
           </span>
         ))}

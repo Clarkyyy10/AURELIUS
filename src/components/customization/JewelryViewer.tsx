@@ -31,7 +31,7 @@ function SnapshotBridge({ captureRef }: { captureRef?: React.RefObject<CaptureFn
         c.width = Math.round(src.width * scale);
         c.height = Math.round(src.height * scale);
         const ctx = c.getContext("2d")!;
-        ctx.fillStyle = "#F6F1E9";
+        ctx.fillStyle = "#f5f5f5";
         ctx.fillRect(0, 0, c.width, c.height);
         ctx.drawImage(src, 0, 0, c.width, c.height);
         return c.toDataURL("image/jpeg", 0.86);
@@ -81,12 +81,7 @@ export function JewelryViewer({
   if (webgl === false) return <NoWebGL className={className} />;
 
   return (
-    <div
-      ref={wrap}
-      className={cn("relative overflow-hidden rounded-2xl bg-gradient-to-b from-[#FFFDF9] to-[#EFE7DA]", className)}
-      role="img"
-      aria-label={label}
-    >
+    <div ref={wrap} className={cn("relative overflow-hidden rounded-none bg-grey-100", className)} role="img" aria-label={label}>
       {webgl && (
         <Canvas dpr={[1, 2]} gl={{ preserveDrawingBuffer: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping }} shadows={false}>
           <JewelryScene
@@ -126,7 +121,7 @@ export function JewelryViewer({
         </div>
       )}
       {showControls && webgl && (
-        <p className="pointer-events-none absolute top-3 left-3 rounded-full bg-paper/80 px-2.5 py-1 text-xs text-muted-foreground">
+        <p className="pointer-events-none absolute top-3 left-3 rounded-sm bg-paper/80 px-2.5 py-1 text-xs text-muted-foreground">
           Drag to rotate · scroll or pinch to zoom
         </p>
       )}
@@ -137,7 +132,7 @@ export function JewelryViewer({
 /** NFR compatibility: clear message instead of a blank viewer. */
 export function NoWebGL({ className }: { className?: string }) {
   return (
-    <div className={cn("flex flex-col items-center justify-center gap-3 rounded-2xl border border-line bg-paper p-6 text-center", className)} role="status">
+    <div className={cn("flex flex-col items-center justify-center gap-3 rounded-lg border border-line bg-paper p-6 text-center", className)} role="status">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src="/placeholders/no-webgl.svg" alt="Illustration of a ring" className="w-40 max-w-full rounded-xl" />
       <p className="max-w-sm text-sm text-muted-foreground">

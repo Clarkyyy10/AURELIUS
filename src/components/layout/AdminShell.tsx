@@ -63,14 +63,14 @@ function SideNav({ counts, onNavigate }: { counts?: OwnerCounts; onNavigate?: ()
             onClick={onNavigate}
             aria-current={active ? "page" : undefined}
             className={cn(
-              "flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm font-medium text-ivory/85 hover:bg-sidebar-accent hover:text-ivory",
-              active && "bg-sidebar-accent text-ivory shadow-[inset_3px_0_0_var(--gold)]",
+              "flex min-h-11 items-center gap-3 rounded-sm px-3 text-sm font-medium text-grey-700 hover:bg-grey-100 hover:text-black",
+              active && "bg-grey-100 font-semibold text-black shadow-[inset_3px_0_0_#000]",
             )}
           >
             <Icon className="size-4 shrink-0" />
             <span className="flex-1">{label}</span>
             {n > 0 && (
-              <span className="rounded-full bg-gold px-2 text-xs leading-5 font-semibold text-ink" aria-label={`${n} need action`}>
+              <span className="rounded-sm bg-black px-2 text-xs leading-5 font-semibold text-white" aria-label={`${n} need action`}>
                 {n}
               </span>
             )}
@@ -81,7 +81,7 @@ function SideNav({ counts, onNavigate }: { counts?: OwnerCounts; onNavigate?: ()
   );
 }
 
-/** Owner shell: emerald sidebar, top bar with title, bell (FR-50) and "View store". */
+/** Owner shell: white sidebar, top bar with title, bell (FR-50) and "View store". */
 export function AdminShell({ user, children }: { user: UserProfile; children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -90,10 +90,10 @@ export function AdminShell({ user, children }: { user: UserProfile; children: Re
 
   return (
     <div className="flex min-h-[calc(100vh-2.25rem)] flex-1">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto bg-sidebar text-sidebar-foreground lg:flex">
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto border-r border-grey-200 bg-white text-black lg:flex">
         <div className="border-b border-sidebar-border px-5 py-4">
           <Logo href="/admin" tone="light" />
-          <p className="mt-1 text-xs text-ivory/60">Owner dashboard</p>
+          <p className="mt-1 text-xs text-grey-600">Owner dashboard</p>
         </div>
         <SideNav counts={q.data} />
       </aside>

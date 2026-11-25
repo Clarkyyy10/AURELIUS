@@ -21,7 +21,7 @@ export function EstimateBar({
 }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className={cn("@container rounded-2xl border border-line bg-paper p-3 shadow-[0_-6px_20px_-12px_rgba(28,27,25,0.25)] sm:p-4", className)}>
+    <div className={cn("@container rounded-lg border border-line bg-paper p-3 shadow-[0_-6px_20px_-12px_rgba(28,27,25,0.25)] sm:p-4", className)}>
       <div className="flex flex-col gap-2.5 @sm:flex-row @sm:items-center @sm:gap-4">
         <div aria-live="polite" aria-atomic="true" className="min-w-0 flex-1">
           {estimate ? (
