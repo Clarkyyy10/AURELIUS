@@ -18,19 +18,21 @@ Pinned in `package.json`, `pnpm-workspace.yaml` and `.nvmrc`: Next.js 16.4.6, Re
 
 ### Commands
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Start the development server |
-| `pnpm build` | Production build |
-| `pnpm start` | Serve the production build |
-| `pnpm lint` | ESLint |
-| `pnpm typecheck` | `next typegen` then `tsc --noEmit` |
-| `pnpm test` | Vitest unit tests (`vitest run --passWithNoTests`) |
+| Command          | Purpose                                            |
+| ---------------- | -------------------------------------------------- |
+| `pnpm dev`       | Start the development server                       |
+| `pnpm build`     | Production build                                   |
+| `pnpm start`     | Serve the production build                         |
+| `pnpm lint`      | ESLint                                             |
+| `pnpm typecheck` | `next typegen` then `tsc --noEmit`                 |
+| `pnpm test`      | Vitest unit tests (`vitest run --passWithNoTests`) |
 
 ### Git rules
 
 - `main` is protected. Never push directly to `main`.
-- Work on `feat/<name>` or `fix/<name>`. Open one pull request per task. One approval is required before merge.
+- Work on `feat/<name>` or `fix/<name>`. Open one pull request per task.
+- Merging needs the CI check `checks` to pass, for everyone. A teammate approval is also required, with one exception: the repository owner (admin role) may merge their own pull request without an approval. Never use the "bypass rules" option to merge a pull request with failing checks. Agents do not approve or bypass; leave merging to the human.
+- `main` is guarded by two rulesets, `protect-main-core` and `main-approval`. See `CONTRIBUTING.md` for the details.
 - Commit every change with a typed message: `feat`, `fix`, `docs`, `test`, `refactor`, `chore`, `ci`.
 - Never use `--no-verify`. If a hook fails, fix the problem and commit again.
 - Stage files by name. Do not use `git add -A` or `git add .`.

@@ -7,18 +7,18 @@ These rules apply to everyone on the team. Read `docs/00-overview.md` first.
 1. `main` is protected. **No direct push to `main`.**
 2. Work in a feature branch named `feat/<name>` or `fix/<name>`.
 3. Open a pull request for each task.
-4. One approval is required before merge.
+4. One teammate approval is required before merge. The repository owner may merge their own pull requests without an approval once the required checks pass.
 5. Every change is committed with a clear message.
 6. Husky runs lint and type check before each commit.
 7. GitHub Actions runs lint, type check, unit tests and build on every pull request. A failing check blocks the merge.
 
 ## Branching (Gitflow style)
 
-| Branch | Purpose |
-| --- | --- |
-| `main` | Always deployable. Protected. Production deploys come from here. |
-| `feat/<name>` | New work, for example `feat/ring-viewer-band`. |
-| `fix/<name>` | Bug fixes, for example `fix/estimate-rounding`. |
+| Branch        | Purpose                                                          |
+| ------------- | ---------------------------------------------------------------- |
+| `main`        | Always deployable. Protected. Production deploys come from here. |
+| `feat/<name>` | New work, for example `feat/ring-viewer-band`.                   |
+| `fix/<name>`  | Bug fixes, for example `fix/estimate-rounding`.                  |
 
 Branch from the latest `main`. Use short lowercase names with hyphens. Delete the branch after it merges.
 
@@ -52,17 +52,18 @@ docs: update ERD with release record
 - State how you tested it. Mention anything you did not test.
 - Mark the pull request as a draft until the checks pass.
 - The author does not approve their own pull request. One teammate approves before merge.
+- Exception: the repository owner (the admin role) may merge their own pull request without an approval. The required checks still apply to everyone. Use the "bypass rules" option only for the missing approval, never to merge a pull request with failing checks.
 - Merge with squash or merge commit as the team agrees. Do not rewrite shared history.
 
 ## Husky pre-commit hooks
 
 Husky runs these before each commit:
 
-| Check | Command |
-| --- | --- |
-| Lint (ESLint) | `pnpm lint` |
-| Type check (TypeScript) | `pnpm typecheck` |
-| Format staged files (Prettier) | `lint-staged` |
+| Check                          | Command          |
+| ------------------------------ | ---------------- |
+| Lint (ESLint)                  | `pnpm lint`      |
+| Type check (TypeScript)        | `pnpm typecheck` |
+| Format staged files (Prettier) | `lint-staged`    |
 
 Do not bypass hooks with `--no-verify`. If a hook fails, fix the problem and commit again. Prettier formats staged files through lint-staged, which runs first. `pnpm install` installs the hooks through the `prepare` script.
 
@@ -80,14 +81,16 @@ Until the first unit tests exist, `pnpm test` passes with no test files (`--pass
 
 ## Branch protection settings (repository owner)
 
-Set these on `main` in GitHub:
+`main` is protected by two active rulesets (Settings, Rules, Rulesets). Both target the default branch.
 
-- Require a pull request before merging.
-- Require 1 approval.
-- Require status checks to pass (lint, type check, unit tests, build).
-- Require branches to be up to date before merging.
-- Block force pushes and deletions.
-- Apply the rules to administrators.
+| Ruleset             | Rules                                                                                                                                                                                          | Bypass                                               |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `protect-main-core` | Require a pull request (0 approvals). Require status check `checks` (the CI job: install, lint, type check, test, build). Require branches to be up to date. Block force pushes and deletions. | None. Applies to everyone, including administrators. |
+| `main-approval`     | Require a pull request with 1 approval.                                                                                                                                                        | Repository admin role, for pull requests only.       |
+
+The effect: collaborators need one approval and a green CI run. The repository owner needs a green CI run and may merge their own pull request without an approval. Nobody can push directly to `main`. Collaborators get write access, not admin, so they do not get the bypass.
+
+If you change the CI job name in `.github/workflows/ci.yml`, update the required check in `protect-main-core` as well.
 
 ## Local setup
 
