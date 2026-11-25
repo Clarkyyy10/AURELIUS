@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
-import { LayoutDashboard, LogOut, Menu, User, UserCircle } from "lucide-react";
+import { LogOut, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -25,56 +25,48 @@ const nav = [
   { href: "/shop", label: "Shop" },
   { href: "/customize", label: "Customize" },
   { href: "/services", label: "Services" },
+  { href: "/track", label: "Track" },
 ];
 
+const linkClass = "text-[17px] leading-6 text-black underline-offset-[6px] decoration-1 hover:underline";
+
+/** Site header (DESIGN.md §10): logo left, plain text links right; the current page is underlined. */
 export function SiteHeader() {
   const { user, ready } = useCurrentUser();
   const pathname = usePathname();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
-  const links =
-    user?.role === "customer"
-      ? [...nav, { href: "/account", label: "My Account" }]
-      : user?.role === "owner"
-        ? [...nav, { href: "/admin", label: "Owner dashboard" }]
-        : nav;
 
   const logout = async () => {
     await repos.auth.logout();
-    toast.success("You're logged out.");
+    toast.success("You are signed out.");
     router.push("/");
   };
 
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const authActive = ["/login", "/register", "/forgot-password", "/reset-password"].some((p) => pathname.startsWith(p));
+  const accountHref = user?.role === "owner" ? "/admin" : "/account";
+  const accountLabel = user?.role === "owner" ? "Owner" : "Account";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-ivory/95 backdrop-blur supports-[backdrop-filter]:bg-ivory/80">
-      <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
+    <header className="sticky top-0 z-40 border-b border-grey-200 bg-white">
+      <div className="mx-auto flex h-[72px] max-w-[1200px] items-center gap-4 px-4 sm:px-6">
         <Logo />
-        <nav className="ml-6 hidden items-center gap-1 md:flex" aria-label="Main">
-          {links.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              aria-current={isActive(l.href) ? "page" : undefined}
-              className={cn(
-                "rounded-md px-3 py-2 text-sm font-medium text-ink/80 hover:bg-muted hover:text-ink",
-                isActive(l.href) && "text-gold-dark underline decoration-gold decoration-2 underline-offset-8",
-              )}
-            >
+        <nav className="ml-auto hidden items-center gap-6 md:flex" aria-label="Main">
+          {nav.map((l) => (
+            <Link key={l.href} href={l.href} aria-current={isActive(l.href) ? "page" : undefined} className={cn(linkClass, isActive(l.href) && "underline")}>
               {l.label}
             </Link>
           ))}
-        </nav>
-
-        <div className="ml-auto flex items-center gap-1">
-          {ready && user && <NotificationBell user={user} />}
+          {ready && !user && (
+            <Link href="/login" aria-current={authActive ? "page" : undefined} className={cn(linkClass, authActive && "underline")}>
+              Sign in
+            </Link>
+          )}
           {ready && user && (
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label={`Account menu for ${user.fullName}`} className="hidden md:inline-flex">
-                  <UserCircle className="size-5" />
-                </Button>
+              <DropdownMenuTrigger className={cn(linkClass, "rounded-sm", (isActive("/account") || isActive("/admin")) && "underline")}>
+                {accountLabel}
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>
@@ -82,44 +74,25 @@ export function SiteHeader() {
                   <span className="block truncate text-xs font-normal text-muted-foreground">{user.email}</span>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {user.role === "owner" ? (
+                <DropdownMenuItem asChild>
+                  <Link href={accountHref}>{user.role === "owner" ? "Owner dashboard" : "My account"}</Link>
+                </DropdownMenuItem>
+                {user.role === "customer" && (
                   <DropdownMenuItem asChild>
-                    <Link href="/admin">
-                      <LayoutDashboard /> Owner dashboard
-                    </Link>
+                    <Link href="/account/profile">Profile</Link>
                   </DropdownMenuItem>
-                ) : (
-                  <>
-                    <DropdownMenuItem asChild>
-                      <Link href="/account/profile">
-                        <User /> Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/account">
-                        <LayoutDashboard /> My Account
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onSelect={() => void logout()}>
-                  <LogOut /> Log out
+                  <LogOut /> Sign out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )}
-          {ready && !user && (
-            <div className="hidden items-center gap-2 md:flex">
-              <Button asChild variant="ghost">
-                <Link href="/login">Log in</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/register">Register</Link>
-              </Button>
-            </div>
-          )}
+        </nav>
 
+        <div className={cn("flex items-center gap-1", "ml-auto md:ml-2")}>
+          {ready && user && <NotificationBell user={user} />}
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
@@ -130,48 +103,33 @@ export function SiteHeader() {
               <SheetHeader>
                 <SheetTitle className="font-heading text-2xl">Menu</SheetTitle>
               </SheetHeader>
-              <nav className="flex flex-col gap-1 px-4" aria-label="Mobile">
-                {links.map((l) => (
+              <nav className="flex flex-col px-4" aria-label="Mobile">
+                {[...nav, ...(user ? [{ href: accountHref, label: user.role === "owner" ? "Owner dashboard" : "My account" }] : [])].map((l) => (
                   <Link
                     key={l.href}
                     href={l.href}
                     onClick={() => setMenuOpen(false)}
                     aria-current={isActive(l.href) ? "page" : undefined}
-                    className={cn("rounded-lg px-3 py-3 text-base font-medium hover:bg-muted", isActive(l.href) && "bg-muted text-gold-dark")}
+                    className={cn("flex min-h-12 items-center border-b border-grey-200 text-lg", isActive(l.href) && "underline underline-offset-[6px]")}
                   >
                     {l.label}
                   </Link>
                 ))}
-                <div className="my-2 h-px bg-line" />
                 {user ? (
-                  <>
-                    {user.role === "customer" && (
-                      <Link href="/account/profile" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-3 text-base hover:bg-muted">
-                        Profile
-                      </Link>
-                    )}
-                    <button
-                      type="button"
-                      className="rounded-lg px-3 py-3 text-left text-base hover:bg-muted"
-                      onClick={() => {
-                        setMenuOpen(false);
-                        void logout();
-                      }}
-                    >
-                      Log out
-                    </button>
-                  </>
+                  <button
+                    type="button"
+                    className="flex min-h-12 items-center text-left text-lg"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      void logout();
+                    }}
+                  >
+                    Sign out
+                  </button>
                 ) : (
-                  <>
-                    <Link href="/login" onClick={() => setMenuOpen(false)} className="rounded-lg px-3 py-3 text-base hover:bg-muted">
-                      Log in
-                    </Link>
-                    <Button asChild className="mt-1">
-                      <Link href="/register" onClick={() => setMenuOpen(false)}>
-                        Register
-                      </Link>
-                    </Button>
-                  </>
+                  <Link href="/login" onClick={() => setMenuOpen(false)} className="flex min-h-12 items-center text-lg">
+                    Sign in
+                  </Link>
                 )}
               </nav>
             </SheetContent>

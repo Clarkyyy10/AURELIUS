@@ -38,7 +38,7 @@ export async function proxy(req: NextRequest) {
     if (isIdle(lastSeen, now)) {
       await sb.auth.signOut();
       const out = isApi
-        ? NextResponse.json({ error: "You were logged out after 30 minutes without activity. Please log in again.", code: "idle" }, { status: 401 })
+        ? NextResponse.json({ error: "You were signed out after 30 minutes without activity. Sign in to continue.", code: "idle" }, { status: 401 })
         : NextResponse.redirect(new URL(`/login?reason=idle&next=${encodeURIComponent(path)}`, req.url));
       for (const c of res.cookies.getAll()) out.cookies.set(c);
       out.cookies.delete(IDLE_COOKIE);

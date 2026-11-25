@@ -1,5 +1,6 @@
-import { RingGlyph } from "./Logo";
+import { PageIntro, StoreContainer } from "@/components/shared/PageIntro";
 
+/** Sign-in, registration and password pages: a plain page with a large title and a narrow form column. */
 export function AuthCard({
   title,
   description,
@@ -12,14 +13,12 @@ export function AuthCard({
   footer?: React.ReactNode;
 }) {
   return (
-    <div className="mx-auto w-full max-w-md px-4 py-10 sm:py-16">
-      <div className="rounded-lg border border-line bg-paper p-6 shadow-sm sm:p-8">
-        <RingGlyph className="mb-3 size-7 text-gold" />
-        <h1 className="text-3xl">{title}</h1>
-        {description && <div className="mt-1 text-sm text-muted-foreground">{description}</div>}
-        <div className="mt-6">{children}</div>
+    <StoreContainer>
+      <PageIntro title={title} lead={description} />
+      <div className="max-w-[448px]">
+        {children}
+        {footer && <div className="mt-8 text-[15px] text-grey-700">{footer}</div>}
       </div>
-      {footer && <div className="mt-4 text-center text-sm text-muted-foreground">{footer}</div>}
-    </div>
+    </StoreContainer>
   );
 }

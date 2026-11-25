@@ -14,6 +14,7 @@ export function Field({
   hint,
   error,
   optional,
+  required,
   className,
   children,
   id: idProp,
@@ -22,6 +23,7 @@ export function Field({
   hint?: React.ReactNode;
   error?: string;
   optional?: boolean;
+  required?: boolean;
   className?: string;
   children: React.ReactElement<Record<string, unknown>>;
   id?: string;
@@ -40,6 +42,7 @@ export function Field({
       <Label htmlFor={id}>
         {label}
         {optional && <span className="font-normal text-grey-600"> (optional)</span>}
+        {required && <span className="font-normal text-grey-600"> (required)</span>}
       </Label>
       {control}
       {hint && !error && (

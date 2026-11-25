@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { Turnstile } from "@/components/shared/Turnstile";
 import { IS_API } from "@/lib/data/source";
 
-/** FR-42 — log in. Phase 1 demo: any password of 8+ characters. Phase 2: Supabase Auth + Turnstile + lockout. */
+/** FR-42 — sign in. Phase 1 demo: any password of 8+ characters. Phase 2: Supabase Auth + Turnstile + lockout. */
 function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
@@ -46,28 +46,20 @@ function LoginForm() {
 
   return (
     <AuthCard
-      title="Log in"
-      description={next ? "Please log in to continue." : "Welcome back to Afable's Jewelry Store."}
-      footer={
-        <>
-          New here?{" "}
-          <Link href={`/register${next ? `?next=${encodeURIComponent(next)}` : ""}`} className="text-gold-dark hover:underline">
-            Create an account
-          </Link>
-        </>
-      }
+      title="Sign in"
+      description={next ? "Sign in to continue." : "Sign in to order, send requests and see your orders, designs and service requests."}
     >
       <form onSubmit={onSubmit} noValidate className="space-y-4">
         {idle && !error && (
-          <p className="rounded-lg border border-info/30 bg-info/10 px-3 py-2 text-sm" role="status">
-            You were logged out after 30 minutes without activity. Please log in again.
+          <p className="border border-black px-3 py-2 text-sm" role="status">
+            Your session ended after 30 minutes without activity. Sign in to continue.
           </p>
         )}
         <FormError message={error} />
-        <Field label="Email address" error={form.formState.errors.email?.message}>
+        <Field label="Email address" required error={form.formState.errors.email?.message}>
           <Input type="email" autoComplete="email" {...form.register("email")} />
         </Field>
-        <Field label="Password" error={form.formState.errors.password?.message}>
+        <Field label="Password" required error={form.formState.errors.password?.message}>
           <div className="relative">
             <Input type={show ? "text" : "password"} autoComplete="current-password" className="pr-11" {...form.register("password")} />
             <button
@@ -80,28 +72,44 @@ function LoginForm() {
             </button>
           </div>
         </Field>
-        <div className="text-right">
-          <Link href="/forgot-password" className="text-sm text-gold-dark hover:underline">
-            Forgot password?
-          </Link>
-        </div>
         <Turnstile onToken={setCaptcha} resetKey={captchaReset} />
-        <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
-          {form.formState.isSubmitting && <Spinner />} Log in
+        <Button type="submit" size="lg" className="rounded-none px-6" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? (
+            <>
+              <Spinner /> Signing in...
+            </>
+          ) : (
+            "Sign in"
+          )}
         </Button>
       </form>
+      <p className="mt-10 flex flex-wrap gap-4 text-[15px]">
+        <Link href="/forgot-password" className="underline underline-offset-4">
+          Forgot your password?
+        </Link>
+        <Link href={`/register${next ? `?next=${encodeURIComponent(next)}` : ""}`} className="underline underline-offset-4">
+          Create an account
+        </Link>
+      </p>
 
       {!IS_API && (
-        <div className="mt-6 rounded-xl border border-dashed border-gold/50 bg-gold/5 p-4 text-sm">
-          <p className="font-medium">Demo accounts</p>
-          <p className="mt-1 text-muted-foreground">Use any password with 8 or more characters.</p>
+        <div className="mt-12 border border-dashed border-grey-600 p-4 text-[15px]">
+          <p className="font-semibold">Preview sample accounts</p>
+          <p className="mt-1 text-grey-700">Pick one to fill in the form. Any password with 8 or more characters works.</p>
           <div className="mt-2 flex flex-wrap gap-2">
             {[
               ["Customer", "maria@demo.ph"],
               ["Owner", "owner@afables.ph"],
               ["Unverified customer", "ana@demo.ph"],
             ].map(([label, email]) => (
-              <Button key={email} type="button" variant="outline" size="sm" onClick={() => form.reset({ email, password: "demo1234" })}>
+              <Button
+                key={email}
+                type="button"
+                variant="outline"
+                size="sm"
+                className="rounded-none"
+                onClick={() => form.reset({ email, password: "demo1234" })}
+              >
                 {label}: {email}
               </Button>
             ))}

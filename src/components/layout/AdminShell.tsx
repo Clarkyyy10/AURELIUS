@@ -27,6 +27,8 @@ import { useQuery } from "@/lib/data/hooks";
 import { ownerCounts, type OwnerCounts } from "@/lib/transactions/ownerCounts";
 import { cn } from "@/lib/utils";
 import type { UserProfile } from "@/types";
+import { IS_API } from "@/lib/data/source";
+import { DemoBar } from "./DemoBar";
 import { Logo } from "./Logo";
 
 const items: { href: string; label: string; icon: React.ComponentType<{ className?: string }>; badge?: keyof OwnerCounts }[] = [
@@ -89,17 +91,17 @@ export function AdminShell({ user, children }: { user: UserProfile; children: Re
   const q = useQuery("admin-counts", async () => ownerCounts(await repos.transactions.listAll()));
 
   return (
-    <div className="flex min-h-[calc(100vh-2.25rem)] flex-1">
+    <div className="flex min-h-screen flex-1">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col overflow-y-auto border-r border-grey-200 bg-white text-black lg:flex">
         <div className="border-b border-sidebar-border px-5 py-4">
-          <Logo href="/admin" tone="light" />
+          <Logo href="/admin" size="sm" />
           <p className="mt-1 text-xs text-grey-600">Owner dashboard</p>
         </div>
         <SideNav counts={q.data} />
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-line bg-paper px-3 sm:px-5">
+        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-grey-200 bg-white px-3 sm:px-5">
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="lg:hidden" aria-label="Open owner menu">
@@ -109,7 +111,7 @@ export function AdminShell({ user, children }: { user: UserProfile; children: Re
             <SheetContent side="left" className="w-72 bg-sidebar p-0 text-sidebar-foreground">
               <SheetTitle className="sr-only">Owner menu</SheetTitle>
               <div className="border-b border-sidebar-border px-5 py-4">
-                <Logo href="/admin" tone="light" />
+                <Logo href="/admin" size="sm" />
               </div>
               <SideNav counts={q.data} onNavigate={() => setOpen(false)} />
             </SheetContent>
@@ -125,7 +127,7 @@ export function AdminShell({ user, children }: { user: UserProfile; children: Re
             <Button
               variant="ghost"
               size="icon"
-              aria-label="Log out"
+              aria-label="Sign out"
               onClick={async () => {
                 await repos.auth.logout();
                 router.push("/");
@@ -135,6 +137,7 @@ export function AdminShell({ user, children }: { user: UserProfile; children: Re
             </Button>
           </div>
         </header>
+        {!IS_API && <DemoBar />}
         <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-3 py-6 sm:px-6">
           {children}
         </main>

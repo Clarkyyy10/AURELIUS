@@ -1,7 +1,6 @@
 "use client";
 
 import { Check, Info, Minus, Plus } from "lucide-react";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -114,17 +113,13 @@ function Choice({
       onClick={onClick}
       className={cn(
         // DESIGN.md §11: selected = 2 px black border + check icon + aria-checked (never colour alone).
-        "relative rounded-sm border bg-white text-sm transition-colors duration-150 hover:bg-grey-50",
-        selected ? "border-2 border-black" : "border-grey-500",
+        "relative rounded-none border bg-white text-sm transition-colors duration-150 hover:bg-grey-50",
+        selected ? "border-black pr-7 shadow-[inset_0_0_0_1px_#000]" : "border-grey-500",
         className,
       )}
     >
       {children}
-      {selected && (
-        <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-black text-white" aria-hidden>
-          <Check className="size-3.5" strokeWidth={2.5} />
-        </span>
-      )}
+      {selected && <Check className="absolute top-2 right-2 size-4" strokeWidth={2} aria-hidden />}
     </button>
   );
 }
@@ -170,6 +165,20 @@ function engravingSpot(type: ProductType, style?: string): string {
   return "It is shown on a small tag by the clasp.";
 }
 
+// Flat sections with a plain heading (the storefront design has no accordions or step numbers).
+function Accordion({ children, className }: { children: React.ReactNode; className?: string; type?: string; defaultValue?: string[] }) {
+  return <div className={cn("space-y-10", className)}>{children}</div>;
+}
+function AccordionItem({ children }: { children: React.ReactNode; value?: string }) {
+  return <section>{children}</section>;
+}
+function AccordionTrigger({ children }: { children: React.ReactNode; className?: string }) {
+  return <h2 className="mb-4 font-sans text-[17px] leading-6 font-semibold">{children}</h2>;
+}
+function AccordionContent({ children, className }: { children: React.ReactNode; className?: string }) {
+  return <div className={className}>{children}</div>;
+}
+
 /** Options panel for FR-01 to FR-04 (only active, owner-set options are shown — FR-47). */
 export function OptionsPanel({
   config,
@@ -204,8 +213,6 @@ export function OptionsPanel({
     .filter((g) => (pearlOnly ? g.surface === "pearl" : !(g.isNone && rule.min > 0)))
     .sort((a, b) => Number(Boolean(b.isNone)) - Number(Boolean(a.isNone)));
   const qtyMin = Math.max(1, rule.min);
-  let step = 0;
-  const n = () => ++step;
   const isName = config.productType === "name_pendant";
   const fonts = options.fonts ?? [];
   const problem = config.nameText ? nameProblem(config.nameText) : null;
@@ -213,7 +220,7 @@ export function OptionsPanel({
   return (
     <Accordion type="multiple" defaultValue={sections} className="w-full">
       <AccordionItem value="type">
-        <AccordionTrigger className="text-base font-semibold">{n()}. Piece type</AccordionTrigger>
+        <AccordionTrigger className="text-base font-semibold">Piece type</AccordionTrigger>
         <AccordionContent>
           <div role="radiogroup" aria-label="Piece type" className="grid grid-cols-[repeat(auto-fill,minmax(5.75rem,1fr))] gap-2">
             {options.productTypes.map((p) => (
@@ -223,7 +230,7 @@ export function OptionsPanel({
                 onClick={() => onChange({ productType: p.type })}
                 className={cn("flex flex-col items-center gap-1 px-2 py-3", disabledTypes && p.type !== config.productType && "pointer-events-none opacity-40")}
               >
-                <PieceIcon type={p.type} className="text-gold-dark" />
+                <PieceIcon type={p.type} className="text-black" />
                 <span className="text-center text-xs leading-tight font-medium">{p.label}</span>
               </Choice>
             ))}
@@ -234,7 +241,7 @@ export function OptionsPanel({
 
       {styles.length > 0 && (
         <AccordionItem value="style">
-          <AccordionTrigger className="text-base font-semibold">{n()}. Style</AccordionTrigger>
+          <AccordionTrigger className="text-base font-semibold">Style</AccordionTrigger>
           <AccordionContent>
             <GroupPicker group="style" list={styles} value={config.choices?.style} onPick={pick("style")} />
           </AccordionContent>
@@ -242,7 +249,7 @@ export function OptionsPanel({
       )}
 
       <AccordionItem value="material">
-        <AccordionTrigger className="text-base font-semibold">{n()}. Material</AccordionTrigger>
+        <AccordionTrigger className="text-base font-semibold">Material</AccordionTrigger>
         <AccordionContent>
           <div role="radiogroup" aria-label="Material" className="grid grid-cols-2 gap-2">
             {options.materials.map((m) => (
@@ -260,7 +267,7 @@ export function OptionsPanel({
       </AccordionItem>
 
       <AccordionItem value="finish">
-        <AccordionTrigger className="text-base font-semibold">{n()}. Color or finish</AccordionTrigger>
+        <AccordionTrigger className="text-base font-semibold">Color or finish</AccordionTrigger>
         <AccordionContent>
           <div role="radiogroup" aria-label="Color or finish" className="flex flex-wrap gap-3">
             {finishes.map((f) => (
@@ -285,7 +292,7 @@ export function OptionsPanel({
 
       {isName && (
         <AccordionItem value="name">
-          <AccordionTrigger className="text-base font-semibold">{n()}. Name and font</AccordionTrigger>
+          <AccordionTrigger className="text-base font-semibold">Name and font</AccordionTrigger>
           <AccordionContent className="space-y-4">
             <div className="space-y-1.5">
               <Label htmlFor="pendant-name">Name on the pendant</Label>
@@ -344,9 +351,7 @@ export function OptionsPanel({
 
       {style?.textMax ? (
         <AccordionItem value="text">
-          <AccordionTrigger className="text-base font-semibold">
-            {n()}. {style.key === "zodiac" ? "Zodiac sign" : "Letters or text"}
-          </AccordionTrigger>
+          <AccordionTrigger className="text-base font-semibold">{style.key === "zodiac" ? "Zodiac sign" : "Letters or text"}</AccordionTrigger>
           <AccordionContent className="space-y-4">
             {style.key === "zodiac" ? (
               <div role="radiogroup" aria-label="Zodiac sign" className="grid grid-cols-[repeat(auto-fill,minmax(6.5rem,1fr))] gap-2">
@@ -405,7 +410,7 @@ export function OptionsPanel({
 
       {chain && (
         <AccordionItem value="chain">
-          <AccordionTrigger className="text-base font-semibold">{n()}. Chain style and clasp</AccordionTrigger>
+          <AccordionTrigger className="text-base font-semibold">Chain style and clasp</AccordionTrigger>
           <AccordionContent className="space-y-4">
             <div role="radiogroup" aria-label="Chain style" className="space-y-3">
               {CHAIN_GROUPS.map(([family, title]) => {
@@ -457,9 +462,7 @@ export function OptionsPanel({
 
       {!isName && (rule.max > 0 || styles.length === 0 || type.maxStones > 0) && (
         <AccordionItem value="gem">
-          <AccordionTrigger className="text-base font-semibold">
-            {n()}. {pearlOnly ? "Pearls" : "Gemstone"}
-          </AccordionTrigger>
+          <AccordionTrigger className="text-base font-semibold">{pearlOnly ? "Pearls" : "Gemstone"}</AccordionTrigger>
           <AccordionContent>
             {rule.max === 0 ? (
               <p className="rounded-lg bg-muted px-3 py-2 text-sm text-muted-foreground">
@@ -557,9 +560,7 @@ export function OptionsPanel({
 
       {detailGroups.length > 0 && (
         <AccordionItem value="details">
-          <AccordionTrigger className="text-base font-semibold">
-            {n()}. {detailGroups.length === 1 ? GROUP_LABEL[detailGroups[0]] : "Design details"}
-          </AccordionTrigger>
+          <AccordionTrigger className="text-base font-semibold">{detailGroups.length === 1 ? GROUP_LABEL[detailGroups[0]] : "Design details"}</AccordionTrigger>
           <AccordionContent className="space-y-4">
             {detailGroups.map((g) => (
               <div key={g}>
@@ -572,7 +573,7 @@ export function OptionsPanel({
       )}
 
       <AccordionItem value="size">
-        <AccordionTrigger className="text-base font-semibold">{n()}. Size</AccordionTrigger>
+        <AccordionTrigger className="text-base font-semibold">Size</AccordionTrigger>
         <AccordionContent>
           <div className="flex flex-wrap items-center gap-2">
             <div role="radiogroup" aria-label="Size" className="flex flex-wrap gap-2">
@@ -597,7 +598,7 @@ export function OptionsPanel({
       </AccordionItem>
 
       <AccordionItem value="extras">
-        <AccordionTrigger className="text-base font-semibold">{n()}. Engraving and notes (optional)</AccordionTrigger>
+        <AccordionTrigger className="text-base font-semibold">Engraving and notes (optional)</AccordionTrigger>
         <AccordionContent className="space-y-4">
           <div className="space-y-1.5">
             <Label htmlFor="engraving">Engraving text</Label>

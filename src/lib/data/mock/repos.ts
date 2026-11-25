@@ -58,7 +58,7 @@ function sessionUser(d: DbState = db()): UserProfile | null {
 
 function requireUser(d: DbState = db()): UserProfile {
   const u = sessionUser(d);
-  if (!u) throw new UserFacingError("Please log in to continue.");
+  if (!u) throw new UserFacingError("Sign in to continue.");
   return u;
 }
 
@@ -185,7 +185,7 @@ export const mockRepositories: Repositories = {
       return write((d) => {
         const email = input.email.trim().toLowerCase();
         if (d.users.some((u) => u.email === email)) {
-          throw new UserFacingError("An account with this email already exists. Log in instead, or use a different email.");
+          throw new UserFacingError("An account with this email already exists. Sign in instead, or use a different email.");
         }
         const user: UserProfile = {
           id: uid("user"),
@@ -273,7 +273,7 @@ export const mockRepositories: Repositories = {
       return write((d) => {
         const userId = d.verifyTokens[token];
         const user = d.users.find((u) => u.id === userId);
-        if (!user) throw new UserFacingError("This verification link is invalid or was already used. Log in and request a new link.");
+        if (!user) throw new UserFacingError("This verification link is invalid or was already used. Sign in and request a new link.");
         user.emailVerified = true;
         delete d.verifyTokens[token];
         d.sessionUserId = user.id;

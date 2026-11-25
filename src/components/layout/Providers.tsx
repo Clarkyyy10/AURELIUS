@@ -7,7 +7,6 @@ import { useDemoStore } from "@/lib/data/mock/store";
 import { useClientState } from "@/lib/data/client-state";
 import { IS_API } from "@/lib/data/source";
 import { repos } from "@/lib/data";
-import { DemoBar } from "./DemoBar";
 import { RealtimeNotifications } from "./RealtimeNotifications";
 
 /**
@@ -30,8 +29,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
   return (
     <TooltipProvider delayDuration={300}>
       <StoreHydrator />
-      {/* The Demo Mode bar and simulated emails exist only in the Phase 1 demo (manuscript: no demo tools in production). */}
-      {IS_API ? <RealtimeNotifications /> : <DemoBar />}
+      {/* The Demo Mode bar (in SiteShell / AdminShell) exists only in the Phase 1 demo. */}
+      {IS_API && <RealtimeNotifications />}
       {children}
       <Toaster position="top-center" richColors closeButton />
     </TooltipProvider>

@@ -7,7 +7,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { Maximize2, Minimize2, RotateCcw } from "lucide-react";
+import { Maximize2, Minimize2, Minus, Plus, RotateCcw, RotateCw, Undo2 } from "lucide-react";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { CustomizationOptions, DesignConfig } from "@/types";
@@ -46,7 +47,42 @@ function SnapshotBridge({ captureRef }: { captureRef?: React.RefObject<CaptureFn
   return null;
 }
 
+/** Camera moves for the buttons under the viewer: zoom in/out and turn left/right around the piece. */
+function ViewBridge({ viewRef }: { viewRef: React.RefObject<{ zoom: (f: number) => void; turn: (a: number) => void } | null> }) {
+  const get = useThree((s) => s.get);
+  useEffect(() => {
+    viewRef.current = {
+      zoom: (factor) => {
+        const { camera, controls } = get();
+        const c = controls as OrbitControlsImpl | null;
+        if (!c) return;
+        const offset = camera.position.clone().sub(c.target);
+        const d = THREE.MathUtils.clamp(offset.length() * factor, c.minDistance, c.maxDistance);
+        camera.position.copy(c.target).add(offset.setLength(d));
+        c.update();
+      },
+      turn: (angle) => {
+        const { camera, controls } = get();
+        const c = controls as OrbitControlsImpl | null;
+        if (!c) return;
+        const offset = camera.position
+          .clone()
+          .sub(c.target)
+          .applyAxisAngle(new THREE.Vector3(0, 1, 0), angle);
+        camera.position.copy(c.target).add(offset);
+        c.update();
+      },
+    };
+    return () => {
+      viewRef.current = null;
+    };
+  }, [get, viewRef]);
+  return null;
+}
+
 export interface JewelryViewerProps {
+  /** "below": square buttons under the view (storefront customizer); "overlay": small buttons on the view. */
+  controlsPlacement?: "overlay" | "below";
   config: DesignConfig;
   options: CustomizationOptions;
   captureRef?: React.RefObject<CaptureFn | null>;
@@ -62,6 +98,7 @@ export function JewelryViewer({
   captureRef,
   autoRotate = true,
   showControls = true,
+  controlsPlacement = "overlay",
   className,
   label = "3D preview of your design",
 }: JewelryViewerProps) {
@@ -71,6 +108,7 @@ export function JewelryViewer({
   const wrap = useRef<HTMLDivElement>(null);
   const [interacted, setInteracted] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
+  const viewRef = useRef<{ zoom: (f: number) => void; turn: (a: number) => void } | null>(null);
 
   useEffect(() => {
     const on = () => setFullscreen(document.fullscreenElement === wrap.current);
@@ -79,6 +117,53 @@ export function JewelryViewer({
   }, []);
 
   if (webgl === false) return <NoWebGL className={className} />;
+
+  if (controlsPlacement === "below") {
+    const stop = () => setInteracted(true);
+    const sq = "flex size-11 items-center justify-center border border-black bg-white text-black hover:bg-grey-100";
+    return (
+      <div>
+        <div ref={wrap} className={cn("relative overflow-hidden rounded-none bg-grey-100", className)} role="img" aria-label={label}>
+          {webgl && (
+            <Canvas dpr={[1, 2]} gl={{ preserveDrawingBuffer: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping }} shadows={false}>
+              <JewelryScene config={config} options={options} autoRotate={autoRotate && !reduced && !interacted} onInteract={stop} fitRef={fitRef} />
+              <SnapshotBridge captureRef={captureRef} />
+              <ViewBridge viewRef={viewRef} />
+            </Canvas>
+          )}
+        </div>
+        {showControls && webgl && (
+          <>
+            <div className="mt-3 flex flex-wrap items-center gap-2" role="group" aria-label="3D view controls">
+              <button type="button" className={sq} aria-label="Zoom in" onClick={() => (stop(), viewRef.current?.zoom(0.8))}>
+                <Plus className="size-5" aria-hidden />
+              </button>
+              <button type="button" className={sq} aria-label="Zoom out" onClick={() => (stop(), viewRef.current?.zoom(1.25))}>
+                <Minus className="size-5" aria-hidden />
+              </button>
+              <button type="button" className={sq} aria-label="Turn left" onClick={() => (stop(), viewRef.current?.turn(-Math.PI / 8))}>
+                <RotateCcw className="size-5" aria-hidden />
+              </button>
+              <button type="button" className={sq} aria-label="Turn right" onClick={() => (stop(), viewRef.current?.turn(Math.PI / 8))}>
+                <RotateCw className="size-5" aria-hidden />
+              </button>
+              <button
+                type="button"
+                className="ml-2 flex min-h-11 items-center gap-2 px-2 text-[17px] text-black hover:underline"
+                onClick={() => {
+                  fitRef.current?.();
+                  setInteracted(false);
+                }}
+              >
+                <Undo2 className="size-4" aria-hidden /> Reset view
+              </button>
+            </div>
+            <p className="mt-2 text-[15px] text-grey-700">Drag to rotate. Scroll or pinch to zoom.</p>
+          </>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div ref={wrap} className={cn("relative overflow-hidden rounded-none bg-grey-100", className)} role="img" aria-label={label}>

@@ -83,3 +83,42 @@ export function EstimateBar({
     </div>
   );
 }
+
+/** FR-06 — the itemized estimate shown inline under the options (storefront customizer). */
+export function EstimateSummary({ estimate, error, stones }: { estimate: Estimate | null; error?: string | null; stones?: number }) {
+  const b = estimate?.breakdown;
+  const line = (label: string, value: number) => (
+    <div className="flex justify-between gap-4 py-1.5">
+      <dt className="text-grey-700">{label}</dt>
+      <dd className="tabular">{formatPesoExact(value)}</dd>
+    </div>
+  );
+  return (
+    <section aria-labelledby="estimate-title" className="border-t border-black pt-8">
+      <h2 id="estimate-title" className="mb-4 font-sans text-xl font-semibold">
+        Estimate
+      </h2>
+      <div aria-live="polite" aria-atomic="true">
+        {estimate && b ? (
+          <dl className="text-[17px]">
+            {line(`Metal, ${formatWeight(estimate.weightG)}`, b.metal)}
+            {b.stones > 0 && line(stones ? `Stones, ${stones}` : "Stones", b.stones)}
+            {line("Labor", b.labor)}
+            {b.finish > 0 && line("Finishing", b.finish)}
+            {(b.design ?? 0) > 0 && line("Design options", b.design ?? 0)}
+            {b.clasp > 0 && line("Clasp", b.clasp)}
+            <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-black pt-3">
+              <dt className="font-semibold">Estimated total</dt>
+              <dd className="tabular text-2xl font-semibold">{formatPeso(estimate.price)}</dd>
+            </div>
+          </dl>
+        ) : (
+          <p className="flex items-start gap-1.5 text-[15px] font-semibold">Error: {error ?? "Finish choosing your options to see an estimate."}</p>
+        )}
+      </div>
+      <p className="mt-4 text-[15px] leading-6 text-grey-700">
+        Estimate only — final price is confirmed by the owner. It comes from the store&apos;s current rates; the owner sends the final price in a quotation.
+      </p>
+    </section>
+  );
+}

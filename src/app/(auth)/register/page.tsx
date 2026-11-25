@@ -62,7 +62,7 @@ function RegisterForm() {
         <>
           Already have an account?{" "}
           <Link href="/login" className="text-gold-dark hover:underline">
-            Log in
+            Sign in
           </Link>
         </>
       }

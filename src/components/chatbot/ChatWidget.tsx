@@ -154,7 +154,6 @@ export function ChatWidget() {
   };
 
   const lastAssistant = [...list].reverse().find((m) => m.role === "assistant");
-  const raised = pathname.startsWith("/customize");
 
   return (
     <>
@@ -162,14 +161,10 @@ export function ChatWidget() {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className={cn(
-            "fixed right-4 z-40 flex h-13 items-center gap-2 rounded-sm bg-black px-5 text-white shadow-lg transition-colors hover:bg-grey-800",
-            raised ? "bottom-48 lg:right-auto lg:bottom-6 lg:left-4" : "bottom-5",
-          )}
-          aria-label="Open the store assistant"
+          className="fixed right-4 bottom-4 z-40 flex h-12 items-center gap-2 rounded-none bg-black px-6 text-white shadow-lg transition-colors hover:bg-grey-800 sm:right-4 sm:h-[50px]"
         >
           <MessageCircle className="size-5" aria-hidden />
-          <span className="hidden text-sm font-medium sm:inline">Ask our assistant</span>
+          <span className="text-base font-semibold">Chat with us</span>
         </button>
       )}
 

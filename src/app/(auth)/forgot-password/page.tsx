@@ -52,7 +52,7 @@ function ForgotPassword() {
           </p>
         )}
         <Button asChild variant="outline" className="mt-6">
-          <Link href="/login">Back to log in</Link>
+          <Link href="/login">Back to sign in</Link>
         </Button>
       </AuthCard>
     );
@@ -63,7 +63,7 @@ function ForgotPassword() {
       description="Enter your email and we'll send you a link to choose a new one."
       footer={
         <Link href="/login" className="text-gold-dark hover:underline">
-          Back to log in
+          Back to sign in
         </Link>
       }
     >

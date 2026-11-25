@@ -19,7 +19,7 @@ export class HttpError extends Error {
   }
 }
 
-export const unauthorized = () => new HttpError(401, "Please log in to continue.");
+export const unauthorized = () => new HttpError(401, "Sign in to continue.");
 export const forbidden = (msg = "You don't have access to this.") => new HttpError(403, msg);
 export const notFound = (what = "This record") => new HttpError(404, `${what} was not found. It may have been removed, or the link is wrong.`);
 

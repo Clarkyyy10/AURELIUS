@@ -2,15 +2,11 @@
 
 import { LoadingState } from "@/components/shared/States";
 import { Suspense, useMemo } from "react";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search, Sparkles, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Check } from "lucide-react";
 import { ProductCard, SharedViewCanvas } from "@/components/ecommerce/ProductCard";
-import { PageHeader } from "@/components/shared/PageHeader";
+import { PageIntro, StoreContainer } from "@/components/shared/PageIntro";
+import { cn } from "@/lib/utils";
 import { EmptyState, QueryView } from "@/components/shared/States";
 import { repos } from "@/lib/data";
 import { useQuery } from "@/lib/data/hooks";
@@ -56,83 +52,40 @@ function Shop() {
   const materials = useMemo(() => [...new Set((allQ.data ?? []).map((p) => p.material))].sort(), [allQ.data]);
   const active = ["category", "material", "availability", "min", "max", "q"].some((k) => params.get(k));
 
-  return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <SharedViewCanvas />
-      <PageHeader title="Shop the collection" description="Ready-made pieces and made-to-order designs from Afable's Jewelry Store." />
+  const toggle = (key: string, value: string) => set(key, params.get(key) === value ? null : value);
+  const count = q.data?.length;
 
-      <div className="mb-6 grid gap-3 rounded-lg border border-line bg-paper p-4 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1fr_1.2fr]">
-        <div className="space-y-1.5 sm:col-span-2 lg:col-span-1">
-          <Label htmlFor="shop-search">Search</Label>
-          <div className="relative">
-            <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
-            <Input
-              id="shop-search"
-              defaultValue={filter.search}
-              placeholder="Search by name"
-              className="pl-9"
-              onChange={(e) => set("q", e.target.value || null)}
-            />
-          </div>
-        </div>
-        <FilterSelect
-          label="Category"
+  return (
+    <StoreContainer>
+      <SharedViewCanvas />
+      <PageIntro title="Shop jewelry" lead="Every piece shows its price and whether it is in stock. Pieces made to order are made in your size." />
+
+      <section aria-label="Filters" className="mt-14 flex flex-wrap gap-x-12 gap-y-6 border-y border-grey-200 py-8">
+        <ChipGroup
+          label="Type"
           value={filter.category}
-          onChange={(v) => set("category", v)}
-          options={PRODUCT_TYPES.map((t) => [t, CATEGORY_LABEL[t]])}
+          onToggle={(v) => toggle("category", v)}
+          options={PRODUCT_TYPES.filter((t) => (allQ.data ?? []).some((p) => p.category === t)).map((t) => [t, CATEGORY_LABEL[t] ?? t])}
         />
-        <FilterSelect label="Material" value={filter.material} onChange={(v) => set("material", v)} options={materials.map((m) => [m, m])} />
-        <FilterSelect
+        <ChipGroup
           label="Availability"
           value={filter.availability}
-          onChange={(v) => set("availability", v)}
+          onToggle={(v) => toggle("availability", v)}
           options={[
             ["available", "Available"],
             ["made_to_order", "Made to order"],
             ["unavailable", "Unavailable"],
           ]}
         />
-        <div className="space-y-1.5">
-          <Label htmlFor="min-price">Min ₱</Label>
-          <Input
-            id="min-price"
-            type="number"
-            min={0}
-            inputMode="numeric"
-            defaultValue={params.get("min") ?? ""}
-            onChange={(e) => set("min", e.target.value || null)}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="max-price">Max ₱</Label>
-          <Input
-            id="max-price"
-            type="number"
-            min={0}
-            inputMode="numeric"
-            defaultValue={params.get("max") ?? ""}
-            onChange={(e) => set("max", e.target.value || null)}
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="sort">Sort by</Label>
-          <Select value={filter.sort} onValueChange={(v) => set("sort", v === "newest" ? null : v)}>
-            <SelectTrigger id="sort" className="w-full">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="price_asc">Price: low to high</SelectItem>
-              <SelectItem value="price_desc">Price: high to low</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <ChipGroup label="Material" value={filter.material} onToggle={(v) => toggle("material", v)} options={materials.map((m) => [m, m])} />
+      </section>
+
+      <div className="mt-12 mb-14 flex min-h-6 items-center gap-4 text-[15px] text-grey-700" aria-live="polite">
+        {count !== undefined && <span>{count === 1 ? "1 piece" : `${count} pieces`}</span>}
         {active && (
-          <div className="sm:col-span-2 lg:col-span-7">
-            <Button variant="link" className="px-0" onClick={() => router.replace(pathname, { scroll: false })}>
-              <X className="size-4" /> Clear all filters
-            </Button>
-          </div>
+          <button type="button" className="text-black underline underline-offset-4" onClick={() => router.replace(pathname, { scroll: false })}>
+            Clear filters
+          </button>
         )}
       </div>
 
@@ -142,24 +95,20 @@ function Shop() {
         empty={(list) =>
           list.length === 0 ? (
             <EmptyState
-              title="No products match your filters"
-              description="Try removing a filter, or design your own piece."
-              action={{ label: "Design your own", href: "/customize" }}
+              title={active ? "No products match these filters" : "No products yet"}
+              description={active ? "Remove a filter to see more pieces, or design your own." : "Design your own piece while the store adds products."}
+              action={
+                active
+                  ? { label: "Clear filters", onClick: () => router.replace(pathname, { scroll: false }) }
+                  : { label: "Design your own", href: "/customize" }
+              }
             />
           ) : null
         }
       >
         {(list) => (
-          <ul className="grid grid-cols-1 gap-5 min-[420px]:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {list.slice(0, 5).map((p) => (
-              <li key={p.id}>
-                <ProductCard product={p} options={optionsQ.data} />
-              </li>
-            ))}
-            <li>
-              <DesignYourOwnCard />
-            </li>
-            {list.slice(5).map((p) => (
+          <ul className="grid grid-cols-1 gap-x-6 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
+            {list.map((p) => (
               <li key={p.id}>
                 <ProductCard product={p} options={optionsQ.data} />
               </li>
@@ -167,45 +116,41 @@ function Shop() {
           </ul>
         )}
       </QueryView>
-    </div>
+    </StoreContainer>
   );
 }
 
-function DesignYourOwnCard() {
+/** A row of toggle buttons; the pressed one has a 2 px black border and a check (DESIGN.md §11). */
+function ChipGroup({ label, value, onToggle, options }: { label: string; value?: string; onToggle: (v: string) => void; options: [string, string][] }) {
+  if (options.length === 0) return null;
   return (
-    <Link href="/customize" className="flex h-full min-h-56 flex-col justify-between gap-4 rounded-lg bg-emerald p-6 text-ivory hover:opacity-95">
-      <Sparkles className="size-7 text-gold" aria-hidden />
-      <div>
-        <p className="font-heading text-2xl">Can&apos;t find it?</p>
-        <p className="mt-1 text-ivory/80">Design your own in 3D and the owner will confirm the price.</p>
-      </div>
-      <span className="font-medium text-gold underline underline-offset-4">Design your own →</span>
-    </Link>
-  );
-}
-
-function FilterSelect({ label, value, onChange, options }: { label: string; value?: string; onChange: (v: string) => void; options: [string, string][] }) {
-  const id = `filter-${label.toLowerCase()}`;
-  return (
-    <div className="space-y-1.5">
-      <Label htmlFor={id}>{label}</Label>
-      <Select value={value ?? ALL} onValueChange={onChange}>
-        <SelectTrigger id={id} className="w-full">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ALL}>All</SelectItem>
-          {options.map(([v, l]) => (
-            <SelectItem key={v} value={v}>
+    <div role="group" aria-labelledby={`chips-${label}`}>
+      <p id={`chips-${label}`} className="mb-3 text-[15px] font-semibold">
+        {label}
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {options.map(([v, l]) => {
+          const on = value === v;
+          return (
+            <button
+              key={v}
+              type="button"
+              aria-pressed={on}
+              onClick={() => onToggle(v)}
+              className={cn(
+                "flex min-h-11 items-center gap-1.5 rounded-none border bg-white px-4 text-[15px] font-medium transition-colors hover:bg-grey-50",
+                on ? "border-2 border-black px-[15px]" : "border-grey-500",
+              )}
+            >
               {l}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+              {on && <Check className="size-4" aria-hidden />}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
-
 export default function ShopPage() {
   return (
     <Suspense fallback={<LoadingState className="mx-auto max-w-3xl p-6" />}>

@@ -61,7 +61,7 @@ function VerifyEmail() {
         <XCircle className="mb-3 size-10 text-danger" aria-hidden />
         <p className="text-muted-foreground">{result.message}</p>
         <Button asChild className="mt-6">
-          <Link href="/login">Log in</Link>
+          <Link href="/login">Sign in</Link>
         </Button>
       </AuthCard>
     );

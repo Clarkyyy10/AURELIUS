@@ -3,12 +3,13 @@
 import { Suspense, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { MessageSquareWarning, Send, Sparkles } from "lucide-react";
+import { MessageSquareWarning, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { VerifyEmailBanner } from "@/components/layout/Guards";
-import { EstimateBar } from "@/components/customization/EstimateBar";
+import { EstimateSummary } from "@/components/customization/EstimateBar";
+import { PageIntro, StoreContainer } from "@/components/shared/PageIntro";
 import { LazyJewelryViewer, type CaptureFn } from "@/components/customization/LazyViewer";
 import { OptionsPanel } from "@/components/customization/OptionsPanel";
 import { SubmitDesignDialog } from "@/components/customization/SubmitDesignDialog";
@@ -160,81 +161,90 @@ function Customizer({
 
   const nextParam = encodeURIComponent(`/customize${fromProductId ? `?from=${fromProductId}` : ""}`);
   const submitLabel = revising ? "Resubmit for review" : "Submit for owner review";
-  const submitButton = (
-    <Button size="lg" onClick={startSubmit} disabled={!est || (revising && !canRevise)}>
-      <Send className="size-4" /> {submitLabel}
-    </Button>
-  );
+  const saveDraft = () => {
+    // Kept on this device; opening Customize again brings it back (frontend-spec §5.4).
+    setPendingDesign({ ...config, fromProductId });
+    toast.success("Draft saved on this device. Open Customize again to continue.");
+  };
 
   return (
-    <div className="mx-auto max-w-7xl px-0 pb-28 sm:px-4 lg:pb-8">
-      <div className="space-y-3 px-4 pt-6 sm:px-0">
-        <h1 className="text-3xl sm:text-4xl">{revising ? `Edit your design · ${request?.code}` : "Design your piece"}</h1>
+    <StoreContainer>
+      <PageIntro
+        title={revising ? `Edit your design · ${request?.code}` : "Customize your piece"}
+        lead="Choose the piece, style, metal, stone and size. The piece and the estimate update as you go. The owner confirms the final price."
+      />
+      <div className="space-y-3">
         {user && <VerifyEmailBanner user={user} action="submit a design" />}
-        {request === null && <ErrorState message="We couldn't find that request. It may belong to another account." />}
+        {request === null && <ErrorState message="We could not find that request. It may belong to another account." />}
         {request && (
           <div className="space-y-2">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-grey-700">
               Version {request.versions.length + 1} of your design ·{" "}
-              <Link href={`/account/custom/${request.id}#versions`} className="text-gold-dark underline">
+              <Link href={`/account/custom/${request.id}#versions`} className="text-black underline">
                 compare with version {request.versions.length}
               </Link>
             </p>
             {request.revisionRemarks.length > 0 && (
-              <div className="rounded-xl border border-warning/40 bg-warning/10 p-4" role="note">
-                <p className="flex items-center gap-2 font-medium">
-                  <MessageSquareWarning className="size-5 text-warning" aria-hidden /> Remarks from the owner
+              <div className="border-2 border-black p-4" role="note">
+                <p className="flex items-center gap-2 font-semibold">
+                  <MessageSquareWarning className="size-5" aria-hidden /> Remarks from the owner
                 </p>
                 <p className="mt-1">“{request.revisionRemarks[request.revisionRemarks.length - 1].text}”</p>
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 text-xs text-grey-700">
                   Sent <DateText value={request.revisionRemarks[request.revisionRemarks.length - 1].at} withTime />
                 </p>
               </div>
             )}
             {!canRevise && (
-              <p className="rounded-lg bg-muted px-3 py-2 text-sm">This design isn&apos;t waiting for changes right now, so it can&apos;t be resubmitted.</p>
+              <p className="border border-grey-500 px-3 py-2 text-sm">This design is not waiting for changes right now, so it cannot be resubmitted.</p>
             )}
           </div>
         )}
         {draft && (
-          <p className="flex items-start gap-2 rounded-xl border border-info/30 bg-info/10 p-3 text-sm">
-            <Sparkles className="mt-0.5 size-4 shrink-0 text-info" aria-hidden /> Your assistant filled this in. Review and change anything before submitting.
+          <p className="flex items-start gap-2 border border-grey-500 p-3 text-sm">
+            <Sparkles className="mt-0.5 size-4 shrink-0" aria-hidden /> The assistant filled this in. Review and change anything before you submit.
           </p>
         )}
         {product && (
-          <p className="rounded-xl border border-line bg-paper p-3 text-sm">
-            Based on <strong>{product.name}</strong> from our shop. Change anything you like — the owner will use it as a reference.
+          <p className="border border-grey-500 p-3 text-sm">
+            Based on <strong>{product.name}</strong> from the shop. Change anything you like. The owner uses it as a reference.
           </p>
         )}
       </div>
 
-      <div className="mt-4 grid gap-6 lg:grid-cols-[3fr_2fr]">
-        <div className="min-w-0 lg:sticky lg:top-20 lg:self-start">
+      <div className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,670px)_minmax(0,1fr)] lg:gap-12">
+        <div className="min-w-0 lg:sticky lg:top-24 lg:self-start">
           <LazyJewelryViewer
             config={config}
             options={options}
             captureRef={captureRef}
-            className="h-[45vh] min-h-72 w-full rounded-none sm:rounded-lg lg:h-[calc(100vh-8rem)] lg:max-h-[720px]"
+            controlsPlacement="below"
+            className="aspect-square w-full lg:aspect-auto lg:h-[min(670px,calc(100vh-15rem))]"
             label={`3D preview: ${labels.finish} ${labels.material} ${labels.productType.toLowerCase()}, ${labels.gemstone}, size ${labels.size}`}
           />
         </div>
 
-        <div className="min-w-0 px-4 sm:px-0">
+        <div className="min-w-0">
           {notice && (
-            <p className="mb-3 rounded-lg border border-info/30 bg-info/10 px-3 py-2 text-sm" role="status">
+            <p className="mb-6 border border-grey-500 px-3 py-2 text-sm" role="status">
               {notice}
             </p>
           )}
-          <div className="rounded-lg border border-line bg-paper px-4">
-            <OptionsPanel config={config} options={options} onChange={change} disabledTypes={revising} />
+          <OptionsPanel config={config} options={options} onChange={change} disabledTypes={revising} />
+          <div className="mt-10">
+            <EstimateSummary estimate={est} error={estError} stones={est && est.breakdown.stones > 0 ? config.stoneQuantity : undefined} />
           </div>
-          <EstimateBar estimate={est} error={estError} className="sticky bottom-4 mt-4 hidden lg:block" action={submitButton} />
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Button size="lg" className="rounded-none px-6" onClick={startSubmit} disabled={!est || (revising && !canRevise)}>
+              {revising ? "Resubmit design" : "Submit design"}
+            </Button>
+            {!revising && (
+              <Button size="lg" variant="outline" className="rounded-none px-6" onClick={saveDraft}>
+                Save draft
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
-
-      {/* Mobile: estimate bar fixed to the bottom of the screen */}
-      <div className="fixed inset-x-0 bottom-0 z-30 p-2 lg:hidden">
-        <EstimateBar estimate={est} error={estError} action={<div className="w-full">{submitButton}</div>} className="[&_button[aria-expanded]]:hidden" />
       </div>
 
       {est && (
@@ -254,20 +264,20 @@ function Customizer({
       <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-heading text-2xl">Log in to submit your design</DialogTitle>
-            <DialogDescription>We saved your design on this device. Log in or create an account, and you&apos;ll come right back to it.</DialogDescription>
+            <DialogTitle className="font-heading text-2xl">Sign in to submit your design</DialogTitle>
+            <DialogDescription>We saved your design on this device. Sign in or create an account, and you&apos;ll come right back to it.</DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button asChild variant="outline">
               <Link href={`/register?next=${nextParam}`}>Create an account</Link>
             </Button>
             <Button asChild>
-              <Link href={`/login?next=${nextParam}`}>Log in</Link>
+              <Link href={`/login?next=${nextParam}`}>Sign in</Link>
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </StoreContainer>
   );
 }
 

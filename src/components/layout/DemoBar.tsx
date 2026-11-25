@@ -3,7 +3,7 @@
 import { useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronUp, FlaskConical, Mail, RotateCcw } from "lucide-react";
+import { ChevronDown, ChevronUp, Info, Mail, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
@@ -72,8 +72,8 @@ export function DemoBar() {
       onClick={() => switchTo(userId)}
       aria-pressed={active}
       className={cn(
-        "min-h-8 rounded-md px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors",
-        active ? "bg-gold text-ink" : "text-ivory/80 hover:bg-white/10 hover:text-ivory",
+        "min-h-8 rounded-sm border px-2.5 py-1 text-xs font-medium whitespace-nowrap transition-colors",
+        active ? "border-black bg-black text-white" : "border-grey-500 bg-white text-black hover:bg-grey-100",
       )}
     >
       {label}
@@ -82,22 +82,33 @@ export function DemoBar() {
 
   if (collapsed) {
     return (
-      <div className="flex justify-end bg-ink px-3 text-ivory">
-        <button type="button" onClick={() => setCollapsedStored(false)} className="flex min-h-7 items-center gap-1 text-xs text-ivory/80 hover:text-ivory">
-          <FlaskConical className="size-3.5" aria-hidden /> Demo mode <ChevronDown className="size-3.5" aria-hidden />
-          <span className="sr-only">Show the demo bar</span>
-        </button>
+      <div className="border-b border-grey-200 bg-grey-50">
+        <div className="mx-auto flex max-w-[1200px] flex-wrap items-center justify-between gap-2 px-4 py-3 sm:px-6">
+          <p className="flex items-start gap-2 text-sm text-grey-700">
+            <Info className="mt-0.5 size-4 shrink-0" aria-hidden /> Preview. Products, prices and orders are samples. Forms work in this browser only.
+          </p>
+          <button
+            type="button"
+            onClick={() => setCollapsedStored(false)}
+            className="flex min-h-8 items-center gap-1 text-xs text-grey-700 underline underline-offset-4 hover:text-black"
+          >
+            Demo tools <ChevronDown className="size-3.5" aria-hidden />
+            <span className="sr-only">Show the demo tools</span>
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-ink text-ivory" role="region" aria-label="Demo mode controls">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-3 gap-y-1 px-3 py-1.5 text-xs sm:px-4">
-        <span className="flex items-center gap-1.5 font-medium text-gold">
-          <FlaskConical className="size-3.5" aria-hidden /> Demo mode
-        </span>
-        <span className="text-ivory/70">viewing as:</span>
+    <div className="border-b border-grey-200 bg-grey-50 text-black" role="region" aria-label="Preview notice and demo tools">
+      <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 text-xs sm:px-6">
+        <div className="w-full">
+          <p className="flex items-start gap-2 text-sm text-grey-700">
+            <Info className="mt-0.5 size-4 shrink-0" aria-hidden /> Preview. Products, prices and orders are samples. Forms work in this browser only.
+          </p>
+        </div>
+        <span className="text-grey-700">Viewing as:</span>
         <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Choose who you are viewing as">
           {roleButton("Guest", null, hydrated && !current)}
           {roleButton("Customer: Maria Santos", MARIA_ID, sessionUserId === MARIA_ID)}
@@ -108,7 +119,7 @@ export function DemoBar() {
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <Sheet open={emailsOpen} onOpenChange={setEmailsOpen}>
             <SheetTrigger asChild>
-              <button type="button" className="flex min-h-8 items-center gap-1 rounded-md px-2 hover:bg-white/10">
+              <button type="button" className="flex min-h-8 items-center gap-1 rounded-md px-2 hover:bg-grey-100">
                 <Mail className="size-3.5" aria-hidden /> Simulated emails ({emails.length})
               </button>
             </SheetTrigger>
@@ -141,7 +152,7 @@ export function DemoBar() {
             </SheetContent>
           </Sheet>
 
-          <label className="flex min-h-8 cursor-pointer items-center gap-1.5 rounded-md px-2 hover:bg-white/10">
+          <label className="flex min-h-8 cursor-pointer items-center gap-1.5 rounded-md px-2 hover:bg-grey-100">
             <Switch
               checked={simulateErrors}
               onCheckedChange={(v) => useDemoStore.getState().setSimulateErrors(v)}
@@ -153,7 +164,7 @@ export function DemoBar() {
 
           <ConfirmDialog
             trigger={
-              <button type="button" className="flex min-h-8 items-center gap-1 rounded-md px-2 hover:bg-white/10">
+              <button type="button" className="flex min-h-8 items-center gap-1 rounded-md px-2 hover:bg-grey-100">
                 <RotateCcw className="size-3.5" aria-hidden /> Reset demo data
               </button>
             }
@@ -177,8 +188,8 @@ export function DemoBar() {
           <button
             type="button"
             onClick={() => setCollapsedStored(true)}
-            className="flex min-h-8 items-center rounded-md px-1.5 hover:bg-white/10"
-            aria-label="Hide the demo bar"
+            className="flex min-h-8 items-center rounded-md px-1.5 hover:bg-grey-100"
+            aria-label="Hide the demo tools"
           >
             <ChevronUp className="size-4" aria-hidden />
           </button>

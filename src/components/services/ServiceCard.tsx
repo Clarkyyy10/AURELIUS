@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { Battery, Flame, Gem, History, PaintBucket, PenTool, Ruler, Sparkles, Wand2, Watch, Waves, Wrench } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowRight, Battery, Flame, Gem, History, PaintBucket, PenTool, Ruler, Sparkles, Wand2, Watch, Waves, Wrench } from "lucide-react";
 import type { ServiceCatalogItem } from "@/types";
 
 export const SERVICE_ICONS: Record<string, React.ComponentType<{ className?: string }>> = {
@@ -23,26 +22,24 @@ export function ServiceIcon({ name, className }: { name: string; className?: str
   return <Icon className={className} aria-hidden />;
 }
 
-/** FR-25 service card. */
+const appliesLabel = (a: ServiceCatalogItem["appliesTo"]) =>
+  a.includes("jewelry") && a.includes("watch") ? "Jewelry and watches" : a.includes("watch") ? "Watches" : "Jewelry";
+
+/** FR-25 service card: what it applies to, name, description and the request link. */
 export function ServiceCard({ service, compact }: { service: ServiceCatalogItem; compact?: boolean }) {
   return (
-    <article className="flex h-full flex-col rounded-lg border border-line bg-paper p-5">
-      <span className="mb-3 flex size-11 items-center justify-center rounded-xl bg-gold/15">
-        <ServiceIcon name={service.icon} className="size-5 text-gold-dark" />
-      </span>
-      <h3 className="font-sans text-lg font-semibold">{service.name}</h3>
-      <p className="mt-1 flex-1 text-sm text-muted-foreground">{service.description}</p>
-      <div className="mt-3 flex flex-wrap gap-1.5">
-        {service.appliesTo.map((a) => (
-          <span key={a} className="rounded-sm bg-muted px-2 py-0.5 text-xs">
-            For {a === "jewelry" ? "jewelry" : "watches"}
-          </span>
-        ))}
-      </div>
+    <article className="flex h-full flex-col border border-grey-500 bg-white p-5">
+      <p className="text-sm text-grey-700">{appliesLabel(service.appliesTo)}</p>
+      <h3 className="mt-3 font-sans text-lg leading-6 font-semibold">{service.name}</h3>
+      <p className="mt-3 flex-1 text-[15px] leading-[22px] text-grey-700">{service.description}</p>
       {!compact && (
-        <Button asChild variant="outline" className="mt-4">
-          <Link href={`/services/request?service=${service.id}`}>Request this service</Link>
-        </Button>
+        <Link
+          href={`/services/request?service=${service.id}`}
+          className="mt-5 inline-flex min-h-6 items-center gap-1 self-start text-[15px] font-medium text-black underline-offset-4 hover:underline"
+        >
+          Request this service <ArrowRight className="size-4" aria-hidden />
+          <span className="sr-only">: {service.name}</span>
+        </Link>
       )}
     </article>
   );

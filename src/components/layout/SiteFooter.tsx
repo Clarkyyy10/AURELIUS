@@ -1,51 +1,21 @@
-"use client";
-
 import Link from "next/link";
-import { Clock, MapPin, Phone } from "lucide-react";
-import { useSettings } from "@/lib/data/hooks";
 import { Logo } from "./Logo";
 
+/** Footer (DESIGN.md §10): logo on the left, policy links on the right. */
 export function SiteFooter() {
-  const settings = useSettings();
   return (
-    <footer className="mt-16 border-t border-line bg-paper">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="space-y-3">
-          <Logo />
-          <p className="text-sm text-muted-foreground">{settings.claimingNote}</p>
-        </div>
-        <address className="space-y-2 text-sm not-italic">
-          <p className="flex gap-2">
-            <MapPin className="mt-0.5 size-4 shrink-0 text-gold-dark" aria-hidden /> {settings.address}
-          </p>
-          <p className="flex gap-2">
-            <Phone className="mt-0.5 size-4 shrink-0 text-gold-dark" aria-hidden />
-            <a href={`tel:${settings.contactNumber}`} className="hover:underline">
-              {settings.contactNumber}
-            </a>
-          </p>
-        </address>
-        <p className="flex gap-2 text-sm">
-          <Clock className="mt-0.5 size-4 shrink-0 text-gold-dark" aria-hidden /> {settings.openingHours}
-        </p>
-        <nav className="flex flex-col gap-2 text-sm" aria-label="Footer">
-          <Link href="/shop" className="hover:underline">
-            Shop
+    <footer className="mt-24 border-t border-grey-200 bg-white">
+      <div className="mx-auto flex max-w-[1200px] flex-col gap-6 px-4 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <Logo size="sm" />
+        <nav aria-label="Footer" className="flex flex-wrap gap-6 text-sm">
+          <Link href="/privacy" className="text-grey-700 underline underline-offset-4 hover:text-black">
+            Privacy notice
           </Link>
-          <Link href="/customize" className="hover:underline">
-            Design your piece
-          </Link>
-          <Link href="/services" className="hover:underline">
-            Services
-          </Link>
-          <Link href="/privacy" className="text-gold-dark hover:underline">
-            Privacy Notice
+          <Link href="/credits" className="text-grey-700 underline underline-offset-4 hover:text-black">
+            Photo credits
           </Link>
         </nav>
       </div>
-      <p className="border-t border-line py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} {settings.storeName}.
-      </p>
     </footer>
   );
 }

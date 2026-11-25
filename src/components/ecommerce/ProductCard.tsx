@@ -27,32 +27,33 @@ export function ProductCard({ product, options }: { product: Product; options?: 
   const show3d = Boolean(webgl && options && options.productTypes.some((p) => p.type === product.category));
 
   return (
-    <article className="group overflow-hidden rounded-lg border border-line bg-paper transition-shadow hover:shadow-md">
-      <div className="relative">
+    <article className="group">
+      <div className="bg-grey-100">
         {show3d ? (
           <ProductModelView
             config={productDesign(product, options!)}
             options={options!}
-            className="aspect-square w-full"
+            className="aspect-[4/5] w-full"
             label={`3D model of ${product.name}`}
           />
         ) : (
           <Link href={href} tabIndex={-1} aria-hidden>
-            <StoredImage src={product.photos[0]} alt="" className="aspect-square w-full" />
+            <StoredImage src={product.photos[0]} alt="" className="aspect-[4/5] w-full" />
           </Link>
         )}
-        <AvailabilityBadge value={product.availability} className="pointer-events-none absolute top-3 left-3 bg-paper/95" />
       </div>
-      <Link href={href} className="block p-4">
-        <h3 className="font-sans text-base font-semibold text-ink group-hover:underline">{product.name}</h3>
-        <p className="text-sm text-muted-foreground">{product.material}</p>
-        <p className="mt-1 flex items-baseline justify-between gap-2">
-          <span className="font-heading text-xl font-semibold">
-            <MoneyText value={product.price} />
-          </span>
-          <span className="text-sm text-gold-dark">View details →</span>
-        </p>
-      </Link>
+      <h3 className="mt-6 text-lg leading-6 font-semibold text-black">
+        <Link href={href} className="underline-offset-4 hover:underline">
+          {product.name}
+        </Link>
+      </h3>
+      <p className="mt-0.5 text-[15px] text-grey-700">{product.material}</p>
+      <p className="mt-2 flex flex-wrap items-center gap-3">
+        <span className="text-lg">
+          <MoneyText value={product.price} />
+        </span>
+        <AvailabilityBadge value={product.availability} />
+      </p>
     </article>
   );
 }

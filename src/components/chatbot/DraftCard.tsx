@@ -375,7 +375,7 @@ export function DraftCard({
         <p className="mt-2 text-xs" role="alert">
           Please{" "}
           <Link href="/login" onClick={onNavigate} className="font-medium text-gold-dark underline">
-            log in
+            sign in
           </Link>{" "}
           or{" "}
           <Link href="/register" onClick={onNavigate} className="font-medium text-gold-dark underline">

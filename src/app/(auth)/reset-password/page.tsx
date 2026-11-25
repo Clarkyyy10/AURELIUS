@@ -41,9 +41,9 @@ function ResetPassword() {
     return (
       <AuthCard title="Your password was changed">
         <CheckCircle2 className="mb-3 size-10 text-success" aria-hidden />
-        <p className="text-muted-foreground">You can now log in with your new password.</p>
+        <p className="text-muted-foreground">You can now sign in with your new password.</p>
         <Button asChild className="mt-6">
-          <Link href="/login">Log in</Link>
+          <Link href="/login">Sign in</Link>
         </Button>
       </AuthCard>
     );

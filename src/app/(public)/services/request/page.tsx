@@ -143,7 +143,7 @@ function RequestForm({
         <p className="rounded-xl border border-line bg-paper p-3 text-sm">
           You can fill in the form now. You&apos;ll need to{" "}
           <Link href={`/login?next=${encodeURIComponent("/services/request")}`} className="text-gold-dark underline">
-            log in
+            sign in
           </Link>{" "}
           to send it.
         </p>
@@ -327,7 +327,7 @@ function RequestForm({
             <SubmitButton
               onClick={submit}
               disabled={Boolean(user && (!user.emailVerified || user.role !== "customer"))}
-              label={user ? "Send request" : "Log in to send"}
+              label={user ? "Send request" : "Sign in to send"}
             />
           </div>
           {user?.role === "owner" && <p className="text-sm text-danger">Owner accounts can&apos;t submit requests. Switch to a customer in the Demo bar.</p>}

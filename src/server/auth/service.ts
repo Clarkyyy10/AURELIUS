@@ -30,13 +30,13 @@ export async function register(
 ): Promise<UserProfile> {
   await verifyTurnstile(input.captchaToken, ip);
   const exists = await asSystem((tx) => tx.user.findUnique({ where: { email: input.email }, select: { id: true } }));
-  if (exists) throw new HttpError(409, "An account with this email already exists. Log in, or reset your password if you forgot it.");
+  if (exists) throw new HttpError(409, "An account with this email already exists. Sign in, or reset your password if you forgot it.");
 
   const sb = await supabaseServer();
   const { data, error } = await sb.auth.signUp({ email: input.email, password: input.password, options: { emailRedirectTo: confirmUrl() } });
   if (error || !data.user) throw new HttpError(400, authMessage(error?.message));
   if (data.user.identities?.length === 0)
-    throw new HttpError(409, "An account with this email already exists. Log in, or reset your password if you forgot it.");
+    throw new HttpError(409, "An account with this email already exists. Sign in, or reset your password if you forgot it.");
 
   try {
     const row = await asSystem((tx) =>
@@ -97,7 +97,7 @@ export async function resendVerification(): Promise<void> {
   } = await sb.auth.getUser();
   if (user?.email_confirmed_at) throw new HttpError(400, "Your email is already confirmed.");
   const email = user?.email ?? (await cookies()).get(PENDING_COOKIE)?.value;
-  if (!email) throw new HttpError(400, "Log in with the email you registered, and we'll send a new link.");
+  if (!email) throw new HttpError(400, "Sign in with the email you registered, and we'll send a new link.");
   const { error } = await sb.auth.resend({ type: "signup", email, options: { emailRedirectTo: confirmUrl() } });
   if (error) throw new HttpError(429, authMessage(error.message));
 }
@@ -120,7 +120,7 @@ export async function resetPassword(password: string): Promise<void> {
   const { error } = await sb.auth.updateUser({ password });
   if (error) throw new HttpError(400, authMessage(error.message));
   await recordSuccess(user.email ?? "");
-  await sb.auth.signOut(); // log in again with the new password everywhere
+  await sb.auth.signOut(); // sign in again with the new password everywhere
 }
 
 export async function updateProfile(input: { fullName: string; contactNumber: string }): Promise<UserProfile> {
