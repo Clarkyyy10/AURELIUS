@@ -1,45 +1,45 @@
 # Tech Stack
 
-Source: manuscript Section 3.13 (Table 4). The manuscript marks versions as tentative as of Nov 2026. The **Scaffold version** column holds the versions you chose for the scaffold. I have not checked them against the registries. Verify each with `pnpm view <package> version` before the first install.
+Source: manuscript Section 3.13 (Table 4). The manuscript marks versions as tentative as of Nov 2026. The **Scaffold version** column holds the versions you chose for the scaffold. The Three.js, Drei, Supabase, Zod, React Hook Form and Playwright versions were checked with `pnpm view <package> version` and pinned. Prisma 7.10.1 and shadcn/ui are not installed yet.
 
-| Technology / tool | Manuscript version | Scaffold version | Purpose |
-| --- | --- | --- | --- |
-| Next.js (App Router) | 16.4 | 16.4.6 | Full-stack React framework. Pages and API routes in one project. Turbopack builds. Deploys to Vercel. |
-| React | 19.3 | 19.3.1 | Component-based UI. Each module is built from reusable components. |
-| TypeScript | 5.9 | 5.9.x | Type checks catch errors before runtime. Easier maintenance for five developers. |
-| Tailwind CSS | 4 | 4.3.5 | Utility-first styling. |
-| shadcn/ui | 4.23.0 | latest CLI | Accessible prebuilt components. |
-| Three.js + React Three Fiber + Drei | r187 / 9 / 10.7.7 | as listed | WebGL rendering of the ring viewer. The ring is generated procedurally in code. |
-| Node.js | 22 LTS | 22 LTS | Server runtime for Next.js. |
-| PostgreSQL via Supabase | 16 | 16 | Relational database with transactions. |
-| Prisma ORM | 6 | **7.10.1** | Type-safe database access with parameterized queries. |
-| Supabase Auth + Storage | n/a | n/a | Email verification, password reset, sessions, roles, TOTP for the owner. Private storage for proofs. |
-| Cloudflare Turnstile | n/a | n/a | Bot protection on login, registration and password reset. |
-| Google Gemini API (Gemini 2.5 Flash) | API | API | Chatbot through a server-side API route. Key stays on the server. |
-| Resend | n/a | n/a | Transactional email and owner alerts. |
-| pnpm | 12.x | 12.22.0 | Package manager. |
-| ESLint + Prettier + Husky | 9 / 3 | 9 / 3 / latest | Lint, format, pre-commit checks. |
-| Git + GitHub + GitHub Actions | n/a | n/a | Version control, review, CI. |
-| Visual Studio Code | 1.x | 1.x | Editor. |
-| React Hook Form + Zod | 4.x | 4.x (Zod) | Forms and server-side validation. |
-| Vitest + Playwright | 3.x / 1.65.1 | Vitest 5.1.x installed; Playwright as listed | Unit and browser tests. |
-| Vercel | n/a | n/a | Hosting with HTTPS and GitHub deploys. |
+| Technology / tool                    | Manuscript version | Scaffold version                                                                                                                                                             | Purpose                                                                                               |
+| ------------------------------------ | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Next.js (App Router)                 | 16.4               | 16.4.6                                                                                                                                                                       | Full-stack React framework. Pages and API routes in one project. Turbopack builds. Deploys to Vercel. |
+| React                                | 19.3               | 19.3.1                                                                                                                                                                       | Component-based UI. Each module is built from reusable components.                                    |
+| TypeScript                           | 5.9                | 5.9.x                                                                                                                                                                        | Type checks catch errors before runtime. Easier maintenance for five developers.                      |
+| Tailwind CSS                         | 4                  | 4.3.5                                                                                                                                                                        | Utility-first styling.                                                                                |
+| shadcn/ui                            | 4.23.0             | latest CLI                                                                                                                                                                   | Accessible prebuilt components.                                                                       |
+| Three.js + React Three Fiber + Drei  | r187 / 9 / 10.7.7  | three 0.187.0, @react-three/fiber 9.8.2, @react-three/drei 10.7.9, @types/three 0.187.0 (installed)                                                                          | WebGL rendering of the ring viewer. The ring is generated procedurally in code.                       |
+| Node.js                              | 22 LTS             | 22 LTS                                                                                                                                                                       | Server runtime for Next.js.                                                                           |
+| PostgreSQL via Supabase              | 16                 | 16                                                                                                                                                                           | Relational database with transactions.                                                                |
+| Prisma ORM                           | 6                  | **7.10.1**                                                                                                                                                                   | Type-safe database access with parameterized queries.                                                 |
+| Supabase Auth + Storage              | n/a                | @supabase/supabase-js 2.119.2, @supabase/ssr 0.12.7 (installed)                                                                                                              | Email verification, password reset, sessions, roles, TOTP for the owner. Private storage for proofs.  |
+| Cloudflare Turnstile                 | n/a                | n/a                                                                                                                                                                          | Bot protection on login, registration and password reset.                                             |
+| Google Gemini API (Gemini 2.5 Flash) | API                | API                                                                                                                                                                          | Chatbot through a server-side API route. Key stays on the server.                                     |
+| Resend                               | n/a                | n/a                                                                                                                                                                          | Transactional email and owner alerts.                                                                 |
+| pnpm                                 | 12.x               | 12.22.0                                                                                                                                                                      | Package manager.                                                                                      |
+| ESLint + Prettier + Husky            | 9 / 3              | 9 / 3 / latest                                                                                                                                                               | Lint, format, pre-commit checks.                                                                      |
+| Git + GitHub + GitHub Actions        | n/a                | n/a                                                                                                                                                                          | Version control, review, CI.                                                                          |
+| Visual Studio Code                   | 1.x                | 1.x                                                                                                                                                                          | Editor.                                                                                               |
+| React Hook Form + Zod                | 4.x                | react-hook-form 7.92.0, @hookform/resolvers 7.0.9, zod 4.6.7 (installed)                                                                                                     | Forms and server-side validation.                                                                     |
+| Vitest + Playwright                  | 3.x / 1.65.1       | Vitest 5.1.x and @playwright/test 1.65.1 installed. `pnpm test:e2e` runs Playwright locally; it is not in CI and browsers are installed with `pnpm exec playwright install`. | Unit and browser tests.                                                                               |
+| Vercel                               | n/a                | n/a                                                                                                                                                                          | Hosting with HTTPS and GitHub deploys.                                                                |
 
 ## Differences to resolve
 
 - **Prisma 6 vs 7.10.1.** The manuscript says 6 and the scaffold uses 7.10.1. Update Table 4 to match what you ship.
 - **Tailwind and shadcn.** The manuscript row "4 / 4.23.0" mixes two products. Split them in Table 4.
-- **Three.js, Drei, Vitest, Playwright, shadcn/ui.** The scaffold versions are taken from the manuscript and have not been verified.
+- **Three.js, Drei, Vitest, Playwright, shadcn/ui.** Three.js, Drei and Playwright now match the registry (Drei is 10.7.9, not the manuscript 10.7.7). Vitest 5.1.x is installed. shadcn/ui is still unverified.
 - **Table 4 wording.** The manuscript calls Vercel's free tier and Gemini's free tier enough for the system. Production uses paid tiers (N34).
 - **3D description.** Table 4 should say the ring geometry is procedural (N3).
 - **Supabase Auth.** Add TOTP for the owner (N68).
 
 ## Environments
 
-| Environment | Hosting plans |
-| --- | --- |
-| Development and evaluation | Free tiers |
-| Production at handover | Vercel Pro, Supabase Pro, paid Gemini plan. The owner pays the monthly cost (**Open**: owner has not agreed yet, N38). Provider terms are unverified (N35). |
+| Environment                | Hosting plans                                                                                                                                               |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Development and evaluation | Free tiers                                                                                                                                                  |
+| Production at handover     | Vercel Pro, Supabase Pro, paid Gemini plan. The owner pays the monthly cost (**Open**: owner has not agreed yet, N38). Provider terms are unverified (N35). |
 
 ## Not in the stack
 
