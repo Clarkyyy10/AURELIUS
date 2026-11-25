@@ -3,3 +3,5 @@ allowBuilds:
   prisma: false
   sharp: false
   unrs-resolver: false
+minimumReleaseAgeExclude:
+  - lucide-react@1.80.0

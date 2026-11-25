@@ -29,7 +29,7 @@ Source: manuscript Section 3.13 (Table 4). The manuscript marks versions as tent
 
 - **Prisma 6 vs 7.10.1.** The manuscript says 6 and the scaffold uses 7.10.1. Update Table 4 to match what you ship.
 - **Tailwind and shadcn.** The manuscript row "4 / 4.23.0" mixes two products. Split them in Table 4.
-- **Three.js, Drei, Vitest, Playwright, shadcn/ui.** Three.js, Drei and Playwright now match the registry (Drei is 10.7.9, not the manuscript 10.7.7). Vitest 5.1.x is installed. shadcn/ui is still unverified.
+- **Three.js, Drei, Vitest, Playwright, shadcn/ui.** Three.js, Drei and Playwright now match the registry (Drei is 10.7.9, not the manuscript 10.7.7). Vitest 5.1.x is installed. shadcn/ui 4.23.0 is installed with the Base UI library and the `base-lyra` preset (D-54). `lucide-react` 1.80.0 is installed. Component icon names in docs/12 were checked only by typecheck.
 - **Table 4 wording.** The manuscript calls Vercel's free tier and Gemini's free tier enough for the system. Production uses paid tiers (N34).
 - **3D description.** Table 4 should say the ring geometry is procedural (N3).
 - **Supabase Auth.** Add TOTP for the owner (N68).
