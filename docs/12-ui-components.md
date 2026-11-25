@@ -157,7 +157,7 @@ The meaning of `proof-expired` is not defined in the source documents, which lis
 - **Unknown status.** A status key the component does not know renders the raw label with the `neutral` variant and logs a development warning. It does not hide the status.
 - **Not interactive.** A badge is not a button. Do not put it in the tab order. If a status explains itself in a longer text (for example Unclaimed), put the explanation in the page text beside it.
 - **Do not combine two badges to tell a story.** One badge per record. Secondary facts (balance due, expiry date) are text.
-- **Greyscale and high contrast check.** A review prints or screenshots the page in greyscale and in Windows high contrast, and confirms every status in the same list can still be told apart by text, border style and icon. This check is listed in the UI review checklist of [13-ux-content-a11y.md](13-ux-content-a11y.md) (not yet written when this file was drafted).
+- **Greyscale and high contrast check.** A review prints or screenshots the page in greyscale and in Windows high contrast, and confirms every status in the same list can still be told apart by text, border style and icon. This check is listed in the UI review checklist of [13-ux-content-a11y.md](13-ux-content-a11y.md).
 
 ## 3. Timelines
 
@@ -444,7 +444,7 @@ Layout, in a `Card`:
 
 ## 9. Owner action queue and pending count
 
-Screen: [OWN-02](11-ui-screens.md#own-02-dashboard-and-action-queue). FR-50, FR-46. The owner is told by email as well (D-26); the dashboard count is the in-app signal.
+Screen: [OWN-02](11-ui-screens.md#own-02-dashboard-and-action-queue). FR-50. The owner is told by email as well (D-26); the dashboard count is the in-app signal.
 
 ### 9.1 `PendingCount`
 
@@ -579,15 +579,15 @@ Short entries for components that the sections above rely on.
 
 ## 13. Requirement coverage
 
-| Area              | Components                                                                             | FRs                                      |
-| ----------------- | -------------------------------------------------------------------------------------- | ---------------------------------------- |
-| Status vocabulary | `StatusBadge`, `PaymentProofBadge`, `Timeline`                                         | FR-10, FR-19, FR-21, FR-23, FR-31, FR-32 |
-| Quotation         | `QuotationPage`, `EstimateTable`, `RateSnapshot`, `PaymentAccountBlock`, `PolicyBlock` | FR-15, FR-16, FR-22, FR-28               |
-| Ring viewer       | `RingViewer`, `ViewerControls`, `ViewerFallback`, `OptionPicker`                       | FR-01 to FR-07                           |
-| Payments          | `PaymentProofUpload`, `PaymentProofBadge`, `ReasonDialog`                              | FR-17, FR-18, FR-30                      |
-| Claiming          | `ClaimCode`, `ReleaseForm`                                                             | FR-19, FR-20, FR-29, FR-49               |
-| Owner alerts      | `PendingCount`, `ActionQueue`                                                          | FR-46, FR-50                             |
-| Chatbot           | `ChatPanel`, `DraftSummary`, `SubmitConfirmation`                                      | FR-35 to FR-40                           |
+| Area              | Components                                                                             | FRs                                             |
+| ----------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Status vocabulary | `StatusBadge`, `PaymentProofBadge`, `Timeline`                                         | FR-10, FR-19, FR-21, FR-22, FR-23, FR-31, FR-32 |
+| Quotation         | `QuotationPage`, `EstimateTable`, `RateSnapshot`, `PaymentAccountBlock`, `PolicyBlock` | FR-15, FR-16, FR-28                             |
+| Ring viewer       | `RingViewer`, `ViewerControls`, `ViewerFallback`, `OptionPicker`                       | FR-01 to FR-07                                  |
+| Payments          | `PaymentProofUpload`, `PaymentProofBadge`, `ReasonDialog`                              | FR-17, FR-18, FR-30                             |
+| Claiming          | `ClaimCode`, `ReleaseForm`                                                             | FR-19, FR-20, FR-29, FR-49                      |
+| Owner alerts      | `PendingCount`, `ActionQueue`                                                          | FR-50                                           |
+| Chatbot           | `ChatPanel`, `DraftSummary`, `SubmitConfirmation`                                      | FR-35 to FR-40                                  |
 
 Requirement numbers are taken from the screen coverage table in [11-ui-screens.md section 8](11-ui-screens.md#8-fr-coverage). Check them against [01-requirements.md](01-requirements.md) at review.
 
@@ -610,7 +610,7 @@ Requirement numbers are taken from the screen coverage table in [11-ui-screens.m
 - **Payment channels, refund policy text, whether Accept is blocked when a policy is empty.** Open (D-05, D-22, owner interview).
 - **Queue ordering and grouping.** Proposal, to confirm with the owner.
 - **Chatbot limits.** Rate limit and message length (N54).
-- **Where status treatments are defined.** [DESIGN.md section 11](../DESIGN.md#11-status-and-validation-without-color) lists some statuses by class. This file assigns the rest (Received, Under assessment, Design approved, Down payment verified, Declined) and uses a 3 px double border for Rejected. DESIGN.md should be aligned in a later edit.
+- **Where status treatments are defined.** [DESIGN.md section 11](../DESIGN.md#11-status-and-validation-without-color) lists some statuses by class. This file assigns the rest (Received, Under assessment, Design approved, Down payment verified, Declined) and uses a 3 px double border for Rejected. DESIGN.md section 11 now matches.
 - **Owner interview.** Logo, brand colors and fonts, and which jewelry sells most may change the wordmark, product card and homepage emphasis.
 
 ## 16. Related documents
