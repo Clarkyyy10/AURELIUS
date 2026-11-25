@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## Project source of truth for agents
 
-Read this section first. Then read `CONTRIBUTING.md` for the full rules and `docs/` for the project: `00-overview.md` (start here), `01-requirements.md`, `02-architecture.md`, `03-erd.md`, `04-flowcharts.md`, `05-tech-stack.md`, `06-testing.md`, `07-ethics-privacy.md`, `08-decisions.md`, `09-owner-data.md`, `10-sprint-plan.md`. When a change alters a requirement, the schema, a flow or a decision, update the matching file in `docs/` in the same pull request.
+Read this section first. Then read `CONTRIBUTING.md` for the full rules and `docs/` for the project: `00-overview.md` (start here), `01-requirements.md`, `02-architecture.md`, `03-erd.md`, `04-flowcharts.md`, `05-tech-stack.md`, `06-testing.md`, `07-ethics-privacy.md`, `08-decisions.md`, `09-owner-data.md`, `10-sprint-plan.md`, `11-ui-screens.md`, `12-ui-components.md`, `13-ux-content-a11y.md`. The visual system is `DESIGN.md` at the repo root. When a change alters a requirement, the schema, a flow or a decision, update the matching file in `docs/` in the same pull request.
 
 ### Stack and pinned versions
 
