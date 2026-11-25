@@ -39,6 +39,22 @@ describe("env validation", () => {
     expect(parseServerEnv(serverValues)).toEqual(serverValues);
   });
 
+  it("treats empty optional values as unset", () => {
+    const parsed = parseServerEnv({
+      ...serverValues,
+      GEMINI_API_KEY: "",
+      RESEND_FROM_EMAIL: "",
+    });
+    expect(parsed.GEMINI_API_KEY).toBeUndefined();
+    expect(parsed.RESEND_FROM_EMAIL).toBeUndefined();
+  });
+
+  it("rejects an invalid sender email", () => {
+    expect(() =>
+      parseServerEnv({ ...serverValues, RESEND_FROM_EMAIL: "not-an-email" }),
+    ).toThrow();
+  });
+
   it("rejects server values with an empty secret", () => {
     expect(() =>
       parseServerEnv({ ...serverValues, SUPABASE_SERVICE_ROLE_KEY: "" }),

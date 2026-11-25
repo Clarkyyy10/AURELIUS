@@ -1,0 +1,422 @@
+// Prisma schema derived from docs/03-erd.md. Assumptions beyond the ERD are
+// listed in docs/08-decisions.md (D-44 to D-52) and are provisional.
+// Tables and columns are snake_case in the database (@@map, @map).
+// No migrations are applied yet: there is no database.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  customer
+  owner
+}
+
+enum Availability {
+  available
+  made_to_order
+  unavailable
+}
+
+enum DesignOptionKind {
+  material
+  color
+  gemstone
+  ring_size
+  ring_style
+}
+
+enum CustomDesignStatus {
+  draft
+  submitted
+  under_review
+  revision_requested
+  approved
+  rejected
+}
+
+enum CustomDesignSource {
+  viewer
+  chatbot
+  owner_entered
+}
+
+enum OrderType {
+  ready_made
+  custom
+}
+
+enum OrderSource {
+  viewer
+  owner_entered_outside_viewer
+}
+
+enum QuotationStatus {
+  issued
+  accepted
+  declined
+  expired
+}
+
+enum PaymentChannel {
+  cash
+  transfer
+}
+
+enum PaymentState {
+  pending
+  verified
+  rejected
+}
+
+enum PaymentSettlement {
+  refunded_full
+  refunded_part
+  retained
+}
+
+enum ChatRole {
+  customer
+  assistant
+}
+
+enum NotificationChannel {
+  in_app
+  email
+}
+
+// Profiles. A row with no auth_user_id is an owner-created walk-in profile (N30).
+// role is written only on the server (N67). auth_user_id refers to Supabase
+// auth.users, which Prisma does not model, so there is no foreign key.
+model User {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  role            Role      @default(customer)
+  fullName        String    @map("full_name")
+  contactNumber   String?   @map("contact_number")
+  email           String?
+  authUserId      String?   @unique @map("auth_user_id") @db.Uuid
+  linkedProfileId String?   @unique @map("linked_profile_id") @db.Uuid
+  consentRecorded Boolean   @default(false) @map("consent_recorded")
+  consentAt       DateTime? @map("consent_at") @db.Timestamptz(6)
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  linkedProfile   User?            @relation("ProfileLink", fields: [linkedProfileId], references: [id])
+  linkedFrom      User?            @relation("ProfileLink")
+  customDesigns   CustomDesign[]
+  orders          Order[]
+  serviceRequests ServiceRequest[]
+  chatSessions    ChatSession[]
+  notifications   Notification[]
+
+  @@map("users")
+}
+
+model Product {
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String
+  description   String?
+  material      String?
+  price         Decimal      @db.Decimal(12, 2)
+  stockQuantity Int          @default(0) @map("stock_quantity")
+  availability  Availability @default(available)
+  archived      Boolean      @default(false)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  orderItems OrderItem[]
+
+  @@map("products")
+}
+
+model DesignOption {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  kind           DesignOptionKind
+  name           String
+  rate           Decimal          @db.Decimal(12, 2)
+  densityOrCarat Decimal?         @map("density_or_carat") @db.Decimal(10, 4)
+  archived       Boolean          @default(false)
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  customDesigns CustomDesignOption[]
+
+  @@map("design_options")
+}
+
+model CustomDesign {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String             @map("user_id") @db.Uuid
+  chatSessionId    String?            @map("chat_session_id") @db.Uuid
+  status           CustomDesignStatus @default(draft)
+  source           CustomDesignSource
+  selectedOptions  Json               @map("selected_options")
+  estimateSnapshot Json?              @map("estimate_snapshot")
+  notes            String?
+  submittedAt      DateTime?          @map("submitted_at") @db.Timestamptz(6)
+  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user        User                 @relation(fields: [userId], references: [id])
+  chatSession ChatSession?         @relation(fields: [chatSessionId], references: [id])
+  options     CustomDesignOption[]
+  order       Order?
+
+  @@index([userId])
+  @@index([chatSessionId])
+  @@map("custom_designs")
+}
+
+// Explicit join table for the many-to-many "custom_designs uses design_options".
+model CustomDesignOption {
+  customDesignId String @map("custom_design_id") @db.Uuid
+  designOptionId String @map("design_option_id") @db.Uuid
+
+  customDesign CustomDesign @relation(fields: [customDesignId], references: [id], onDelete: Cascade)
+  designOption DesignOption @relation(fields: [designOptionId], references: [id])
+
+  @@id([customDesignId, designOptionId])
+  @@index([designOptionId])
+  @@map("custom_design_options")
+}
+
+// status is free text. The ready-made sequence is open (N45), so the allowed
+// values live in src/shared/status.ts, not in a database enum.
+model Order {
+  id                   String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId               String       @map("user_id") @db.Uuid
+  customDesignId       String?      @unique @map("custom_design_id") @db.Uuid
+  type                 OrderType
+  status               String
+  source               OrderSource?
+  claimCode            String?      @unique @map("claim_code")
+  totalPrice           Decimal?     @map("total_price") @db.Decimal(12, 2)
+  reservationExpiresAt DateTime?    @map("reservation_expires_at") @db.Timestamptz(6)
+  createdAt            DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user         User          @relation(fields: [userId], references: [id])
+  customDesign CustomDesign? @relation(fields: [customDesignId], references: [id])
+  items        OrderItem[]
+  quotations   Quotation[]
+  payments     Payment[]
+  release      Release?
+
+  @@index([userId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id                String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId           String  @map("order_id") @db.Uuid
+  productId         String  @map("product_id") @db.Uuid
+  quantity          Int
+  unitPriceSnapshot Decimal @map("unit_price_snapshot") @db.Decimal(12, 2)
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@index([orderId])
+  @@index([productId])
+  @@map("order_items")
+}
+
+model Service {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  description String?
+  archived    Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  serviceRequests ServiceRequest[]
+
+  @@map("services")
+}
+
+// status is free text validated against src/shared/status.ts (see Order).
+model ServiceRequest {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  serviceId        String   @map("service_id") @db.Uuid
+  itemDescription  String   @map("item_description")
+  preliminaryRange String?  @map("preliminary_range")
+  status           String
+  claimCode        String?  @unique @map("claim_code")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user       User        @relation(fields: [userId], references: [id])
+  service    Service     @relation(fields: [serviceId], references: [id])
+  quotations Quotation[]
+  payments   Payment[]
+  release    Release?
+
+  @@index([userId])
+  @@index([serviceId])
+  @@index([status])
+  @@map("service_requests")
+}
+
+// Belongs to exactly one of an order or a service request. Prisma cannot express
+// that rule; the SQL migration will add a CHECK constraint.
+model Quotation {
+  id                 String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId            String?         @map("order_id") @db.Uuid
+  serviceRequestId   String?         @map("service_request_id") @db.Uuid
+  finalPrice         Decimal         @map("final_price") @db.Decimal(12, 2)
+  downPayment        Decimal         @map("down_payment") @db.Decimal(12, 2)
+  expectedCompletion DateTime?       @map("expected_completion") @db.Date
+  rateSnapshot       Json            @map("rate_snapshot")
+  validUntil         DateTime        @map("valid_until") @db.Timestamptz(6)
+  status             QuotationStatus @default(issued)
+  createdAt          DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  order          Order?          @relation(fields: [orderId], references: [id])
+  serviceRequest ServiceRequest? @relation(fields: [serviceRequestId], references: [id])
+  payments       Payment[]
+
+  @@index([orderId])
+  @@index([serviceRequestId])
+  @@map("quotations")
+}
+
+// Belongs to an order or a service request, directly or through a quotation.
+// Ready-made orders skip the quotation, so order_id and service_request_id are
+// on the payment itself. reference_number is unique across payments (N22).
+// Reuse after a rejected proof is open (N24).
+model Payment {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId          String?            @map("order_id") @db.Uuid
+  serviceRequestId String?            @map("service_request_id") @db.Uuid
+  quotationId      String?            @map("quotation_id") @db.Uuid
+  amount           Decimal            @db.Decimal(12, 2)
+  paidOn           DateTime           @map("paid_on") @db.Date
+  channel          PaymentChannel
+  referenceNumber  String?            @unique @map("reference_number")
+  proofPath        String?            @map("proof_path")
+  state            PaymentState       @default(pending)
+  rejectionReason  String?            @map("rejection_reason")
+  settlement       PaymentSettlement?
+  settlementAmount Decimal?           @map("settlement_amount") @db.Decimal(12, 2)
+  settlementReason String?            @map("settlement_reason")
+  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  order          Order?          @relation(fields: [orderId], references: [id])
+  serviceRequest ServiceRequest? @relation(fields: [serviceRequestId], references: [id])
+  quotation      Quotation?      @relation(fields: [quotationId], references: [id])
+
+  @@index([orderId])
+  @@index([serviceRequestId])
+  @@index([quotationId])
+  @@index([state])
+  @@map("payments")
+}
+
+// Release record (N86). One per released order or service request.
+model Release {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId           String?  @unique @map("order_id") @db.Uuid
+  serviceRequestId  String?  @unique @map("service_request_id") @db.Uuid
+  recipientName     String   @map("recipient_name")
+  isRepresentative  Boolean  @default(false) @map("is_representative")
+  authorizationSeen Boolean  @default(false) @map("authorization_seen")
+  balancePaid       Decimal  @map("balance_paid") @db.Decimal(12, 2)
+  releasedAt        DateTime @default(now()) @map("released_at") @db.Timestamptz(6)
+
+  order          Order?          @relation(fields: [orderId], references: [id])
+  serviceRequest ServiceRequest? @relation(fields: [serviceRequestId], references: [id])
+
+  @@map("releases")
+}
+
+model ChatSession {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  startedAt DateTime @default(now()) @map("started_at") @db.Timestamptz(6)
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+
+  user          User           @relation(fields: [userId], references: [id])
+  messages      ChatMessage[]
+  customDesigns CustomDesign[]
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  sessionId String   @map("session_id") @db.Uuid
+  role      ChatRole
+  content   String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@map("chat_messages")
+}
+
+model Notification {
+  id        String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String              @map("user_id") @db.Uuid
+  event     String
+  channel   NotificationChannel
+  readAt    DateTime?           @map("read_at") @db.Timestamptz(6)
+  createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("notifications")
+}
+
+// Owner-editable settings. The store holds one row. The day counts and the
+// refund policy text have no defaults because their values are open decisions.
+model AppSettings {
+  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reservationDays    Int      @map("reservation_days")
+  quotationValidDays Int      @map("quotation_valid_days")
+  unclaimedDays      Int      @map("unclaimed_days")
+  refundPolicyText   String   @map("refund_policy_text")
+  updatedAt          DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  paymentAccounts PaymentAccount[]
+  faq             StoreFaq[]
+
+  @@map("app_settings")
+}
+
+model PaymentAccount {
+  id            String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  settingsId    String @map("settings_id") @db.Uuid
+  channel       String
+  accountName   String @map("account_name")
+  accountNumber String @map("account_number")
+
+  settings AppSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+
+  @@index([settingsId])
+  @@map("payment_accounts")
+}
+
+model StoreFaq {
+  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  settingsId String @map("settings_id") @db.Uuid
+  question   String
+  answer     String
+
+  settings AppSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+
+  @@index([settingsId])
+  @@map("store_faq")
+}
