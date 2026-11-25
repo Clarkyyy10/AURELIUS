@@ -6,11 +6,11 @@
 
 ## Users
 
-| Role | Notes |
-| --- | --- |
-| Customer | Registers with a verified email. Customizes rings, orders, requests services, tracks status, uses the chatbot. |
-| Owner (administrator) | Single operator. Created by the proponents at handover. Requires TOTP two-factor. No delegate role. |
-| Walk-in profile | Created by the owner for customers without accounts. Name and contact number only, no login, no online tracking. |
+| Role                  | Notes                                                                                                            |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Customer              | Registers with a verified email. Customizes rings, orders, requests services, tracks status, uses the chatbot.   |
+| Owner (administrator) | Single operator. Created by the proponents at handover. Requires TOTP two-factor. No delegate role.              |
+| Walk-in profile       | Created by the owner for customers without accounts. Name and contact number only, no login, no online tracking. |
 
 ## Modules
 
@@ -33,19 +33,23 @@ Next.js, React, TypeScript, Tailwind and shadcn/ui, Three.js with React Three Fi
 
 ## Document map
 
-| File | Content |
-| --- | --- |
-| `01-requirements.md` | FR-01 to FR-50 and the NFR table |
-| `02-architecture.md` | Architecture (3.10, Figure 5) |
-| `03-erd.md` | Entity relationship diagram (3.11, Figure 6) |
-| `04-flowcharts.md` | Flowcharts (3.12, Figures 7 to 10) |
-| `05-tech-stack.md` | Tools and versions (3.13) |
-| `06-testing.md` | Testing and evaluation (3.14) |
-| `07-ethics-privacy.md` | Ethics and data privacy (3.15) |
-| `08-decisions.md` | Decision log |
-| `09-owner-data.md` | Owner data template |
-| `10-sprint-plan.md` | Scrum phases and sprints |
-| `../CONTRIBUTING.md` | Git and review rules |
+| File                    | Content                                                                       |
+| ----------------------- | ----------------------------------------------------------------------------- |
+| `01-requirements.md`    | FR-01 to FR-50 and the NFR table                                              |
+| `02-architecture.md`    | Architecture (3.10, Figure 5)                                                 |
+| `03-erd.md`             | Entity relationship diagram (3.11, Figure 6)                                  |
+| `04-flowcharts.md`      | Flowcharts (3.12, Figures 7 to 10)                                            |
+| `05-tech-stack.md`      | Tools and versions (3.13)                                                     |
+| `06-testing.md`         | Testing and evaluation (3.14)                                                 |
+| `07-ethics-privacy.md`  | Ethics and data privacy (3.15)                                                |
+| `08-decisions.md`       | Decision log                                                                  |
+| `09-owner-data.md`      | Owner data template                                                           |
+| `10-sprint-plan.md`     | Scrum phases and sprints                                                      |
+| `11-ui-screens.md`      | Screen inventory, states, FR coverage                                         |
+| `12-ui-components.md`   | Component inventory on shadcn/ui, status badge treatments                     |
+| `13-ux-content-a11y.md` | Microcopy, chatbot voice, mobile and accessibility rules, UI review checklist |
+| `../DESIGN.md`          | Visual system (black, white and greys only)                                   |
+| `../CONTRIBUTING.md`    | Git and review rules                                                          |
 
 ## Open blockers
 
