@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     "build/**",
     // Not application code:
     ".agents/**",
+    "src/generated/**",
     "docs/**",
     "next-env.d.ts",
   ]),

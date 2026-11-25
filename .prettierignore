@@ -4,3 +4,4 @@ skills-lock.json
 .next
 node_modules
 next-env.d.ts
+src/generated
