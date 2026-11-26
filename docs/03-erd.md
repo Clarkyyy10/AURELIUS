@@ -1,6 +1,6 @@
 # Entity Relationship Diagram
 
-Source: manuscript Section 3.11 and Figure 6. The diagram is redrawn from the text and extended with the grill-me decisions. Entities and fields marked *(proposed)* come from the decision notes, not from the manuscript. Field lists are a starting point for the Prisma schema, not final.
+Source: manuscript Section 3.11 and Figure 6. The diagram is redrawn from the text and extended with the grill-me decisions. Entities and fields marked _(proposed)_ come from the decision notes, not from the manuscript. Field lists are a starting point for the Prisma schema, not final.
 
 ## Figure 6. ERD
 

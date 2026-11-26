@@ -45,10 +45,10 @@ in partial fulfillment of the requirements for Bachelor of Science in Informatio
 **PANEL OF EXAMINERS**
 
 | **Name** | **Role / Designation** | **Signature / Date** |
-| --- | --- | --- |
-|  |  |  |
-|  |  |  |
-|  |  |  |
+| -------- | ---------------------- | -------------------- |
+|          |                        |                      |
+|          |                        |                      |
+|          |                        |                      |
 
 Accepted in partial fulfillment of the requirements for the degree Bachelor of Science in Information Technology.
 
@@ -56,19 +56,19 @@ Accepted in partial fulfillment of the requirements for the degree Bachelor of S
 
 ## Acknowledgement
 
-*(Empty in the source document.)*
+_(Empty in the source document.)_
 
 ## Abstract
 
-*(Empty in the source document.)*
+_(Empty in the source document.)_
 
 ## List of Tables
 
-*(Empty in the source document.)*
+_(Empty in the source document.)_
 
 ## List of Figures
 
-*(Empty in the source document.)*
+_(Empty in the source document.)_
 
 ## Table of Contents
 
@@ -144,7 +144,7 @@ The project aims to address the following problems:
 - How can the system provide customers to browse jewelry products, place orders or custom-order requests, settle quotations and payments, and track their order status in one online platform?
 - How can the system present the available jewelry and watch services in a service catalog and allow customers to submit service requests with item details and service type, then track the progress of each request from drop-off to claiming?
 - How can the AI-powered chatbot guide customers in submitting service requests or custom-order details?
-Through these features, AURELIUS could reduce the owner’s manual workload, organize business records, improve communication between the store and its customers, and support a more efficient management of custom orders and jewelry and watch services.
+  Through these features, AURELIUS could reduce the owner’s manual workload, organize business records, improve communication between the store and its customers, and support a more efficient management of custom orders and jewelry and watch services.
 
 ### 1.3 Objectives of the Project
 
@@ -261,7 +261,7 @@ Jewelry and watch services such as cleaning, resizing, repair, and stone setting
 
 A large part of the owner's current workload comes from customers asking about the progress of their orders and repairs, and the literature on operational transparency explains why showing this progress matters. Analyzing 4.68 million parcel deliveries of the Cainiao Network, the logistics arm of Alibaba, whose customers could track each step of their delivery, Bray (2023) found that customers punished idle time late in the process more than idle time early in the process. Delivery service scores were higher when visible work activity was concentrated toward the end, which shows that customers are especially sensitive to how a service ends. Hwang et al. (2024) found that when customers could observe the labor and effort that a business put into their service, they felt more gratitude toward it, which raised the perceived value of the service and, in turn, their evaluation of the brand and their intention to purchase. This effect held even in ordinary commercial exchanges between customers and businesses.
 
-This theme supports the status tracking features of both the e-commerce and the service management modules of AURELIUS. In a jewelry or watch service, the work happens out of the customer's sight and often takes several days. The status stages used in the system turn that hidden work into visible progress: *received*, *under assessment*, *in progress*, *completed*, and *ready for claiming*. Based on the reviewed literature, this visibility is expected to reduce follow-up calls and messages to the owner, to make the store's reliability and responsiveness visible to customers, and to improve their perception of the value of the service.
+This theme supports the status tracking features of both the e-commerce and the service management modules of AURELIUS. In a jewelry or watch service, the work happens out of the customer's sight and often takes several days. The status stages used in the system turn that hidden work into visible progress: _received_, _under assessment_, _in progress_, _completed_, and _ready for claiming_. Based on the reviewed literature, this visibility is expected to reduce follow-up calls and messages to the owner, to make the store's reliability and responsiveness visible to customers, and to improve their perception of the value of the service.
 
 **AI-Powered Chatbots in Customer Service**
 
@@ -458,7 +458,7 @@ The proponents will use two research instruments: an interview guide and a syste
 - **Usability** – the degree to which the system can be used by its intended users to achieve their goals effectively, efficiently, and with satisfaction;
 - **Reliability** – the degree to which the system operates consistently and without failure under defined conditions; and
 - **Security** – the degree to which the system protects information and data so that unauthorized access, use, or modification is prevented.
-The remaining ISO/IEC 25010 characteristics, Compatibility and Maintainability, are not included in the questionnaire because they cannot be reliably judged by respondents through short-term use of the system. They are verified instead through compatibility testing across browsers and devices and through the owner’s user acceptance testing.
+  The remaining ISO/IEC 25010 characteristics, Compatibility and Maintainability, are not included in the questionnaire because they cannot be reliably judged by respondents through short-term use of the system. They are verified instead through compatibility testing across browsers and devices and through the owner’s user acceptance testing.
 
 Each item will be written as a declarative statement describing a specific system behavior or quality, and respondents will rate their agreement using a five-point Likert scale: 5 – Strongly Agree, 4 – Agree, 3 – Neutral, 2 – Disagree, and 1 – Strongly Disagree.
 
@@ -489,7 +489,7 @@ Data Handling. All data will be handled in accordance with the Data Privacy Act 
 To convert the perceptions of the respondents into quantitative measures, statistical analyses will be applied to the data collected from the system evaluation questionnaire. The statistical tools utilized in this study include:
 
 - **Frequency and Percentage Distribution:** Used to analyze the profile of the respondents and to summarize the distribution of responses across the Likert scale ratings. The formula is expressed as:
-P = (f / n) × 100
+  P = (f / n) × 100
 
 Where,
 
@@ -500,7 +500,7 @@ Where,
 **n** = is the total number of respondents, which is 30
 
 - **Weighted Arithmetic Mean (WAM):** Used to compute the average rating given by the respondents for every questionnaire item and ISO/IEC 25010 quality characteristic, accounting for the different weights assigned to the Likert scale options. The formula is expressed as:
-X̄ = Σ(f · w) / N
+  X̄ = Σ(f · w) / N
 
 **X̄** = Weighted Arithmetic Mean
 
@@ -516,13 +516,13 @@ The score of each quality characteristic will be computed as the mean of the wei
 
 **Table 1: Scale and Verbal Interpretation of the Weighted Mean**
 
-| **Scale / Weight** | **Statistical Range** | **Verbal Interpretation** |
-| --- | --- | --- |
-| 5 | 4.51 – 5.00 | Highly Acceptable (Strongly Agree) |
-| 4 | 3.51 – 4.50 | Acceptable (Agree) |
-| 3 | 2.51 – 3.50 | Moderately Acceptable (Neutral) |
-| 2 | 1.51 – 2.50 | Unacceptable (Disagree) |
-| 1 | 1.00 – 1.50 | Highly Unacceptable (Strongly Disagree) |
+| **Scale / Weight** | **Statistical Range** | **Verbal Interpretation**               |
+| ------------------ | --------------------- | --------------------------------------- |
+| 5                  | 4.51 – 5.00           | Highly Acceptable (Strongly Agree)      |
+| 4                  | 3.51 – 4.50           | Acceptable (Agree)                      |
+| 3                  | 2.51 – 3.50           | Moderately Acceptable (Neutral)         |
+| 2                  | 1.51 – 2.50           | Unacceptable (Disagree)                 |
+| 1                  | 1.00 – 1.50           | Highly Unacceptable (Strongly Disagree) |
 
 ### 3.9 System Requirements
 
@@ -530,102 +530,102 @@ The score of each quality characteristic will be computed as the mean of the wei
 
 **Table 2: Functional Requirements**
 
-| **ID** | **Functional Requirement** | **Priority** |
-| --- | --- | --- |
-| **MODULE 1 – 3D Design Customization** |  |  |
-| FR-01 | The system shall allow customers to select the jewelry material (e.g., gold, silver, stainless steel) from a predefined list set by the owner. | Must |
-| FR-02 | The system shall allow customers to select the jewelry color or finish (e.g., yellow gold, white gold, rose gold) from the available options. | Must |
-| FR-03 | The system shall allow customers to select the gemstone type, cut, and quantity from a predefined list set by the owner. | Must |
-| FR-04 | The system shall allow customers to select the jewelry size (e.g., ring size, bracelet length, necklace length) from the available options. | Must |
-| FR-05 | The system shall display the customized jewelry design in a 3D viewer that updates whenever the customer changes an option. | Must |
-| FR-06 | The system shall compute and display an estimated weight and price from the customer’s selected options and the rates configured by the owner and shall label them as estimates subject to the owner’s final confirmation. | Must |
-| FR-07 | The system shall allow customers to submit a custom order request with their design specifications for the owner’s review, either directly from the 3D viewer or through the e-commerce module. Both entry points shall create the same single request record. | Must |
-| FR-08 | The system shall allow the owner to review a submitted custom order request and to confirm, revise, or reject the final price and design before production. | Must |
-| FR-09 | The system shall allow the owner to request design revisions with written remarks and shall notify the customer of the requested changes. | Must |
-| FR-10 | The system shall allow the customer to view the owner’s revision remarks, adjust the design in the 3D viewer, and resubmit it for review. | Must |
-| FR-11 | The system shall allow the owner to approve a custom order design, after which the order proceeds to quotation and production. | Must |
-| **MODULE 2 – E-Commerce** |  |  |
-| FR-12 | The system shall allow customers to browse a catalog of jewelry products showing photos, descriptions, materials, and prices. | Must |
-| FR-13 | The system shall display an availability status for each product (available, made to order, or unavailable) and shall prevent orders for products marked unavailable. | Must |
-| FR-14 | The system shall allow customers to place an order for an available ready-made jewelry product. | Must |
-| FR-15 | The system shall allow the owner to issue a quotation for a customer’s order or custom-order request, specifying the final price, the down payment required (if any), and the expected completion date. | Must |
-| FR-16 | The system shall allow customers to view a quotation issued by the owner and to accept or decline it. | Must |
-| FR-17 | The system shall allow customers to submit payment details (amount, date, reference number) and upload an image of the proof of payment (e.g., receipt or transfer screenshot) for a down payment or full payment. | Must |
-| FR-18 | The system shall allow the owner to verify and record payments and outstanding balances for each order. | Must |
-| FR-19 | The system shall allow customers to track the status of their orders (e.g., pending, confirmed, in production, ready for claiming). | Must |
-| FR-20 | The system shall allow the owner to update the status of each order. | Must |
-| FR-21 | The system shall allow the owner to view, manage, and maintain records of all orders, quotations, and payments. | Must |
-| FR-22 | The system shall allow customers to cancel an order or custom-order request that has not yet been confirmed or started in production and shall notify the owner. Later cancellations are referred to the owner. | Should |
-| FR-23 | The system shall allow customers to view the history of their own orders, custom-order requests, quotations, and payments. | Should |
-| FR-24 | The system shall allow the owner to add, edit, hide, and remove products (photos, description, material, price, and availability status) through the administrator interface. | Must |
-| **MODULE 3 – Service Management Platform** |  |  |
-| FR-25 | The system shall display a service catalog listing the available jewelry and watch services (e.g., cleaning, polishing, resizing, repair, stone setting, restoration, engraving, casting, plating, ultrasonic cleaning) with descriptions. | Must |
-| FR-26 | The system shall allow customers to submit a service request specifying the item to be serviced, the type of service needed, and relevant item details. | Must |
-| FR-27 | The system shall allow the owner to review a submitted service request and issue a service quotation with the estimated cost, proposed procedure, and expected completion or retrieval date. | Must |
-| FR-28 | The system shall allow customers to view the service quotation and to accept or decline it before work begins. | Must |
-| FR-29 | The system shall allow the owner to record and update the progress status of each service request from drop-off to claiming (e.g., received, under assessment, in progress, completed, ready for claiming). | Must |
-| FR-30 | The system shall allow the owner to record the down payment collected at drop-off and the remaining balance to be settled upon claiming. | Must |
-| FR-31 | The system shall allow customers to track the status of their service requests. | Must |
-| FR-32 | The system shall allow the owner to view and manage records of all service requests, quotations, and payments. | Must |
-| FR-33 | The system shall allow customers to cancel a service request before the owner begins work on it and shall notify the owner. | Should |
-| FR-34 | The system shall allow the owner to add, edit, and hide service catalog entries (name and description) through the administrator interface. | Must |
-| **MODULE 4 – AI-Powered Chatbot** |  |  |
-| FR-35 | The system shall provide an AI-powered chatbot accessible to customers within the platform. | Must |
-| FR-36 | The chatbot shall guide customers in preparing a custom order request within the chat interface by asking about design preferences, materials, gemstones, and size, and shall present a pre-filled text draft summary in the chat that the customer reviews, edits, and confirms. The chatbot shall not automatically generate or modify 3D designs, nor shall it submit a request without the customer’s explicit confirmation in chat. | Must |
-| FR-37 | The chatbot shall guide customers in preparing a service request by asking about the item, the type of service needed, relevant details and the chatbot shall not submit a request without the customer’s confirmation. | Must |
-| FR-38 | The chatbot shall answer customer inquiries about the store’s available products, services, and service catalog. | Should |
-| FR-39 | The chatbot shall recognize when an inquiry falls outside its defined scope and shall refer the customer to the store owner. | Must |
-| FR-40 | The chatbot shall not provide binding quotations, final prices, or production commitments on behalf of the owner. | Must |
-| **GENERAL / ADMINISTRATION** |  |  |
-| FR-41 | The system shall require customers to register with a valid email address and contact number and to verify their email address through a confirmation link before placing orders or submitting requests. | Must |
-| FR-42 | The system shall require customers to log in with their credentials before using transactional features. | Must |
-| FR-43 | The system shall allow users to reset a forgotten password through a time-limited link sent to their registered email address. | Must |
-| FR-44 | The system shall allow customers to view and update their name and contact details and to change their password. | Should |
-| FR-45 | The system shall present a data privacy notice at registration and require the customer’s consent before personal data is collected. | Must |
-| FR-46 | The system shall provide the owner with a secure administrator account to manage products, services, orders, quotations, payments, and system settings. | Must |
-| FR-47 | The system shall allow the owner to configure the material, color, gemstone, and size options available in the 3D customization module, together with their associated rates. | Must |
-| FR-48 | The system shall maintain a transaction history for each customer, accessible to the owner, covering all orders, service requests, quotations, and payments. | Should |
-| FR-49 | The system shall notify customers through in-app notifications and email of key events: design revision requested, quotation issued, order or service status changed, and item ready for claiming. | Must |
-| FR-50 | The system shall notify the owner through in-app notifications of new orders, custom-order requests, service requests, and payment submissions. | Must |
+| **ID**                                     | **Functional Requirement**                                                                                                                                                                                                                                                                                                                                                                                                               | **Priority** |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| **MODULE 1 – 3D Design Customization**     |                                                                                                                                                                                                                                                                                                                                                                                                                                          |              |
+| FR-01                                      | The system shall allow customers to select the jewelry material (e.g., gold, silver, stainless steel) from a predefined list set by the owner.                                                                                                                                                                                                                                                                                           | Must         |
+| FR-02                                      | The system shall allow customers to select the jewelry color or finish (e.g., yellow gold, white gold, rose gold) from the available options.                                                                                                                                                                                                                                                                                            | Must         |
+| FR-03                                      | The system shall allow customers to select the gemstone type, cut, and quantity from a predefined list set by the owner.                                                                                                                                                                                                                                                                                                                 | Must         |
+| FR-04                                      | The system shall allow customers to select the jewelry size (e.g., ring size, bracelet length, necklace length) from the available options.                                                                                                                                                                                                                                                                                              | Must         |
+| FR-05                                      | The system shall display the customized jewelry design in a 3D viewer that updates whenever the customer changes an option.                                                                                                                                                                                                                                                                                                              | Must         |
+| FR-06                                      | The system shall compute and display an estimated weight and price from the customer’s selected options and the rates configured by the owner and shall label them as estimates subject to the owner’s final confirmation.                                                                                                                                                                                                               | Must         |
+| FR-07                                      | The system shall allow customers to submit a custom order request with their design specifications for the owner’s review, either directly from the 3D viewer or through the e-commerce module. Both entry points shall create the same single request record.                                                                                                                                                                           | Must         |
+| FR-08                                      | The system shall allow the owner to review a submitted custom order request and to confirm, revise, or reject the final price and design before production.                                                                                                                                                                                                                                                                              | Must         |
+| FR-09                                      | The system shall allow the owner to request design revisions with written remarks and shall notify the customer of the requested changes.                                                                                                                                                                                                                                                                                                | Must         |
+| FR-10                                      | The system shall allow the customer to view the owner’s revision remarks, adjust the design in the 3D viewer, and resubmit it for review.                                                                                                                                                                                                                                                                                                | Must         |
+| FR-11                                      | The system shall allow the owner to approve a custom order design, after which the order proceeds to quotation and production.                                                                                                                                                                                                                                                                                                           | Must         |
+| **MODULE 2 – E-Commerce**                  |                                                                                                                                                                                                                                                                                                                                                                                                                                          |              |
+| FR-12                                      | The system shall allow customers to browse a catalog of jewelry products showing photos, descriptions, materials, and prices.                                                                                                                                                                                                                                                                                                            | Must         |
+| FR-13                                      | The system shall display an availability status for each product (available, made to order, or unavailable) and shall prevent orders for products marked unavailable.                                                                                                                                                                                                                                                                    | Must         |
+| FR-14                                      | The system shall allow customers to place an order for an available ready-made jewelry product.                                                                                                                                                                                                                                                                                                                                          | Must         |
+| FR-15                                      | The system shall allow the owner to issue a quotation for a customer’s order or custom-order request, specifying the final price, the down payment required (if any), and the expected completion date.                                                                                                                                                                                                                                  | Must         |
+| FR-16                                      | The system shall allow customers to view a quotation issued by the owner and to accept or decline it.                                                                                                                                                                                                                                                                                                                                    | Must         |
+| FR-17                                      | The system shall allow customers to submit payment details (amount, date, reference number) and upload an image of the proof of payment (e.g., receipt or transfer screenshot) for a down payment or full payment.                                                                                                                                                                                                                       | Must         |
+| FR-18                                      | The system shall allow the owner to verify and record payments and outstanding balances for each order.                                                                                                                                                                                                                                                                                                                                  | Must         |
+| FR-19                                      | The system shall allow customers to track the status of their orders (e.g., pending, confirmed, in production, ready for claiming).                                                                                                                                                                                                                                                                                                      | Must         |
+| FR-20                                      | The system shall allow the owner to update the status of each order.                                                                                                                                                                                                                                                                                                                                                                     | Must         |
+| FR-21                                      | The system shall allow the owner to view, manage, and maintain records of all orders, quotations, and payments.                                                                                                                                                                                                                                                                                                                          | Must         |
+| FR-22                                      | The system shall allow customers to cancel an order or custom-order request that has not yet been confirmed or started in production and shall notify the owner. Later cancellations are referred to the owner.                                                                                                                                                                                                                          | Should       |
+| FR-23                                      | The system shall allow customers to view the history of their own orders, custom-order requests, quotations, and payments.                                                                                                                                                                                                                                                                                                               | Should       |
+| FR-24                                      | The system shall allow the owner to add, edit, hide, and remove products (photos, description, material, price, and availability status) through the administrator interface.                                                                                                                                                                                                                                                            | Must         |
+| **MODULE 3 – Service Management Platform** |                                                                                                                                                                                                                                                                                                                                                                                                                                          |              |
+| FR-25                                      | The system shall display a service catalog listing the available jewelry and watch services (e.g., cleaning, polishing, resizing, repair, stone setting, restoration, engraving, casting, plating, ultrasonic cleaning) with descriptions.                                                                                                                                                                                               | Must         |
+| FR-26                                      | The system shall allow customers to submit a service request specifying the item to be serviced, the type of service needed, and relevant item details.                                                                                                                                                                                                                                                                                  | Must         |
+| FR-27                                      | The system shall allow the owner to review a submitted service request and issue a service quotation with the estimated cost, proposed procedure, and expected completion or retrieval date.                                                                                                                                                                                                                                             | Must         |
+| FR-28                                      | The system shall allow customers to view the service quotation and to accept or decline it before work begins.                                                                                                                                                                                                                                                                                                                           | Must         |
+| FR-29                                      | The system shall allow the owner to record and update the progress status of each service request from drop-off to claiming (e.g., received, under assessment, in progress, completed, ready for claiming).                                                                                                                                                                                                                              | Must         |
+| FR-30                                      | The system shall allow the owner to record the down payment collected at drop-off and the remaining balance to be settled upon claiming.                                                                                                                                                                                                                                                                                                 | Must         |
+| FR-31                                      | The system shall allow customers to track the status of their service requests.                                                                                                                                                                                                                                                                                                                                                          | Must         |
+| FR-32                                      | The system shall allow the owner to view and manage records of all service requests, quotations, and payments.                                                                                                                                                                                                                                                                                                                           | Must         |
+| FR-33                                      | The system shall allow customers to cancel a service request before the owner begins work on it and shall notify the owner.                                                                                                                                                                                                                                                                                                              | Should       |
+| FR-34                                      | The system shall allow the owner to add, edit, and hide service catalog entries (name and description) through the administrator interface.                                                                                                                                                                                                                                                                                              | Must         |
+| **MODULE 4 – AI-Powered Chatbot**          |                                                                                                                                                                                                                                                                                                                                                                                                                                          |              |
+| FR-35                                      | The system shall provide an AI-powered chatbot accessible to customers within the platform.                                                                                                                                                                                                                                                                                                                                              | Must         |
+| FR-36                                      | The chatbot shall guide customers in preparing a custom order request within the chat interface by asking about design preferences, materials, gemstones, and size, and shall present a pre-filled text draft summary in the chat that the customer reviews, edits, and confirms. The chatbot shall not automatically generate or modify 3D designs, nor shall it submit a request without the customer’s explicit confirmation in chat. | Must         |
+| FR-37                                      | The chatbot shall guide customers in preparing a service request by asking about the item, the type of service needed, relevant details and the chatbot shall not submit a request without the customer’s confirmation.                                                                                                                                                                                                                  | Must         |
+| FR-38                                      | The chatbot shall answer customer inquiries about the store’s available products, services, and service catalog.                                                                                                                                                                                                                                                                                                                         | Should       |
+| FR-39                                      | The chatbot shall recognize when an inquiry falls outside its defined scope and shall refer the customer to the store owner.                                                                                                                                                                                                                                                                                                             | Must         |
+| FR-40                                      | The chatbot shall not provide binding quotations, final prices, or production commitments on behalf of the owner.                                                                                                                                                                                                                                                                                                                        | Must         |
+| **GENERAL / ADMINISTRATION**               |                                                                                                                                                                                                                                                                                                                                                                                                                                          |              |
+| FR-41                                      | The system shall require customers to register with a valid email address and contact number and to verify their email address through a confirmation link before placing orders or submitting requests.                                                                                                                                                                                                                                 | Must         |
+| FR-42                                      | The system shall require customers to log in with their credentials before using transactional features.                                                                                                                                                                                                                                                                                                                                 | Must         |
+| FR-43                                      | The system shall allow users to reset a forgotten password through a time-limited link sent to their registered email address.                                                                                                                                                                                                                                                                                                           | Must         |
+| FR-44                                      | The system shall allow customers to view and update their name and contact details and to change their password.                                                                                                                                                                                                                                                                                                                         | Should       |
+| FR-45                                      | The system shall present a data privacy notice at registration and require the customer’s consent before personal data is collected.                                                                                                                                                                                                                                                                                                     | Must         |
+| FR-46                                      | The system shall provide the owner with a secure administrator account to manage products, services, orders, quotations, payments, and system settings.                                                                                                                                                                                                                                                                                  | Must         |
+| FR-47                                      | The system shall allow the owner to configure the material, color, gemstone, and size options available in the 3D customization module, together with their associated rates.                                                                                                                                                                                                                                                            | Must         |
+| FR-48                                      | The system shall maintain a transaction history for each customer, accessible to the owner, covering all orders, service requests, quotations, and payments.                                                                                                                                                                                                                                                                             | Should       |
+| FR-49                                      | The system shall notify customers through in-app notifications and email of key events: design revision requested, quotation issued, order or service status changed, and item ready for claiming.                                                                                                                                                                                                                                       | Must         |
+| FR-50                                      | The system shall notify the owner through in-app notifications of new orders, custom-order requests, service requests, and payment submissions.                                                                                                                                                                                                                                                                                          | Must         |
 
 #### 3.9.2 Non-Functional Requirements
 
 **Table 3: Non-Functional Requirements**
 
-| **Category** | **Requirement / Metric** | **Target / Criterion** |
-| --- | --- | --- |
-| Functional Suitability | All Must-priority functional requirements shall be implemented and verifiable through test cases. | 100% of Must-priority test cases pass before system evaluation. Any Should-priority requirement not met is recorded in the backlog. |
-| Functional Suitability | The 3D viewer shall accurately reflect the customer's selected material, color, gemstone, and size options. | No discrepancy between the selected options and the 3D display across every available option value tested at least once. |
-| Functional Suitability | The estimated weight and price shall be computed from the formula and rates configured by the owner. | Computed price and weight equal the owner's manual computation with the same rates, rounded to the displayed precision (nearest peso for price, 0.01 g for weight), across at least 20 configurations covering all materials, gemstones, and sizes. Finished-piece weight remains an approximation, as stated in the limitations. |
-| Functional Suitability | The chatbot shall give correct and relevant responses within its defined scope. | At least 80% of responses to a test set of at least 50 queries are correct and relevant; 100% of out-of-scope queries are referred to the owner; no response presents an estimate as a final price or completion date. |
-| Performance Efficiency | Standard pages (product catalog, service catalog, order history) shall load within an acceptable time on a broadband connection. | Page load time ≤ 3 seconds (average of at least three runs). |
-| Performance Efficiency | Standard pages shall remain usable on a mobile data connection. | Page load time ≤ 5 seconds on a 4G mobile connection (average of at least three runs). |
-| Performance Efficiency | The 3D viewer shall load and respond within an acceptable time. | Initial load of the base model ≤ 5 seconds; display update ≤ 3 seconds per option change under normal conditions. |
-| Performance Efficiency | 3D model assets shall be optimized for web and mobile use. | Each 3D model file ≤ 5 MB. |
-| Performance Efficiency | The chatbot shall respond within an acceptable time. | Chatbot response time ≤ 5 seconds per message under normal conditions. |
-| Performance Efficiency | The system shall handle the expected number of concurrent users without degraded response or errors. | Remains functional and within the response time targets above with up to 30 simultaneous users. |
-| Usability | First-time customers shall be able to complete a custom order request and a service request without help beyond the chatbot's guidance. | At least 80% of customer respondents complete both task scenarios unaided during the evaluation. |
-| Usability | The owner shall be able to review and process orders, quotations, and service requests after the orientation session without developer assistance. | At least 80% of owner-group and business-owner respondents complete the owner task scenarios unaided. |
-| Usability | The system shall be rated acceptable for usability by respondents. | Usability characteristic mean (WAM) ≥ 3.51 ("Acceptable"). Any item with a mean below 3.51 is flagged for improvement. |
-| Usability | The interface and chatbot shall use clear, plain English, and error messages shall state what went wrong and how to correct it. | All user-facing text and error messages pass a review checklist. Filipino or Taglish input is outside the defined scope and is listed as a limitation. |
-| Reliability | The system shall be available during the evaluation period. | Uptime ≥ 95% during the evaluation period, excluding announced maintenance. |
-| Reliability | The system shall operate without critical failure during testing and evaluation. | No critical failure (core function inoperable or data lost) is recorded in the defect log during system testing and the evaluation period. |
-| Reliability | The system shall preserve the integrity of transaction records when a session ends unexpectedly. | When a submission is interrupted (browser closed, connection lost), the record is either saved completely or not saved; no partial or duplicate records are created. Tested on order, quotation, service request, and payment submissions. |
-| Reliability | All forms shall validate required fields and formats and shall display descriptive error messages. | 100% of defined validation rules are enforced with descriptive messages. |
-| Reliability | The system shall be recoverable after data loss. | Automated daily database backups retained for at least 7 days; one successful restore test performed before deployment. |
-| Security | Only authenticated users shall access the platform's transactional features. | Unauthenticated access to any protected page redirects to the login screen. |
-| Security | The administrator functions shall not be accessible to customer accounts, and customers shall not access other customers' records. | Role-based access control enforced in all modules, including direct URL and request manipulation. |
-| Security | Passwords shall be stored hashed and shall never be stored or transmitted in plaintext. | Industry-standard hashing algorithm (e.g., bcrypt) in use; minimum password length of 8 characters. |
-| Security | All form inputs shall be validated and sanitized on the server side. | No injection or cross-site scripting (XSS) vulnerability is found when tested against the OWASP Top 10 checklist and sample attack inputs. |
-| Security | All data transmission between the browser and the server shall be encrypted. | HTTPS enforced on all pages; HTTP requests redirect to HTTPS. |
-| Security | Sessions and login attempts shall be controlled. | Sessions expire after 30 minutes of inactivity and are invalidated on logout; login is temporarily blocked for 15 minutes after 5 consecutive failed attempts. |
-| Security | Uploaded proof-of-payment files shall be restricted and checked. | Only JPG, PNG, or PDF files up to 5 MB are accepted; type and size are checked on the server; uploaded files cannot be executed. |
-| Security | Personal data shall be handled in accordance with the Data Privacy Act of 2012 (RA 10173). | Only data needed for transactions is collected; consent is recorded at registration; personal data is visible only to the account holder and the owner. |
-| Compatibility | The system shall function correctly on the current and one previous major version of Google Chrome, Mozilla Firefox, Microsoft Edge, and Safari. | All core user flows pass functional testing on every target browser. |
-| Compatibility | The system shall be fully functional on mobile devices through a responsive layout. | All customer and owner workflows are completable on a smartphone screen of 360 px width or larger. |
-| Compatibility | The 3D viewer shall handle browsers or devices that lack WebGL support. | A clear message is shown instead of a blank viewer, and the design options remain usable. |
-| Maintainability | The code shall be organized into modules matching the four functional modules. | Each module's code is in a distinct directory or component group, documented in the system design. |
-| Maintainability | The owner shall be able to update products, services, and 3D customization options and rates without developer assistance. | All configurable content is manageable through the administrator interface without direct database or code changes. |
+| **Category**           | **Requirement / Metric**                                                                                                                           | **Target / Criterion**                                                                                                                                                                                                                                                                                                            |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Functional Suitability | All Must-priority functional requirements shall be implemented and verifiable through test cases.                                                  | 100% of Must-priority test cases pass before system evaluation. Any Should-priority requirement not met is recorded in the backlog.                                                                                                                                                                                               |
+| Functional Suitability | The 3D viewer shall accurately reflect the customer's selected material, color, gemstone, and size options.                                        | No discrepancy between the selected options and the 3D display across every available option value tested at least once.                                                                                                                                                                                                          |
+| Functional Suitability | The estimated weight and price shall be computed from the formula and rates configured by the owner.                                               | Computed price and weight equal the owner's manual computation with the same rates, rounded to the displayed precision (nearest peso for price, 0.01 g for weight), across at least 20 configurations covering all materials, gemstones, and sizes. Finished-piece weight remains an approximation, as stated in the limitations. |
+| Functional Suitability | The chatbot shall give correct and relevant responses within its defined scope.                                                                    | At least 80% of responses to a test set of at least 50 queries are correct and relevant; 100% of out-of-scope queries are referred to the owner; no response presents an estimate as a final price or completion date.                                                                                                            |
+| Performance Efficiency | Standard pages (product catalog, service catalog, order history) shall load within an acceptable time on a broadband connection.                   | Page load time ≤ 3 seconds (average of at least three runs).                                                                                                                                                                                                                                                                      |
+| Performance Efficiency | Standard pages shall remain usable on a mobile data connection.                                                                                    | Page load time ≤ 5 seconds on a 4G mobile connection (average of at least three runs).                                                                                                                                                                                                                                            |
+| Performance Efficiency | The 3D viewer shall load and respond within an acceptable time.                                                                                    | Initial load of the base model ≤ 5 seconds; display update ≤ 3 seconds per option change under normal conditions.                                                                                                                                                                                                                 |
+| Performance Efficiency | 3D model assets shall be optimized for web and mobile use.                                                                                         | Each 3D model file ≤ 5 MB.                                                                                                                                                                                                                                                                                                        |
+| Performance Efficiency | The chatbot shall respond within an acceptable time.                                                                                               | Chatbot response time ≤ 5 seconds per message under normal conditions.                                                                                                                                                                                                                                                            |
+| Performance Efficiency | The system shall handle the expected number of concurrent users without degraded response or errors.                                               | Remains functional and within the response time targets above with up to 30 simultaneous users.                                                                                                                                                                                                                                   |
+| Usability              | First-time customers shall be able to complete a custom order request and a service request without help beyond the chatbot's guidance.            | At least 80% of customer respondents complete both task scenarios unaided during the evaluation.                                                                                                                                                                                                                                  |
+| Usability              | The owner shall be able to review and process orders, quotations, and service requests after the orientation session without developer assistance. | At least 80% of owner-group and business-owner respondents complete the owner task scenarios unaided.                                                                                                                                                                                                                             |
+| Usability              | The system shall be rated acceptable for usability by respondents.                                                                                 | Usability characteristic mean (WAM) ≥ 3.51 ("Acceptable"). Any item with a mean below 3.51 is flagged for improvement.                                                                                                                                                                                                            |
+| Usability              | The interface and chatbot shall use clear, plain English, and error messages shall state what went wrong and how to correct it.                    | All user-facing text and error messages pass a review checklist. Filipino or Taglish input is outside the defined scope and is listed as a limitation.                                                                                                                                                                            |
+| Reliability            | The system shall be available during the evaluation period.                                                                                        | Uptime ≥ 95% during the evaluation period, excluding announced maintenance.                                                                                                                                                                                                                                                       |
+| Reliability            | The system shall operate without critical failure during testing and evaluation.                                                                   | No critical failure (core function inoperable or data lost) is recorded in the defect log during system testing and the evaluation period.                                                                                                                                                                                        |
+| Reliability            | The system shall preserve the integrity of transaction records when a session ends unexpectedly.                                                   | When a submission is interrupted (browser closed, connection lost), the record is either saved completely or not saved; no partial or duplicate records are created. Tested on order, quotation, service request, and payment submissions.                                                                                        |
+| Reliability            | All forms shall validate required fields and formats and shall display descriptive error messages.                                                 | 100% of defined validation rules are enforced with descriptive messages.                                                                                                                                                                                                                                                          |
+| Reliability            | The system shall be recoverable after data loss.                                                                                                   | Automated daily database backups retained for at least 7 days; one successful restore test performed before deployment.                                                                                                                                                                                                           |
+| Security               | Only authenticated users shall access the platform's transactional features.                                                                       | Unauthenticated access to any protected page redirects to the login screen.                                                                                                                                                                                                                                                       |
+| Security               | The administrator functions shall not be accessible to customer accounts, and customers shall not access other customers' records.                 | Role-based access control enforced in all modules, including direct URL and request manipulation.                                                                                                                                                                                                                                 |
+| Security               | Passwords shall be stored hashed and shall never be stored or transmitted in plaintext.                                                            | Industry-standard hashing algorithm (e.g., bcrypt) in use; minimum password length of 8 characters.                                                                                                                                                                                                                               |
+| Security               | All form inputs shall be validated and sanitized on the server side.                                                                               | No injection or cross-site scripting (XSS) vulnerability is found when tested against the OWASP Top 10 checklist and sample attack inputs.                                                                                                                                                                                        |
+| Security               | All data transmission between the browser and the server shall be encrypted.                                                                       | HTTPS enforced on all pages; HTTP requests redirect to HTTPS.                                                                                                                                                                                                                                                                     |
+| Security               | Sessions and login attempts shall be controlled.                                                                                                   | Sessions expire after 30 minutes of inactivity and are invalidated on logout; login is temporarily blocked for 15 minutes after 5 consecutive failed attempts.                                                                                                                                                                    |
+| Security               | Uploaded proof-of-payment files shall be restricted and checked.                                                                                   | Only JPG, PNG, or PDF files up to 5 MB are accepted; type and size are checked on the server; uploaded files cannot be executed.                                                                                                                                                                                                  |
+| Security               | Personal data shall be handled in accordance with the Data Privacy Act of 2012 (RA 10173).                                                         | Only data needed for transactions is collected; consent is recorded at registration; personal data is visible only to the account holder and the owner.                                                                                                                                                                           |
+| Compatibility          | The system shall function correctly on the current and one previous major version of Google Chrome, Mozilla Firefox, Microsoft Edge, and Safari.   | All core user flows pass functional testing on every target browser.                                                                                                                                                                                                                                                              |
+| Compatibility          | The system shall be fully functional on mobile devices through a responsive layout.                                                                | All customer and owner workflows are completable on a smartphone screen of 360 px width or larger.                                                                                                                                                                                                                                |
+| Compatibility          | The 3D viewer shall handle browsers or devices that lack WebGL support.                                                                            | A clear message is shown instead of a blank viewer, and the design options remain usable.                                                                                                                                                                                                                                         |
+| Maintainability        | The code shall be organized into modules matching the four functional modules.                                                                     | Each module's code is in a distinct directory or component group, documented in the system design.                                                                                                                                                                                                                                |
+| Maintainability        | The owner shall be able to update products, services, and 3D customization options and rates without developer assistance.                         | All configurable content is manageable through the administrator interface without direct database or code changes.                                                                                                                                                                                                               |
 
 ### 3.10 System Architecture
 
@@ -693,27 +693,27 @@ The System Flowchart presents a step-by-step visualization of the operational lo
 
 **Table 4: Development Tools and Technologies**
 
-| **Technology / Tool** | **Version  (tentative, as of  Nov 2026)** | **Purpose / Justification** |
-| --- | --- | --- |
-| Next.js (App Router) | 16.4 | Next.js is a full stack React framework. It serves web pages and API routes in one project. It uses Turbopack for fast builds. It deploys directly to Vercel. |
-| React | 19.3 | React is a component-based user interface library. It builds each module as reusable components. It supports a responsive interface for desktop and mobile devices. |
-| TypeScript | 5.9 | TypeScript adds type checks to JavaScript. It finds errors before runtime. It makes code easy to maintain for a team of five members. |
-| Tailwind CSS + shadcn/ui | 4 / 4.23.0 | Tailwind CSS is a utility-first styling framework. shadcn/ui gives pre-built accessible components. Together they give fast, consistent, and responsive design. |
-| Three.js + React Three Fiber + Drei | r187 / 9 / 10.7.7 | Three.js renders 3D graphics in the browser with WebGL. React Three Fiber connects Three.js to React. Drei gives controls and lighting. The viewer updates when the user changes material, color, gemstone, or size. |
-| Node.js | 22 LTS | Node.js is the runtime for the Next.js backend. It uses JavaScript on the server. It lets the team use one language for the frontend and the backend. |
-| PostgreSQL via Supabase | 16 | PostgreSQL is a relational database. It stores customers, orders, quotations, payments, and service requests. It uses transactions to keep balances correct. |
-| Prisma ORM | 6 | Prisma is a type-safe layer between Next.js and PostgreSQL. It uses parameterized queries to prevent SQL injection. It keeps the database schema in sync with the entity-relationship diagram. |
-| Supabase Auth + Storage | — | Supabase Auth manages email verification, password reset, login sessions, and user roles. Supabase Storage holds proof-of-payment files. It accepts JPG, PNG, and PDF files up to 5 MB. |
-| Cloudflare Turnstile | — | Cloudflare Turnstile is a bot protection service. It verifies users on login, registration, and password reset forms. It blocks automated abuse and spam. It shows no puzzle to most users. |
-| Google Gemini API (Gemini 2.5 Flash) | API | Gemini 2.5 Flash is a free-tier AI model. It powers the chatbot through a Next.js API route. The API key stays on the server. The chatbot uses only approved store data. It does not give final prices. |
-| pnpm | 12.x | pnpm is a fast package manager. It shares packages to save disk space. It works well on low-spec laptops. It works with Vercel builds. |
-| ESLint + Prettier + Husky | 9 / 3 | ESLint finds code errors. Prettier formats code automatically. Husky runs these checks before each commit. Together they keep code style consistent for all team members. |
-| Git + GitHub + GitHub Actions | — | Git controls versions of the code. GitHub stores the code and supports teamwork. GitHub Actions runs lint, type-check, and build checks on each push. |
-| Visual Studio Code | 1.x | Visual Studio Code is the main code editor. It has extensions for Next.js, TypeScript, Prisma, and Tailwind CSS. It is light and fast. |
-| Resend | — | Resend sends transactional email. It sends quotations, status changes, and ready-for-claiming notices. It works with Next.js API routes. |
-| React Hook Form + Zod | 4.x | React Hook Form manages order and service forms. Zod validates input on the server. Together they stop invalid data before it is saved. |
-| Vitest + Playwright | 3.x / 1.65.1 | Vitest tests components and API logic. Playwright tests the system in real browsers. Together they check key flows such as order placement and service tracking. |
-| Vercel | — | Vercel hosts the Next.js application. It gives HTTPS by default. It deploys automatically from GitHub. Its free tier supports development and evaluation. |
+| **Technology / Tool**                | **Version (tentative, as of Nov 2026)** | **Purpose / Justification**                                                                                                                                                                                          |
+| ------------------------------------ | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Next.js (App Router)                 | 16.4                                    | Next.js is a full stack React framework. It serves web pages and API routes in one project. It uses Turbopack for fast builds. It deploys directly to Vercel.                                                        |
+| React                                | 19.3                                    | React is a component-based user interface library. It builds each module as reusable components. It supports a responsive interface for desktop and mobile devices.                                                  |
+| TypeScript                           | 5.9                                     | TypeScript adds type checks to JavaScript. It finds errors before runtime. It makes code easy to maintain for a team of five members.                                                                                |
+| Tailwind CSS + shadcn/ui             | 4 / 4.23.0                              | Tailwind CSS is a utility-first styling framework. shadcn/ui gives pre-built accessible components. Together they give fast, consistent, and responsive design.                                                      |
+| Three.js + React Three Fiber + Drei  | r187 / 9 / 10.7.7                       | Three.js renders 3D graphics in the browser with WebGL. React Three Fiber connects Three.js to React. Drei gives controls and lighting. The viewer updates when the user changes material, color, gemstone, or size. |
+| Node.js                              | 22 LTS                                  | Node.js is the runtime for the Next.js backend. It uses JavaScript on the server. It lets the team use one language for the frontend and the backend.                                                                |
+| PostgreSQL via Supabase              | 16                                      | PostgreSQL is a relational database. It stores customers, orders, quotations, payments, and service requests. It uses transactions to keep balances correct.                                                         |
+| Prisma ORM                           | 6                                       | Prisma is a type-safe layer between Next.js and PostgreSQL. It uses parameterized queries to prevent SQL injection. It keeps the database schema in sync with the entity-relationship diagram.                       |
+| Supabase Auth + Storage              | —                                       | Supabase Auth manages email verification, password reset, login sessions, and user roles. Supabase Storage holds proof-of-payment files. It accepts JPG, PNG, and PDF files up to 5 MB.                              |
+| Cloudflare Turnstile                 | —                                       | Cloudflare Turnstile is a bot protection service. It verifies users on login, registration, and password reset forms. It blocks automated abuse and spam. It shows no puzzle to most users.                          |
+| Google Gemini API (Gemini 2.5 Flash) | API                                     | Gemini 2.5 Flash is a free-tier AI model. It powers the chatbot through a Next.js API route. The API key stays on the server. The chatbot uses only approved store data. It does not give final prices.              |
+| pnpm                                 | 12.x                                    | pnpm is a fast package manager. It shares packages to save disk space. It works well on low-spec laptops. It works with Vercel builds.                                                                               |
+| ESLint + Prettier + Husky            | 9 / 3                                   | ESLint finds code errors. Prettier formats code automatically. Husky runs these checks before each commit. Together they keep code style consistent for all team members.                                            |
+| Git + GitHub + GitHub Actions        | —                                       | Git controls versions of the code. GitHub stores the code and supports teamwork. GitHub Actions runs lint, type-check, and build checks on each push.                                                                |
+| Visual Studio Code                   | 1.x                                     | Visual Studio Code is the main code editor. It has extensions for Next.js, TypeScript, Prisma, and Tailwind CSS. It is light and fast.                                                                               |
+| Resend                               | —                                       | Resend sends transactional email. It sends quotations, status changes, and ready-for-claiming notices. It works with Next.js API routes.                                                                             |
+| React Hook Form + Zod                | 4.x                                     | React Hook Form manages order and service forms. Zod validates input on the server. Together they stop invalid data before it is saved.                                                                              |
+| Vitest + Playwright                  | 3.x / 1.65.1                            | Vitest tests components and API logic. Playwright tests the system in real browsers. Together they check key flows such as order placement and service tracking.                                                     |
+| Vercel                               | —                                       | Vercel hosts the Next.js application. It gives HTTPS by default. It deploys automatically from GitHub. Its free tier supports development and evaluation.                                                            |
 
 ### 3.14 Testing and Evaluation Procedures
 
@@ -723,18 +723,18 @@ The test strategy covers unit, integration, functional, system, usability, perfo
 
 **Table 5. Summary of Test Types and Criteria**
 
-| **Test type** | **What it verifies** | **Pass criterion** |
-| --- | --- | --- |
-| Unit | One small part of the code: form validation, price estimates, status updates, role access rules | All unit test cases pass |
-| Integration | Two or more parts working as one flow: Next.js with Supabase, file upload to Supabase Storage | All integration test cases pass; run in each sprint |
-| Functional | Each key user flow, from start to end, in a real browser | Every test case matches its stated expected result |
-| System | All four modules working as one system | 100% of Must-priority test cases pass before the evaluation |
-| Usability | Whether users finish task scenarios without help | At least 80% of participants complete the scenarios unaided; every message states the problem and the fix |
-| Performance | Load time, response time, model size, concurrent users | Every target in Table 7 is met |
-| Security | Access control, passwords, sessions, input handling, uploads, transport | No injection or cross-site scripting flaw; all unauthorized access attempts refused |
-| Compatibility | Four browsers, smartphone screens, WebGL fallback | All core flows pass in each browser |
-| Reliability | Uptime, record integrity, validation, backup and restore | Uptime of at least 95%; no critical failure; no partial or duplicate records |
-| User acceptance | The owner's administrator tasks in the live workflow | The owner accepts the build |
+| **Test type**   | **What it verifies**                                                                            | **Pass criterion**                                                                                        |
+| --------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Unit            | One small part of the code: form validation, price estimates, status updates, role access rules | All unit test cases pass                                                                                  |
+| Integration     | Two or more parts working as one flow: Next.js with Supabase, file upload to Supabase Storage   | All integration test cases pass; run in each sprint                                                       |
+| Functional      | Each key user flow, from start to end, in a real browser                                        | Every test case matches its stated expected result                                                        |
+| System          | All four modules working as one system                                                          | 100% of Must-priority test cases pass before the evaluation                                               |
+| Usability       | Whether users finish task scenarios without help                                                | At least 80% of participants complete the scenarios unaided; every message states the problem and the fix |
+| Performance     | Load time, response time, model size, concurrent users                                          | Every target in Table 7 is met                                                                            |
+| Security        | Access control, passwords, sessions, input handling, uploads, transport                         | No injection or cross-site scripting flaw; all unauthorized access attempts refused                       |
+| Compatibility   | Four browsers, smartphone screens, WebGL fallback                                               | All core flows pass in each browser                                                                       |
+| Reliability     | Uptime, record integrity, validation, backup and restore                                        | Uptime of at least 95%; no critical failure; no partial or duplicate records                              |
+| User acceptance | The owner's administrator tasks in the live workflow                                            | The owner accepts the build                                                                               |
 
 **Unit Testing and Integration Testing**
 
@@ -750,18 +750,18 @@ After all, four modules are complete, the proponents will run system testing. Sy
 
 **Table 6. Test Cases for Key Flows**
 
-| **Test case** | **Flow** | **Expected result** |
-| --- | --- | --- |
-| TC-01 | Registration and login | The user registers, verifies the email, and logs in. Cloudflare Turnstile checks each authentication form. |
-| TC-02 | 3D design change | The viewer updates at once when the user changes the material, color, gemstone, or size. The display matches the selected options. |
-| TC-03 | Price and weight estimate | The estimate matches the manual computation with the same rates. The price rounds to the nearest peso and the weight to 0.01 g. The test covers at least 20 configurations. |
-| TC-04 | Order and quotation | The customer submits an order. The owner issues a quotation. The customer accepts or declines the quotation. |
-| TC-05 | Payment proof upload | The system accepts a JPG, PNG, or PDF file up to 5 MB. The system rejects other file types and larger files. |
-| TC-06 | Service request and tracking | The customer submits a service request. The owner updates the status. The customer sees the new status. |
-| TC-07 | Chatbot, in-scope question | The chatbot gives a correct and relevant answer. At least 80 percent of at least 50 test queries pass. |
-| TC-08 | Chatbot, out-of-scope question | The chatbot refers the customer to the owner. It gives no final price and no completion date. All out-of-scope queries pass. |
-| TC-09 | Owner administration | The owner adds, edits, and hides products, services, and 3D options and rates without developer help. |
-| TC-10 | Access control | A customer cannot open the record of another customer. The test also tries direct URL access and request changes. |
+| **Test case** | **Flow**                       | **Expected result**                                                                                                                                                         |
+| ------------- | ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| TC-01         | Registration and login         | The user registers, verifies the email, and logs in. Cloudflare Turnstile checks each authentication form.                                                                  |
+| TC-02         | 3D design change               | The viewer updates at once when the user changes the material, color, gemstone, or size. The display matches the selected options.                                          |
+| TC-03         | Price and weight estimate      | The estimate matches the manual computation with the same rates. The price rounds to the nearest peso and the weight to 0.01 g. The test covers at least 20 configurations. |
+| TC-04         | Order and quotation            | The customer submits an order. The owner issues a quotation. The customer accepts or declines the quotation.                                                                |
+| TC-05         | Payment proof upload           | The system accepts a JPG, PNG, or PDF file up to 5 MB. The system rejects other file types and larger files.                                                                |
+| TC-06         | Service request and tracking   | The customer submits a service request. The owner updates the status. The customer sees the new status.                                                                     |
+| TC-07         | Chatbot, in-scope question     | The chatbot gives a correct and relevant answer. At least 80 percent of at least 50 test queries pass.                                                                      |
+| TC-08         | Chatbot, out-of-scope question | The chatbot refers the customer to the owner. It gives no final price and no completion date. All out-of-scope queries pass.                                                |
+| TC-09         | Owner administration           | The owner adds, edits, and hides products, services, and 3D options and rates without developer help.                                                                       |
+| TC-10         | Access control                 | A customer cannot open the record of another customer. The test also tries direct URL access and request changes.                                                           |
 
 For each test case, the proponents will record the actual result and the status in the test log. The status is either Pass or Fail. Chapter 4 will report the full test case table with the actual results.
 
@@ -779,15 +779,15 @@ The proponents will measure load time and response time on a low-spec laptop and
 
 **Table 7. Performance Targets**
 
-| **Measure** | **Target** |
-| --- | --- |
-| Standard page load, broadband | 3 seconds or less |
-| Standard page load, 4G mobile data | 5 seconds or less |
-| 3D viewer, first load of the base model | 5 seconds or less |
-| 3D viewer, display update per option change | 3 seconds or less |
-| 3D model file size | 5 MB or less per file |
-| Chatbot response time per message | 5 seconds or less |
-| Concurrent users | The system stays within the targets above with up to 30 users at the same time |
+| **Measure**                                 | **Target**                                                                     |
+| ------------------------------------------- | ------------------------------------------------------------------------------ |
+| Standard page load, broadband               | 3 seconds or less                                                              |
+| Standard page load, 4G mobile data          | 5 seconds or less                                                              |
+| 3D viewer, first load of the base model     | 5 seconds or less                                                              |
+| 3D viewer, display update per option change | 3 seconds or less                                                              |
+| 3D model file size                          | 5 MB or less per file                                                          |
+| Chatbot response time per message           | 5 seconds or less                                                              |
+| Concurrent users                            | The system stays within the targets above with up to 30 users at the same time |
 
 **Security Testing**
 
@@ -800,7 +800,7 @@ The tests will check the password rules:
 - Sessions end after 30 minutes without activity and at logout.
 - Login is blocked for 15 minutes after 5 failed attempts in a row.
 - Cloudflare Turnstile protects the login, registration, and password reset forms.
-The proponents will test all form inputs on the server using the OWASP Top 10 checklist and sample attack inputs. No injection flaw and no cross-site scripting flaw may remain. The system must use HTTPS on all pages, and HTTP requests must move to HTTPS. Upload tests will check the file type and file size on the server, and uploaded files must not be able to run as code.
+  The proponents will test all form inputs on the server using the OWASP Top 10 checklist and sample attack inputs. No injection flaw and no cross-site scripting flaw may remain. The system must use HTTPS on all pages, and HTTP requests must move to HTTPS. Upload tests will check the file type and file size on the server, and uploaded files must not be able to run as code.
 
 **Compatibility Testing**
 
@@ -840,23 +840,23 @@ The evaluation uses 30 respondents, selected by purposive sampling as stated in 
 
 **Table 8. Respondent Groups**
 
-| **Respondent group** | **Count** | **What the group rates** |
-| --- | --- | --- |
-| Store owner and family | 5 | Fit of the system with the day-to-day work of the store |
-| Customers | 20 | Usability, clarity of the 3D viewer, ease of ordering, service tracking, and help from the chatbot |
-| Business owners | 5 | Use of the system for a small, owner-run business that handles orders, services, and payments |
+| **Respondent group**   | **Count** | **What the group rates**                                                                           |
+| ---------------------- | --------- | -------------------------------------------------------------------------------------------------- |
+| Store owner and family | 5         | Fit of the system with the day-to-day work of the store                                            |
+| Customers              | 20        | Usability, clarity of the 3D viewer, ease of ordering, service tracking, and help from the chatbot |
+| Business owners        | 5         | Use of the system for a small, owner-run business that handles orders, services, and payments      |
 
 The questionnaire uses a 5-point Likert scale. A rating of 5 means Strongly Agree and a rating of 1 means Strongly Disagree. It rates five criteria from the ISO/IEC 25010 model in Section 3.6.
 
 **Table 9. Evaluation Criteria**
 
-| **Criterion** | **What the respondent rates** |
-| --- | --- |
-| Functional Suitability | The system gives the functions that the owner and the customers need. |
-| Performance Efficiency | The system responds within a proper time under normal use. |
-| Usability | Users can learn the system and use it with ease and satisfaction. |
-| Reliability | The system works in a steady way and without failure under set conditions. |
-| Security | The system protects data and blocks access, use, or change without permission. |
+| **Criterion**          | **What the respondent rates**                                                  |
+| ---------------------- | ------------------------------------------------------------------------------ |
+| Functional Suitability | The system gives the functions that the owner and the customers need.          |
+| Performance Efficiency | The system responds within a proper time under normal use.                     |
+| Usability              | Users can learn the system and use it with ease and satisfaction.              |
+| Reliability            | The system works in a steady way and without failure under set conditions.     |
+| Security               | The system protects data and blocks access, use, or change without permission. |
 
 Compatibility and Maintainability are not in the questionnaire because respondents cannot judge these two traits in short use. The proponents will verify Compatibility through the tests in Section 3.14.6 and both traits through the owner acceptance test in Section 3.14.8.
 
@@ -876,16 +876,16 @@ The safeguards cover eight points: informed consent, voluntary participation, co
 
 **Table 10. Summary of Ethical Safeguards**
 
-| **Safeguard** | **Main measure** | **Section** |
-| --- | --- | --- |
-| Informed consent | Written consent from each respondent before the test; data privacy notice and consent at registration | 3.15.1 |
-| Voluntary participation | Respondents may stop or skip any question at any time without penalty | 3.15.2 |
-| Permissions | Written consent of the store owner; permission before audio recording | 3.15.3 |
-| Confidentiality | Anonymous questionnaire with respondent codes R01 to R30; group results only | 3.15.4 |
-| Access control | Only the proponents and the capstone adviser access raw data; role-based access in the system | 3.15.5 |
-| Data minimization | Only data that the study and the system need | 3.15.6 |
-| Retention and disposal | Study data kept only until the study is complete; test data deleted after testing | 3.15.9 |
-| Legal compliance | Compliance with the Data Privacy Act of 2012 (Republic Act No. 10173) | 3.15.10 |
+| **Safeguard**           | **Main measure**                                                                                      | **Section** |
+| ----------------------- | ----------------------------------------------------------------------------------------------------- | ----------- |
+| Informed consent        | Written consent from each respondent before the test; data privacy notice and consent at registration | 3.15.1      |
+| Voluntary participation | Respondents may stop or skip any question at any time without penalty                                 | 3.15.2      |
+| Permissions             | Written consent of the store owner; permission before audio recording                                 | 3.15.3      |
+| Confidentiality         | Anonymous questionnaire with respondent codes R01 to R30; group results only                          | 3.15.4      |
+| Access control          | Only the proponents and the capstone adviser access raw data; role-based access in the system         | 3.15.5      |
+| Data minimization       | Only data that the study and the system need                                                          | 3.15.6      |
+| Retention and disposal  | Study data kept only until the study is complete; test data deleted after testing                     | 3.15.9      |
+| Legal compliance        | Compliance with the Data Privacy Act of 2012 (Republic Act No. 10173)                                 | 3.15.10     |
 
 **Informed Consent**
 
@@ -904,7 +904,7 @@ The proponents will first get the written consent of the store owner. The consen
 - The owner agrees to take part in the study.
 - The owner allows observation of store operations.
 - The owner allows review of store records.
-The proponents will ask permission before they record audio in the interview, and they will use the recording only for the study. They will give the same study information to the family members, the customers, and the business owners in the evaluation. Each person gives consent before answering the questionnaire.
+  The proponents will ask permission before they record audio in the interview, and they will use the recording only for the study. They will give the same study information to the family members, the customers, and the business owners in the evaluation. Each person gives consent before answering the questionnaire.
 
 **Confidentiality and Anonymity**
 

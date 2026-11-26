@@ -53,6 +53,7 @@ Source: grill-me session on `aurelius-final-manuscript.md`. The manuscript is a 
 ## 4. Functional requirements (Table 2)
 
 **Module 1: 3D customization**
+
 - N1, N96, N97: Name ring types. Reword FR-01 to FR-05. Materials, karats and metals come from the owner's price references. Gemstones come from an owner-approved list with stone slots per ring style. FR-04 drops necklace and bracelet length.
 - N5: Weight and price formula. Metal weight = parametric volume x density. Gemstone weight from an owner-maintained lookup. Price = metal + stones + labor + finishing, itemized.
 - N6, N11: FR-08, FR-11, FR-15 conflict on where the final price is set. Final price exists only in the quotation. FR-08 confirms or revises design and estimate only. Custom order statuses: Draft, Submitted, Under review, Design approved, Quotation issued, Quotation accepted, Down payment verified, In production, Ready for claiming, Claimed (and Unclaimed, owner's discretion). A declined quotation ends the order.
@@ -62,6 +63,7 @@ Source: grill-me session on `aurelius-final-manuscript.md`. The manuscript is a 
 - N107: Owner may attach in-store photos (JPG/PNG, 5 MB, owner-only, private storage). Customers cannot upload reference images.
 
 **Module 2: E-commerce**
+
 - N44, N45, N46, N47, N48: Products have stock quantity (usually 1). Stock 0 sets "unavailable" automatically. An owner-confirmed order reserves a unit. Ready-made orders use the listed price and skip the quotation. Reservation expires after an owner-set deadline and the owner can extend it. Made-to-order products have no limit. FR-13, FR-14, FR-15, FR-19, FR-24 change. The ready-made status sequence is undefined. **Open**
 - N81: FR-24 and FR-47: "archive" replaces "remove." Options, products and services are never hard-deleted.
 - N19, N20: FR-17 and FR-30 reworded. Online proof applies to transfers and in-store entry applies to cash. Payment account settings and the refund policy are shown on the quotation page.
@@ -72,10 +74,12 @@ Source: grill-me session on `aurelius-final-manuscript.md`. The manuscript is a 
 - N85, N86, N87, N88, N90: Claim code on the order page and email. Owner checks code and ID. A representative needs code, written authorization and own ID. Owner records recipient, date and balance paid. Warn and require confirmation if balance is not zero. Unclaimed-item period (e.g. 30 days) with reminders, then "Unclaimed, owner's discretion." Owner-created profiles use the same release record without a code. The code must be unguessable and unique.
 
 **Module 3: Services**
+
 - N15, N16: Service sequence: Submitted, Received, Under assessment, Quotation issued, Quotation accepted, Down payment verified, In progress, Completed, Ready for claiming, Claimed. Declined branch: Quotation declined, "Declined, item to be returned," Claimed. Preliminary estimate range is optional and non-binding. Only the post-inspection quotation is binding.
 - N14: FR-37 draft-then-submit pattern assumed but not confirmed. **Open**
 
 **Module 4: Chatbot**
+
 - N8, N9, N12: Chatbot fills the viewer's option fields (type, material, color, gemstone, size) from owner-configured options plus free-text notes. Confirmation in chat saves a Draft only. Submission needs a second explicit confirmation or a viewer submit. The bar on touching designs applies to geometry only. Draft is visible only to the customer. No owner notification until submission.
 - N39, N43: Accepts English, Filipino and Taglish. Replies in the customer's language. The interface stays in English. Draft fields use English option names. Scope detection must work in all three. Remove "Filipino or Taglish out of scope" from the NFR.
 - N100, N103: Chatbot recognizes unsupported pieces, says the platform covers rings only, and refers to the store.
@@ -83,6 +87,7 @@ Source: grill-me session on `aurelius-final-manuscript.md`. The manuscript is a 
 - N53, N54, N55: Transcripts linked to the customer, kept 90 days, visible to owner and account holder. Per-customer hourly rate limit and maximum message length. Privacy notice says the owner can read transcripts.
 
 **General / administration**
+
 - N30, N31, N33: Owner can create customer profiles (name and contact number only, no login), and orders and requests for them. Linking to a later account is manual, never automatic. FR-41, FR-42 get an exception. Consent for these profiles is undefined. **Open**
 - N67, N68, N69: Owner account created by proponents at handover. Public registration cannot produce an owner. Role field not client-writable. Owner requires TOTP two-factor. Recovery by recovery email and one-time backup codes on paper. Lost-device requirement missing. **Open**
 - N47: FR-47 gains payment account settings, refund policy, quotation validity, reservation deadline, unclaimed-item period, Store Information and FAQ.
@@ -134,6 +139,7 @@ Source: grill-me session on `aurelius-final-manuscript.md`. The manuscript is a 
 ## 9. Open items
 
 **Owner interview**
+
 - N7: Real order of design approval, price agreement and down payment.
 - N17: Does the owner quote without seeing the item? Inspection fee on a decline?
 - N23: Which payment channels? Is GCash the main one?
@@ -149,11 +155,13 @@ Source: grill-me session on `aurelius-final-manuscript.md`. The manuscript is a 
 - N5, N97: Owner's pricing method, plus materials, karats and stone lists.
 
 **Ask Sir Jonas**
+
 - N64, N65: Deadline and what Capstone 1 must deliver.
 - N112: Confirm the 3-month support period.
 - N111: School policy on ownership of capstone work.
 
 **Team decisions**
+
 - N13, N14: Draft retention and deletion for custom and service drafts.
 - N24: Reuse of a reference number after a Rejected proof.
 - N33: Manual-match rule details for profile linking.
@@ -172,6 +180,7 @@ Source: grill-me session on `aurelius-final-manuscript.md`. The manuscript is a 
 - N36, N95: Free-tier evaluation conflict, uptime monitor.
 
 **Verify externally**
+
 - N35: Vercel Hobby, Supabase free tier and Gemini free tier terms.
 - N115: National Privacy Commission registration.
 

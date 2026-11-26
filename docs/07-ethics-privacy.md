@@ -4,16 +4,16 @@ Source: manuscript Section 3.15 (Table 10), with grill-me additions marked. The 
 
 ## Table 10. Summary of ethical safeguards
 
-| Safeguard | Main measure | Section |
-| --- | --- | --- |
-| Informed consent | Written consent from each respondent before the test. Privacy notice and consent at registration. | 3.15.1 |
-| Voluntary participation | Respondents may stop or skip any question at any time without penalty. | 3.15.2 |
-| Permissions | Written consent of the store owner. Permission before audio recording. | 3.15.3 |
-| Confidentiality | Anonymous questionnaire with codes R01 to R30. Group results only. | 3.15.4 |
-| Access control | Only the proponents and the capstone adviser access raw data. Role-based access in the system. | 3.15.5 |
-| Data minimization | Only data that the study and the system need. | 3.15.6 |
-| Retention and disposal | Study data kept only until the study is complete. Test data deleted after testing. | 3.15.9 |
-| Legal compliance | Compliance with RA 10173. | 3.15.10 |
+| Safeguard               | Main measure                                                                                      | Section |
+| ----------------------- | ------------------------------------------------------------------------------------------------- | ------- |
+| Informed consent        | Written consent from each respondent before the test. Privacy notice and consent at registration. | 3.15.1  |
+| Voluntary participation | Respondents may stop or skip any question at any time without penalty.                            | 3.15.2  |
+| Permissions             | Written consent of the store owner. Permission before audio recording.                            | 3.15.3  |
+| Confidentiality         | Anonymous questionnaire with codes R01 to R30. Group results only.                                | 3.15.4  |
+| Access control          | Only the proponents and the capstone adviser access raw data. Role-based access in the system.    | 3.15.5  |
+| Data minimization       | Only data that the study and the system need.                                                     | 3.15.6  |
+| Retention and disposal  | Study data kept only until the study is complete. Test data deleted after testing.                | 3.15.9  |
+| Legal compliance        | Compliance with RA 10173.                                                                         | 3.15.10 |
 
 ## Informed consent
 
@@ -59,6 +59,7 @@ Customers upload proof of payment as an image or PDF. Files are stored only in a
 The chatbot uses Google Gemini 2.5 Flash. A notice inside the chatbot says Gemini processes the chat text and tells users not to enter sensitive data (passwords, bank details, government ID numbers). The chatbot gives general guidance only. It gives no final price and promises no completion date. It refers price and inspection questions to the owner (FR-39, FR-40).
 
 **Additions:**
+
 - Say that on a free Gemini tier, Google may use text to improve its products. The notice must match the environment (N37). Verify the provider terms first (N35).
 - Say that the owner can read chat transcripts (N55).
 - Chat transcripts are linked to the customer and kept for 90 days, visible only to the owner and the account holder (N53, proposed).

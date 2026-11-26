@@ -14,33 +14,13 @@ colors:
   grey-800: "#262626"
   black: "#000000"
 typography:
-  display:
-    {
-      family: "Cormorant Garamond (provisional)",
-      weight: 500,
-      size: "40px / 48px",
-      tracking: "0",
-    }
-  heading:
-    {
-      family: "Cormorant Garamond (provisional)",
-      weight: 500,
-      size: "28px / 36px",
-    }
+  display: { family: "Cormorant Garamond (provisional)", weight: 500, size: "40px / 48px", tracking: "0" }
+  heading: { family: "Cormorant Garamond (provisional)", weight: 500, size: "28px / 36px" }
   title: { family: "Inter (provisional)", weight: 600, size: "18px / 26px" }
   body: { family: "Inter (provisional)", weight: 400, size: "16px / 26px" }
   small: { family: "Inter (provisional)", weight: 400, size: "14px / 22px" }
   caption: { family: "Inter (provisional)", weight: 500, size: "12px / 18px" }
-rounded:
-  {
-    none: "0",
-    sm: "2px",
-    md: "2px",
-    lg: "4px",
-    xl: "4px",
-    "2xl": "8px",
-    pill: "9999px (avatars only)",
-  }
+rounded: { none: "0", sm: "2px", md: "2px", lg: "4px", xl: "4px", "2xl": "8px", pill: "9999px (avatars only)" }
 spacing: { base: "4px", scale: "4, 8, 12, 16, 24, 32, 48, 64, 96" }
 ---
 
