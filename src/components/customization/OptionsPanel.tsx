@@ -114,8 +114,10 @@ function Choice({
       className={cn(
         // DESIGN.md §11: selected = 2 px black border + check icon + aria-checked (never colour alone).
         "relative rounded-none border bg-white text-sm transition-colors duration-150 hover:bg-grey-50",
-        selected ? "border-black pr-7 shadow-[inset_0_0_0_1px_#000]" : "border-grey-500",
+        selected ? "border-black shadow-[inset_0_0_0_1px_#000]" : "border-grey-500",
         className,
+        // Room for the check mark; applied after className so a caller padding (px-4) cannot remove it.
+        selected && "pr-7",
       )}
     >
       {children}
