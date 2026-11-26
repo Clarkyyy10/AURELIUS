@@ -16,9 +16,8 @@ export function DiamondMark({ className }: { className?: string }) {
 export const RingGlyph = DiamondMark;
 
 /**
- * The store logo (docs/design/DESIGN.md §3): diamond mark + "AFABLE" in the display face with wide
- * spacing, and "JEWELRY STORE" in small spaced capitals underneath. The accessible name is the full
- * store name.
+ * The store logo: "AFABLE" in the display face with wide letter spacing. The accessible name is the
+ * full store name, so screen readers still hear "Afable's Jewelry Store".
  */
 export function Logo({
   href = "/",
@@ -31,13 +30,10 @@ export function Logo({
   tone?: "dark" | "light";
   subline?: boolean;
 }) {
-  const sm = size === "sm";
   return (
-    <Link href={href} aria-label={brand.name} className={cn("inline-flex items-center gap-2.5 text-black no-underline", className)}>
-      <DiamondMark className={cn("mt-1 shrink-0", sm ? "size-5" : "size-6")} />
-      <span className="flex flex-col items-center leading-none" aria-hidden>
-        <span className={cn("font-heading font-medium tracking-[0.32em]", sm ? "text-xl" : "text-2xl")}>AFABLE</span>
-        <span className={cn("mt-1.5 font-sans font-medium tracking-[0.38em] text-grey-700", sm ? "text-[8px]" : "text-[9px]")}>JEWELRY STORE</span>
+    <Link href={href} aria-label={brand.name} className={cn("inline-flex items-center text-black no-underline", className)}>
+      <span aria-hidden className={cn("font-heading leading-none font-medium tracking-[0.32em]", size === "sm" ? "text-xl" : "text-2xl")}>
+        AFABLE
       </span>
     </Link>
   );
