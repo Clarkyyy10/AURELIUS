@@ -1,21 +1,63 @@
-// Prisma schema derived from docs/03-erd.md. Assumptions beyond the ERD are
-// listed in docs/08-decisions.md (D-44 to D-52) and are provisional.
-// Tables and columns are snake_case in the database (@@map, @map).
-// No migrations are applied yet: there is no database.
+// AURELIUS — Phase 2 database schema (DRAFT for review; not applied to any database yet).
+// Matches the ERD in the manuscript (V2 §3.11): users, custom_designs, orders, order_items, quotations,
+// payments, service_requests, chat_sessions, notifications, products, design_options, services —
+// plus the support tables the existing front end already relies on (marked "support").
+//
+// Supabase owns sign-in data in auth.users (passwords hashed with bcrypt). public.users.id is the same
+// UUID; the foreign key to auth.users and all Row Level Security policies are added in a raw SQL
+// migration (prisma/sql/rls.sql), because Prisma does not model the auth schema.
+// Money is numeric(12,2) pesos; weights are numeric(10,2) grams.
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL") // pooled connection (Supavisor, transaction mode) for the app
+  directUrl = env("DIRECT_URL") // direct connection for migrations
 }
+
+// ------------------------------------------------------------------ accounts (FR-41 to FR-46)
 
 enum Role {
   customer
   owner
 }
+
+/// ERD: users. One row per Supabase Auth user.
+model User {
+  id               String    @id @db.Uuid
+  role             Role      @default(customer)
+  fullName         String    @map("full_name") @db.VarChar(80)
+  email            String    @unique @db.VarChar(254) // copied from auth.users by a trigger
+  contactNumber    String    @map("contact_number") @db.VarChar(16)
+  privacyConsentAt DateTime  @map("privacy_consent_at") @db.Timestamptz // FR-45: required at sign-up
+  privacyNoticeVer String    @map("privacy_notice_version") @db.VarChar(20)
+  emailConfirmedAt DateTime? @map("email_confirmed_at") @db.Timestamptz // copied from auth.users by a trigger
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  orders          Order[]
+  customDesigns   CustomDesign[]
+  serviceRequests ServiceRequest[]
+  notifications   Notification[]
+  chatSessions    ChatSession[]
+
+  @@map("users")
+}
+
+/// Support: NFR "login blocked for 15 minutes after 5 consecutive failed attempts". Server-only.
+model LoginAttempt {
+  email         String    @id @db.VarChar(254)
+  failedCount   Int       @default(0) @map("failed_count")
+  lastFailedAt  DateTime? @map("last_failed_at") @db.Timestamptz
+  lockedUntil   DateTime? @map("locked_until") @db.Timestamptz
+
+  @@map("login_attempts")
+}
+
+// ------------------------------------------------------------------ catalog and options
 
 enum Availability {
   available
@@ -23,400 +65,400 @@ enum Availability {
   unavailable
 }
 
-enum DesignOptionKind {
-  material
-  color
-  gemstone
-  ring_size
-  ring_style
-}
-
-enum CustomDesignStatus {
-  draft
-  submitted
-  under_review
-  revision_requested
-  approved
-  rejected
-}
-
-enum CustomDesignSource {
-  viewer
-  chatbot
-  owner_entered
-}
-
-enum OrderType {
-  ready_made
-  custom
-}
-
-enum OrderSource {
-  viewer
-  owner_entered_outside_viewer
-}
-
-enum QuotationStatus {
-  issued
-  accepted
-  declined
-  expired
-}
-
-enum PaymentChannel {
-  cash
-  transfer
-}
-
-enum PaymentState {
-  pending
-  verified
-  rejected
-}
-
-enum PaymentSettlement {
-  refunded_full
-  refunded_part
-  retained
-}
-
-enum ChatRole {
-  customer
-  assistant
-}
-
-enum NotificationChannel {
-  in_app
-  email
-}
-
-// Profiles. A row with no auth_user_id is an owner-created walk-in profile (N30).
-// role is written only on the server (N67). auth_user_id refers to Supabase
-// auth.users, which Prisma does not model, so there is no foreign key.
-model User {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  role            Role      @default(customer)
-  fullName        String    @map("full_name")
-  contactNumber   String?   @map("contact_number")
-  email           String?
-  authUserId      String?   @unique @map("auth_user_id") @db.Uuid
-  linkedProfileId String?   @unique @map("linked_profile_id") @db.Uuid
-  consentRecorded Boolean   @default(false) @map("consent_recorded")
-  consentAt       DateTime? @map("consent_at") @db.Timestamptz(6)
-  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
-
-  linkedProfile   User?            @relation("ProfileLink", fields: [linkedProfileId], references: [id])
-  linkedFrom      User?            @relation("ProfileLink")
-  customDesigns   CustomDesign[]
-  orders          Order[]
-  serviceRequests ServiceRequest[]
-  chatSessions    ChatSession[]
-  notifications   Notification[]
-
-  @@map("users")
-}
-
+/// ERD: products (FR-12, FR-13, FR-24).
 model Product {
-  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String
-  description   String?
-  material      String?
-  price         Decimal      @db.Decimal(12, 2)
-  stockQuantity Int          @default(0) @map("stock_quantity")
-  availability  Availability @default(available)
-  archived      Boolean      @default(false)
-  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id           String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  slug         String       @unique @db.VarChar(120)
+  name         String       @db.VarChar(120)
+  description  String       @db.VarChar(2000)
+  category     String       @db.VarChar(20) // a product type key, e.g. "ring"
+  material     String       @db.VarChar(60)
+  price        Decimal      @db.Decimal(12, 2)
+  photos       String[] // storage references ("file:product-photos/…") or /placeholders/… paths
+  design       Json? // 3D appearance (partial DesignConfig)
+  availability Availability
+  hidden       Boolean      @default(false)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime     @updatedAt @map("updated_at") @db.Timestamptz
 
   orderItems OrderItem[]
 
+  @@index([hidden, availability])
   @@map("products")
 }
 
-model DesignOption {
-  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  kind           DesignOptionKind
-  name           String
-  rate           Decimal          @db.Decimal(12, 2)
-  densityOrCarat Decimal?         @map("density_or_carat") @db.Decimal(10, 4)
-  archived       Boolean          @default(false)
-  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
-
-  customDesigns CustomDesignOption[]
-
-  @@map("design_options")
-}
-
-model CustomDesign {
-  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId           String             @map("user_id") @db.Uuid
-  chatSessionId    String?            @map("chat_session_id") @db.Uuid
-  status           CustomDesignStatus @default(draft)
-  source           CustomDesignSource
-  selectedOptions  Json               @map("selected_options")
-  estimateSnapshot Json?              @map("estimate_snapshot")
-  notes            String?
-  submittedAt      DateTime?          @map("submitted_at") @db.Timestamptz(6)
-  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt        DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
-
-  user        User                 @relation(fields: [userId], references: [id])
-  chatSession ChatSession?         @relation(fields: [chatSessionId], references: [id])
-  options     CustomDesignOption[]
-  order       Order?
-
-  @@index([userId])
-  @@index([chatSessionId])
-  @@map("custom_designs")
-}
-
-// Explicit join table for the many-to-many "custom_designs uses design_options".
-model CustomDesignOption {
-  customDesignId String @map("custom_design_id") @db.Uuid
-  designOptionId String @map("design_option_id") @db.Uuid
-
-  customDesign CustomDesign @relation(fields: [customDesignId], references: [id], onDelete: Cascade)
-  designOption DesignOption @relation(fields: [designOptionId], references: [id])
-
-  @@id([customDesignId, designOptionId])
-  @@index([designOptionId])
-  @@map("custom_design_options")
-}
-
-// status is free text. The ready-made sequence is open (N45), so the allowed
-// values live in src/shared/status.ts, not in a database enum.
-model Order {
-  id                   String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId               String       @map("user_id") @db.Uuid
-  customDesignId       String?      @unique @map("custom_design_id") @db.Uuid
-  type                 OrderType
-  status               String
-  source               OrderSource?
-  claimCode            String?      @unique @map("claim_code")
-  totalPrice           Decimal?     @map("total_price") @db.Decimal(12, 2)
-  reservationExpiresAt DateTime?    @map("reservation_expires_at") @db.Timestamptz(6)
-  createdAt            DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt            DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
-
-  user         User          @relation(fields: [userId], references: [id])
-  customDesign CustomDesign? @relation(fields: [customDesignId], references: [id])
-  items        OrderItem[]
-  quotations   Quotation[]
-  payments     Payment[]
-  release      Release?
-
-  @@index([userId])
-  @@index([status])
-  @@map("orders")
-}
-
-model OrderItem {
-  id                String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  orderId           String  @map("order_id") @db.Uuid
-  productId         String  @map("product_id") @db.Uuid
-  quantity          Int
-  unitPriceSnapshot Decimal @map("unit_price_snapshot") @db.Decimal(12, 2)
-
-  order   Order   @relation(fields: [orderId], references: [id])
-  product Product @relation(fields: [productId], references: [id])
-
-  @@index([orderId])
-  @@index([productId])
-  @@map("order_items")
-}
-
+/// ERD: services (FR-25, FR-34).
 model Service {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String
-  description String?
-  archived    Boolean  @default(false)
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id          String   @id @db.VarChar(40) // e.g. "svc-cleaning"
+  name        String   @db.VarChar(60)
+  description String   @db.VarChar(600)
+  appliesTo   String[] @map("applies_to") // "jewelry" | "watch"
+  icon        String   @db.VarChar(40)
+  hidden      Boolean  @default(false)
+  sortOrder   Int      @map("sort_order")
 
-  serviceRequests ServiceRequest[]
+  requests ServiceRequestService[]
 
   @@map("services")
 }
 
-// status is free text validated against src/shared/status.ts (see Order).
-model ServiceRequest {
-  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId           String   @map("user_id") @db.Uuid
-  serviceId        String   @map("service_id") @db.Uuid
-  itemDescription  String   @map("item_description")
-  preliminaryRange String?  @map("preliminary_range")
-  status           String
-  claimCode        String?  @unique @map("claim_code")
-  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+enum OptionKind {
+  product_type
+  material
+  finish
+  gemstone
+  cut
+  size
+  font
+  chain_style
+  clasp
+  design // style, setting, band shape, shank, texture (D-25)
+}
 
-  user       User        @relation(fields: [userId], references: [id])
-  service    Service     @relation(fields: [serviceId], references: [id])
+/// ERD: design_options — every owner-configurable 3D option and rate (FR-01 to FR-04, FR-47).
+/// The kind-specific fields (rate per gram, weight factor, fee, stone rule…) live in `attributes` and
+/// are validated with zod plus validateOptions() before every save; the app reads them back as the
+/// existing CustomizationOptions type, so the estimate formula is unchanged.
+model DesignOption {
+  id         String     @id @db.VarChar(60) // keeps the seed IDs, e.g. "mat-18k", "style-ring-halo"
+  kind       OptionKind
+  label      String     @db.VarChar(60)
+  active     Boolean    @default(true)
+  sortOrder  Int        @map("sort_order")
+  attributes Json
+  updatedAt  DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@index([kind, sortOrder])
+  @@map("design_options")
+}
+
+// ------------------------------------------------------------------ orders and custom orders
+
+enum OrderKind {
+  product // FR-14: ready-made product order
+  custom // FR-07: custom order request from the customizer, catalog or chatbot
+}
+
+enum Actor {
+  customer
+  owner
+}
+
+/// ERD: orders — product orders and custom-order requests (one record each, FR-07).
+model Order {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code              String    @unique @db.VarChar(20) // OR-2026-0001 / CO-2026-0001
+  kind              OrderKind
+  customerId        String    @map("customer_id") @db.Uuid
+  status            String    @db.VarChar(30) // changed only through src/lib/status machines
+  source            String    @db.VarChar(20) // catalog | customizer | chatbot
+  basedOnProductId  String?   @map("based_on_product_id") @db.Uuid
+  notes             String?   @db.VarChar(500)
+  rejectionReason   String?   @map("rejection_reason") @db.VarChar(500)
+  clientRequestId   String    @unique @map("client_request_id") @db.VarChar(64) // no duplicates (NFR)
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  customer        User              @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  items           OrderItem[]
+  designs         CustomDesign[]
+  revisionRemarks RevisionRemark[]
+  quotations      Quotation[]
+  payments        Payment[]
+  history         StatusHistory[]
+
+  @@index([customerId, createdAt])
+  @@index([kind, status])
+  @@map("orders")
+}
+
+/// ERD: order_items — the product, price and photo captured when the order was placed.
+model OrderItem {
+  id          String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId     String  @map("order_id") @db.Uuid
+  productId   String  @map("product_id") @db.Uuid
+  productName String  @map("product_name") @db.VarChar(120)
+  unitPrice   Decimal @map("unit_price") @db.Decimal(12, 2)
+  photo       String
+  quantity    Int
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@map("order_items")
+}
+
+/// ERD: custom_designs — each submitted version of a custom order's design (FR-07, FR-10).
+model CustomDesign {
+  id              String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId         String   @map("order_id") @db.Uuid
+  customerId      String   @map("customer_id") @db.Uuid
+  version         Int
+  config          Json // DesignConfig
+  labels          Json // DesignLabels captured at submit time
+  estimateWeightG Decimal  @map("estimate_weight_g") @db.Decimal(10, 2) // recomputed on the server
+  estimatePrice   Decimal  @map("estimate_price") @db.Decimal(12, 2)
+  snapshotPath    String?  @map("snapshot_path") // private bucket "design-snapshots"
+  clientRequestId String?  @unique @map("client_request_id") @db.VarChar(64) // a repeated resubmit is saved once
+  submittedAt     DateTime @default(now()) @map("submitted_at") @db.Timestamptz
+
+  order    Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  customer User  @relation(fields: [customerId], references: [id], onDelete: Restrict)
+
+  @@unique([orderId, version])
+  @@map("custom_designs")
+}
+
+/// Support: the owner's revision remarks (FR-09).
+model RevisionRemark {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId   String   @map("order_id") @db.Uuid
+  text      String   @db.VarChar(1000)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("revision_remarks")
+}
+
+// ------------------------------------------------------------------ services
+
+enum ItemType {
+  jewelry
+  watch
+}
+
+/// ERD: service_requests (FR-26 to FR-33).
+model ServiceRequest {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code                 String    @unique @db.VarChar(20) // SR-2026-0001
+  customerId           String    @map("customer_id") @db.Uuid
+  itemType             ItemType  @map("item_type")
+  itemDescription      String    @map("item_description") @db.VarChar(300)
+  brandModel           String?   @map("brand_model") @db.VarChar(80)
+  material             String?   @db.VarChar(80)
+  details              String    @db.VarChar(1000)
+  photos               String[] // private bucket "service-photos"
+  preferredDropOffDate DateTime? @map("preferred_drop_off_date") @db.Date
+  droppedOffAt         DateTime? @map("dropped_off_at") @db.Date
+  source               String    @db.VarChar(20) // form | chatbot
+  status               String    @db.VarChar(30)
+  clientRequestId      String    @unique @map("client_request_id") @db.VarChar(64)
+  createdAt            DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt            DateTime  @updatedAt @map("updated_at") @db.Timestamptz
+
+  customer   User                    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  services   ServiceRequestService[]
   quotations Quotation[]
   payments   Payment[]
-  release    Release?
+  history    StatusHistory[]
 
-  @@index([userId])
-  @@index([serviceId])
+  @@index([customerId, createdAt])
   @@index([status])
   @@map("service_requests")
 }
 
-// Belongs to exactly one of an order or a service request. Prisma cannot express
-// that rule; the SQL migration will add a CHECK constraint.
+/// Support: which catalog services a request asks for (many-to-many).
+model ServiceRequestService {
+  serviceRequestId String @map("service_request_id") @db.Uuid
+  serviceId        String @map("service_id") @db.VarChar(40)
+
+  serviceRequest ServiceRequest @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
+  service        Service        @relation(fields: [serviceId], references: [id], onDelete: Restrict)
+
+  @@id([serviceRequestId, serviceId])
+  @@map("service_request_services")
+}
+
+// ------------------------------------------------------------------ quotations and payments
+
+/// ERD: quotations (FR-15, FR-16, FR-27, FR-28). Exactly one of orderId / serviceRequestId is set
+/// (check constraint in SQL). A re-issued quotation keeps the old one with isCurrent = false.
 model Quotation {
-  id                 String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  orderId            String?         @map("order_id") @db.Uuid
-  serviceRequestId   String?         @map("service_request_id") @db.Uuid
-  finalPrice         Decimal         @map("final_price") @db.Decimal(12, 2)
-  downPayment        Decimal         @map("down_payment") @db.Decimal(12, 2)
-  expectedCompletion DateTime?       @map("expected_completion") @db.Date
-  rateSnapshot       Json            @map("rate_snapshot")
-  validUntil         DateTime        @map("valid_until") @db.Timestamptz(6)
-  status             QuotationStatus @default(issued)
-  createdAt          DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt          DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId             String?   @map("order_id") @db.Uuid
+  serviceRequestId    String?   @map("service_request_id") @db.Uuid
+  finalPrice          Decimal   @map("final_price") @db.Decimal(12, 2)
+  downPaymentRequired Decimal   @map("down_payment_required") @db.Decimal(12, 2)
+  expectedDate        DateTime  @map("expected_date") @db.Date
+  procedure           String?   @db.VarChar(1000)
+  notes               String?   @db.VarChar(1000)
+  isCurrent           Boolean   @default(true) @map("is_current")
+  responseDecision    String?   @map("response_decision") @db.VarChar(10) // accepted | declined
+  responseReason      String?   @map("response_reason") @db.VarChar(500)
+  respondedAt         DateTime? @map("responded_at") @db.Timestamptz
+  issuedAt            DateTime  @default(now()) @map("issued_at") @db.Timestamptz
 
-  order          Order?          @relation(fields: [orderId], references: [id])
-  serviceRequest ServiceRequest? @relation(fields: [serviceRequestId], references: [id])
-  payments       Payment[]
+  order          Order?          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  serviceRequest ServiceRequest? @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
 
-  @@index([orderId])
-  @@index([serviceRequestId])
   @@map("quotations")
 }
 
-// Belongs to an order or a service request, directly or through a quotation.
-// Ready-made orders skip the quotation, so order_id and service_request_id are
-// on the payment itself. reference_number is unique across payments (N22).
-// Reuse after a rejected proof is open (N24).
+enum PaymentKind {
+  down_payment
+  full_payment
+  balance
+}
+
+enum PaymentStatus {
+  pending_verification
+  verified
+  rejected
+}
+
+enum PaymentMethod {
+  gcash
+  bank_transfer
+  cash_in_store
+}
+
+/// ERD: payments (FR-17, FR-18, FR-30). Recording and verification only — no payment gateway.
 model Payment {
-  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  orderId          String?            @map("order_id") @db.Uuid
-  serviceRequestId String?            @map("service_request_id") @db.Uuid
-  quotationId      String?            @map("quotation_id") @db.Uuid
-  amount           Decimal            @db.Decimal(12, 2)
-  paidOn           DateTime           @map("paid_on") @db.Date
-  channel          PaymentChannel
-  referenceNumber  String?            @unique @map("reference_number")
-  proofPath        String?            @map("proof_path")
-  state            PaymentState       @default(pending)
-  rejectionReason  String?            @map("rejection_reason")
-  settlement       PaymentSettlement?
-  settlementAmount Decimal?           @map("settlement_amount") @db.Decimal(12, 2)
-  settlementReason String?            @map("settlement_reason")
-  createdAt        DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt        DateTime           @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId          String?       @map("order_id") @db.Uuid
+  serviceRequestId String?       @map("service_request_id") @db.Uuid
+  kind             PaymentKind
+  amount           Decimal       @db.Decimal(12, 2)
+  paidOn           DateTime      @map("paid_on") @db.Date
+  method           PaymentMethod
+  referenceNumber  String?       @map("reference_number") @db.VarChar(60)
+  proofPath        String?       @map("proof_path") // private bucket "payment-proofs", signed links only
+  proofName        String?       @map("proof_name") @db.VarChar(200)
+  proofType        String?       @map("proof_type") @db.VarChar(30) // image/jpeg | image/png | application/pdf
+  proofSizeBytes   Int?          @map("proof_size_bytes")
+  recordedBy       Actor         @map("recorded_by")
+  status           PaymentStatus
+  rejectionReason  String?       @map("rejection_reason") @db.VarChar(500)
+  verifiedAt       DateTime?     @map("verified_at") @db.Timestamptz
+  clientRequestId  String?       @unique @map("client_request_id") @db.VarChar(64)
+  createdAt        DateTime      @default(now()) @map("created_at") @db.Timestamptz
 
-  order          Order?          @relation(fields: [orderId], references: [id])
-  serviceRequest ServiceRequest? @relation(fields: [serviceRequestId], references: [id])
-  quotation      Quotation?      @relation(fields: [quotationId], references: [id])
+  order          Order?          @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  serviceRequest ServiceRequest? @relation(fields: [serviceRequestId], references: [id], onDelete: Restrict)
 
-  @@index([orderId])
-  @@index([serviceRequestId])
-  @@index([quotationId])
-  @@index([state])
+  @@index([status])
   @@map("payments")
 }
 
-// Release record (N86). One per released order or service request.
-model Release {
-  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  orderId           String?  @unique @map("order_id") @db.Uuid
-  serviceRequestId  String?  @unique @map("service_request_id") @db.Uuid
-  recipientName     String   @map("recipient_name")
-  isRepresentative  Boolean  @default(false) @map("is_representative")
-  authorizationSeen Boolean  @default(false) @map("authorization_seen")
-  balancePaid       Decimal  @map("balance_paid") @db.Decimal(12, 2)
-  releasedAt        DateTime @default(now()) @map("released_at") @db.Timestamptz(6)
+/// Support: every status change with who made it (FR-19, FR-29, FR-31 tracking timeline).
+model StatusHistory {
+  id               String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId          String?  @map("order_id") @db.Uuid
+  serviceRequestId String?  @map("service_request_id") @db.Uuid
+  status           String   @db.VarChar(30)
+  actor            Actor
+  note             String?  @db.VarChar(500)
+  at               DateTime @default(now()) @db.Timestamptz
 
-  order          Order?          @relation(fields: [orderId], references: [id])
-  serviceRequest ServiceRequest? @relation(fields: [serviceRequestId], references: [id])
+  order          Order?          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  serviceRequest ServiceRequest? @relation(fields: [serviceRequestId], references: [id], onDelete: Cascade)
 
-  @@map("releases")
+  @@map("status_history")
 }
 
-model ChatSession {
+/// Support: yearly counters for readable codes (OR-, CO-, SR-). Server-only.
+model CodeCounter {
+  prefix String @db.VarChar(4)
+  year   Int
+  last   Int    @default(0)
+
+  @@id([prefix, year])
+  @@map("code_counters")
+}
+
+// ------------------------------------------------------------------ notifications and email
+
+/// ERD: notifications (FR-49, FR-50). Published to Supabase Realtime for the bell.
+model Notification {
   id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userId    String   @map("user_id") @db.Uuid
-  startedAt DateTime @default(now()) @map("started_at") @db.Timestamptz(6)
-  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  type      String   @db.VarChar(40)
+  title     String   @db.VarChar(120)
+  body      String   @db.VarChar(500)
+  link      String   @db.VarChar(200)
+  channels  String[] // in_app, email
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
 
-  user          User           @relation(fields: [userId], references: [id])
-  messages      ChatMessage[]
-  customDesigns CustomDesign[]
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@index([expiresAt])
-  @@map("chat_sessions")
-}
-
-model ChatMessage {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  sessionId String   @map("session_id") @db.Uuid
-  role      ChatRole
-  content   String
-  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-
-  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
-  @@index([sessionId])
-  @@map("chat_messages")
-}
-
-model Notification {
-  id        String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId    String              @map("user_id") @db.Uuid
-  event     String
-  channel   NotificationChannel
-  readAt    DateTime?           @map("read_at") @db.Timestamptz(6)
-  createdAt DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
-
-  user User @relation(fields: [userId], references: [id])
-
-  @@index([userId])
+  @@index([userId, createdAt])
   @@map("notifications")
 }
 
-// Owner-editable settings. The store holds one row. The day counts and the
-// refund policy text have no defaults because their values are open decisions.
-model AppSettings {
-  id                 String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  reservationDays    Int      @map("reservation_days")
-  quotationValidDays Int      @map("quotation_valid_days")
-  unclaimedDays      Int      @map("unclaimed_days")
-  refundPolicyText   String   @map("refund_policy_text")
-  updatedAt          DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+/// Support: emails are written here inside the same transaction as the change, then sent through
+/// Resend after it commits (retried by a daily job), so a failed email never undoes a saved record.
+model EmailOutbox {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  toEmail    String    @map("to_email") @db.VarChar(254)
+  template   String    @db.VarChar(40)
+  subject    String    @db.VarChar(200)
+  payload    Json // template fields only (code, status, link) — no extra personal data
+  status     String    @default("pending") @db.VarChar(12) // pending | sent | failed
+  attempts   Int       @default(0)
+  providerId String?   @map("provider_id") @db.VarChar(80)
+  lastError  String?   @map("last_error") @db.VarChar(500)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  sentAt     DateTime? @map("sent_at") @db.Timestamptz
 
-  paymentAccounts PaymentAccount[]
-  faq             StoreFaq[]
-
-  @@map("app_settings")
+  @@index([status, createdAt])
+  @@map("email_outbox")
 }
 
-model PaymentAccount {
-  id            String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  settingsId    String @map("settings_id") @db.Uuid
-  channel       String
-  accountName   String @map("account_name")
-  accountNumber String @map("account_number")
+// ------------------------------------------------------------------ chatbot
 
-  settings AppSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+/// ERD: chat_sessions. DECISION NEEDED (conflicts with D-12): proposed option B — keep only session
+/// metadata (no message text): when, how many messages, which drafts were sent, whether the bot
+/// referred the customer to the owner. See docs/phase2-plan.md §6.
+model ChatSession {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String?   @map("user_id") @db.Uuid // null for guests
+  startedAt       DateTime  @default(now()) @map("started_at") @db.Timestamptz
+  lastMessageAt   DateTime  @default(now()) @map("last_message_at") @db.Timestamptz
+  messageCount    Int       @default(0) @map("message_count")
+  referredToOwner Int       @default(0) @map("referred_to_owner")
+  draftsSent      String[]  @map("drafts_sent") // request codes, e.g. CO-2026-0014
+  usedFallback    Int       @default(0) @map("used_fallback") // times Gemini failed and the scripted bot answered
 
-  @@index([settingsId])
-  @@map("payment_accounts")
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("chat_sessions")
 }
 
-model StoreFaq {
-  id         String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  settingsId String @map("settings_id") @db.Uuid
-  question   String
-  answer     String
+/// Support: per-user / per-IP chatbot rate limit windows. Server-only.
+model RateLimit {
+  key         String   @db.VarChar(120)
+  windowStart DateTime @map("window_start") @db.Timestamptz
+  count       Int      @default(0)
 
-  settings AppSettings @relation(fields: [settingsId], references: [id], onDelete: Cascade)
+  @@id([key, windowStart])
+  @@map("rate_limits")
+}
 
-  @@index([settingsId])
-  @@map("store_faq")
+/// Support: chatbot knowledge entries (FR-38), edited by the owner.
+model Faq {
+  id       String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  question String   @db.VarChar(200)
+  answer   String   @db.VarChar(1500)
+  keywords String[]
+  active   Boolean  @default(true)
+
+  @@map("faqs")
+}
+
+/// Support: store settings and policies (single row, id = 1).
+model StoreSettings {
+  id                  Int      @id @default(1)
+  storeName           String   @map("store_name") @db.VarChar(80)
+  address             String   @db.VarChar(200)
+  contactNumber       String   @map("contact_number") @db.VarChar(20)
+  email               String   @db.VarChar(254)
+  openingHours        String   @map("opening_hours") @db.VarChar(200)
+  paymentInstructions String   @map("payment_instructions") @db.VarChar(1000)
+  claimingNote        String   @map("claiming_note") @db.VarChar(300)
+  policies            String   @db.VarChar(4000)
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("store_settings")
 }

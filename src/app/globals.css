@@ -1,14 +1,42 @@
-@import "tailwindcss" source("../");
+@import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
 /*
- * Design tokens from DESIGN.md sections 4, 5, 6 and 12.
- * Light only. Black, white and greys only: no chroma, no gold, no dark mode.
- * No `.dark` block, no `dark:` variant, no `prefers-color-scheme: dark`.
+ * Design tokens — docs/design/DESIGN.md (the UI/UX of the team's afable-jewelry-store repository,
+ * decision D-30). Quiet luxury: light only, black, white and greys only. No gold, no other accent,
+ * no dark mode. Colour appears only in product photos, metal and gemstone swatches and the 3D scene.
+ *
+ * The older token names (gold, emerald, ivory, paper, ink, line, success, warning, danger, info) are
+ * kept so existing components compile, but every one now maps to a neutral value. Status and
+ * validation are told apart by label, icon, border style, weight and fill — never by colour
+ * (DESIGN.md §11).
  */
-
 :root {
+  /* neutral scale (DESIGN.md §4) */
+  --grey-50: #fafafa;
+  --grey-100: #f5f5f5;
+  --grey-200: #e5e5e5;
+  --grey-300: #d4d4d4;
+  --grey-400: #a3a3a3;
+  --grey-500: #8c8c8c;
+  --grey-600: #525252;
+  --grey-800: #262626;
+
+  /* legacy names, all neutral now */
+  --ivory: var(--grey-50); /* subtle band behind sections */
+  --paper: #ffffff;
+  --ink: #000000;
+  --muted-ink: var(--grey-600);
+  --line: var(--grey-200); /* decoration only */
+  --gold: var(--grey-600); /* former accent: secondary icons */
+  --gold-dark: #000000; /* former accent text and links: black */
+  --emerald: #000000; /* former primary: black */
+  --success: #000000;
+  --warning: #000000;
+  --danger: #000000;
+  --info: #000000;
+
   --background: #ffffff;
   --foreground: #000000;
   --card: #ffffff;
@@ -17,55 +45,61 @@
   --popover-foreground: #000000;
   --primary: #000000;
   --primary-foreground: #ffffff;
-  --primary-active: #262626;
-  --secondary: #f5f5f5;
+  --primary-active: var(--grey-800);
+  --secondary: var(--grey-100);
   --secondary-foreground: #000000;
-  --muted: #f5f5f5;
-  --muted-foreground: #525252;
-  --accent: #f5f5f5;
+  --muted: var(--grey-100);
+  --muted-foreground: var(--grey-600);
+  --accent: var(--grey-100);
   --accent-foreground: #000000;
-  --destructive: #000000; /* no red: errors use border, icon and label (DESIGN.md section 11) */
-  --border: #e5e5e5; /* decoration only */
-  --input: #8c8c8c; /* control borders, 3:1 or more */
+  --destructive: #000000; /* no red: destructive actions are outline buttons with a trash icon */
+  --border: var(--grey-200); /* decoration */
+  --input: var(--grey-500); /* control borders, 3:1 or more */
   --ring: #000000;
-  --chart-1: #000000;
-  --chart-2: #525252;
-  --chart-3: #8c8c8c;
-  --chart-4: #d4d4d4;
-  --chart-5: #f5f5f5;
+  --radius: 2px;
   --sidebar: #ffffff;
   --sidebar-foreground: #000000;
   --sidebar-primary: #000000;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f5f5f5;
+  --sidebar-accent: var(--grey-100);
   --sidebar-accent-foreground: #000000;
-  --sidebar-border: #e5e5e5;
+  --sidebar-border: var(--grey-200);
   --sidebar-ring: #000000;
-  --radius: 2px;
 }
 
-/* Drop Tailwind's default palette so raw colors such as bg-red-500 cannot compile. */
 @theme {
-  --color-*: initial;
-  --color-transparent: transparent;
-  --color-current: currentColor;
-  --color-white: #ffffff;
-  --color-black: #000000;
-  --color-grey-50: #fafafa;
-  --color-grey-100: #f5f5f5;
-  --color-grey-200: #e5e5e5;
-  --color-grey-300: #d4d4d4;
-  --color-grey-400: #a3a3a3;
-  --color-grey-500: #8c8c8c;
-  --color-grey-600: #525252;
-  --color-grey-800: #262626;
-
+  /* Hairline first: no shadows on surfaces; overlays only get the level-1 shadow (DESIGN.md §6). */
   --shadow-xs: 0 0 #0000;
   --shadow-sm: 0 0 #0000;
+  --shadow-md: 0 0 #0000;
+  --shadow: 0 0 #0000;
   --shadow-lg: 0 4px 16px rgb(0 0 0 / 0.12);
+  --shadow-xl: 0 4px 16px rgb(0 0 0 / 0.12);
+  --shadow-2xl: 0 4px 16px rgb(0 0 0 / 0.12);
 }
 
 @theme inline {
+  --color-grey-50: var(--grey-50);
+  --color-grey-100: var(--grey-100);
+  --color-grey-200: var(--grey-200);
+  --color-grey-300: var(--grey-300);
+  --color-grey-400: var(--grey-400);
+  --color-grey-500: var(--grey-500);
+  --color-grey-600: var(--grey-600);
+  --color-grey-800: var(--grey-800);
+
+  --color-ivory: var(--ivory);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-line: var(--line);
+  --color-gold: var(--gold);
+  --color-gold-dark: var(--gold-dark);
+  --color-emerald: var(--emerald);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -85,11 +119,6 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
@@ -99,85 +128,73 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* Cormorant Garamond for headings and the wordmark, Inter for everything else (DESIGN.md §5). */
+  --font-sans: var(--font-inter);
+  --font-heading: var(--font-cormorant);
+  --font-display: var(--font-cormorant);
+
+  /* Near square (DESIGN.md §6): 2 px controls and badges, 4 px cards and dialogs, 8 px toasts and chat. */
   --radius-sm: 2px;
   --radius-md: 2px;
   --radius-lg: 4px;
   --radius-xl: 4px;
   --radius-2xl: 8px;
   --radius-3xl: 8px;
-  --radius-4xl: 4px; /* badges are not pills in this system */
-
-  /*
-   * Fonts. The two next/font variables are declared in src/config/fonts.ts.
-   * To swap typefaces (D-38), change that one file only.
-   */
-  --font-sans: var(--font-face-body);
-  --font-heading: var(--font-face-body); /* small titles stay sans */
-  --font-display: var(--font-face-display); /* headings, wordmark */
+  --radius-4xl: 4px;
 }
 
-/* Type scale, DESIGN.md section 5. Mobile first, desktop from 1024 px. */
+/* Type scale, DESIGN.md §5. Mobile first, desktop from 1024 px. */
 @utility type-display {
-  font-family: var(--font-display);
+  font-family: var(--font-cormorant), Georgia, serif;
   font-size: 2rem;
   line-height: 2.5rem;
   font-weight: 500;
-  letter-spacing: 0;
   @media (min-width: 64rem) {
     font-size: 2.5rem;
     line-height: 3rem;
   }
 }
+/* Page titles on the storefront (Shop, Customize, Services, Track, Sign in). */
+@utility type-hero {
+  font-family: var(--font-cormorant), Georgia, serif;
+  font-size: 2.75rem;
+  line-height: 3.25rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  @media (min-width: 64rem) {
+    font-size: 4.25rem;
+    line-height: 4.75rem;
+  }
+}
 @utility type-heading {
-  font-family: var(--font-display);
+  font-family: var(--font-cormorant), Georgia, serif;
   font-size: 1.5rem;
   line-height: 2rem;
   font-weight: 500;
-  letter-spacing: 0;
   @media (min-width: 64rem) {
     font-size: 1.75rem;
     line-height: 2.25rem;
   }
 }
 @utility type-title {
-  font-family: var(--font-sans);
   font-size: 1.125rem;
   line-height: 1.625rem;
   font-weight: 600;
 }
-@utility type-body {
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  line-height: 1.625rem;
-  font-weight: 400;
-}
 @utility type-small {
-  font-family: var(--font-sans);
   font-size: 0.875rem;
   line-height: 1.375rem;
-  font-weight: 400;
 }
 @utility type-caption {
-  font-family: var(--font-sans);
   font-size: 0.75rem;
   line-height: 1.125rem;
   font-weight: 500;
 }
 
-/* Prices and other amounts: body sans, tabular figures (DESIGN.md section 5). */
-@utility type-amount {
-  font-family: var(--font-sans);
-  font-variant-numeric: tabular-nums;
-}
-
-/* Diagonal hatch for the Rejected and Cancelled status treatments (docs/12 section 2.3). */
+/* Diagonal hatch for the Rejected and Cancelled status treatments (DESIGN.md §11). */
 @utility status-hatch {
-  background-color: var(--color-white);
-  background-image: repeating-linear-gradient(
-    45deg,
-    var(--color-grey-300) 0 1px,
-    transparent 1px 6px
-  );
+  background-color: #ffffff;
+  background-image: repeating-linear-gradient(45deg, var(--grey-300) 0 1px, transparent 1px 6px);
 }
 
 @layer base {
@@ -186,8 +203,8 @@
   }
   html {
     @apply font-sans antialiased;
-    scroll-padding-top: 4rem; /* header height, keeps focus visible under the sticky header */
     color-scheme: light;
+    scroll-padding-top: 4rem; /* header height: keeps focused fields visible under the sticky header */
   }
   @media (min-width: 64rem) {
     html {
@@ -195,13 +212,30 @@
     }
   }
   body {
-    @apply type-body bg-background text-foreground;
+    @apply bg-background text-foreground;
+    font-size: 16px;
+    line-height: 1.625;
+  }
+  h1,
+  h2,
+  h3,
+  .font-heading {
+    font-family: var(--font-cormorant), Georgia, serif;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: 0;
+  }
+  a {
+    text-underline-offset: 4px;
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 }
 
 /*
- * Global focus indicator, DESIGN.md section 11. Unlayered on purpose so it wins
- * over component utilities. Never removed without a replacement.
+ * Global focus indicator, DESIGN.md §11: 2 px black outline, 2 px gap and a white outer ring, so it
+ * shows on white, grey, photos and black buttons. Unlayered on purpose so it wins over utilities.
  */
 :focus-visible {
   outline: 2px solid #000000;
@@ -211,11 +245,11 @@
 
 @media (prefers-reduced-motion: reduce) {
   *,
-  ::before,
-  ::after {
+  *::before,
+  *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

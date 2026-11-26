@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="Pendant placeholder image">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="70%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#F1EBE1"/></radialGradient>
+    <linearGradient id="m" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F4F4F6"/><stop offset=".55" stop-color="#B9BCC4"/><stop offset="1" stop-color="#7D818B"/></linearGradient>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCE4F0"/></linearGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#bg)"/>
+  <ellipse cx="300" cy="500" rx="170" ry="16" fill="#1C1B19" opacity=".06"/>
+  <path d="M140 90 Q300 260 460 90" fill="none" stroke="url(#m)" stroke-width="5"/>
+    <circle cx="300" cy="225" r="16" fill="none" stroke="url(#m)" stroke-width="8"/>
+    <path d="M300 250 C390 250 410 360 300 440 C190 360 210 250 300 250 Z" fill="url(#m)"/><polygon points="300,288 339.9,317.4 325.2,365.7 274.8,365.7 260.1,317.4" fill="url(#g)" stroke="#9FB0C8" stroke-width="2"/>
+  <polyline points="260.1,317.4 300,338.4 339.9,317.4" fill="none" stroke="#9FB0C8" stroke-width="1.5"/>
+  <line x1="300" y1="288" x2="300" y2="338.4" stroke="#9FB0C8" stroke-width="1.5"/>
+</svg>

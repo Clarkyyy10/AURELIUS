@@ -1,9 +1,8 @@
-// The store name lives here once. Page titles, metadata and the Wordmark read
-// from it (DESIGN.md section 3). The only customer-facing name is
-// "Afable's Jewelry Store". The research title is not a brand and never
-// appears in the interface.
+// The store name lives here once (docs/design/DESIGN.md §2–3). The only customer-facing name is
+// "Afable's Jewelry Store". AURELIUS is the research title and internal code name: it never appears in
+// rendered text, page titles, metadata, emails or chatbot replies.
 export const brand = {
   name: "Afable's Jewelry Store",
   description:
-    "3D ring customization, online ordering, and jewelry and watch service tracking for Afable's Jewelry Store.",
+    "Design a piece in 3D, order from the collection, or request a jewelry or watch service at Afable's Jewelry Store in Montalban Public Market, Rizal.",
 } as const;

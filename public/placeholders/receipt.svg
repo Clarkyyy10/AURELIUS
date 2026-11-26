@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 640" role="img" aria-label="Sample GCash receipt">
+  <rect width="360" height="640" fill="#F4F7FB"/>
+  <rect x="0" y="0" width="360" height="120" fill="#0A5DE8"/>
+  <text x="180" y="72" fill="#fff" font-family="Arial" font-size="28" text-anchor="middle" font-weight="700">Payment sent</text>
+  <rect x="24" y="150" width="312" height="400" rx="16" fill="#fff"/>
+  <text x="180" y="215" font-family="Arial" font-size="40" text-anchor="middle" font-weight="700" fill="#1C1B19">₱ 500.00</text>
+  <text x="48" y="290" font-family="Arial" font-size="16" fill="#6B665E">To</text>
+  <text x="312" y="290" font-family="Arial" font-size="16" text-anchor="end" fill="#1C1B19">Afable's Jewelry</text>
+  <text x="48" y="340" font-family="Arial" font-size="16" fill="#6B665E">Ref. No.</text>
+  <text x="312" y="340" font-family="Arial" font-size="16" text-anchor="end" fill="#1C1B19">9100023757</text>
+  <text x="48" y="390" font-family="Arial" font-size="16" fill="#6B665E">Date</text>
+  <text x="312" y="390" font-family="Arial" font-size="16" text-anchor="end" fill="#1C1B19">Sample receipt</text>
+  <text x="180" y="600" font-family="Arial" font-size="13" text-anchor="middle" fill="#6B665E">Demo image — not a real transaction</text>
+</svg>
